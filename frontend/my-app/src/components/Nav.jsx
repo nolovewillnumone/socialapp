@@ -8,7 +8,7 @@ export default function Nav({ page, setPage }) {
         <button className="nav-link" onClick={() => setPage("quiz")}>Тест Талантов</button>
         <button className="nav-link" onClick={() => setPage("tasks")}>Игры</button>
         <button className="nav-link">О проекте</button>
-        <button className="nav-btn" onClick={() => setPage(page === "home" ? "quiz" : "results")}>
+        <button className="nav-btn" onClick={() => setPage("Authpage")}>
           Войти
         </button>
       </div>
