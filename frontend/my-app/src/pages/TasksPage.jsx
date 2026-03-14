@@ -246,71 +246,149 @@ const G = {
   optWrong: { background:"#FFEBEE", borderColor:"#EF5350", color:"#C62828" },
   emojiBtn: { fontSize:"1.6rem", border:"2px solid #E3F2FD", borderRadius:12, background:"#F8FBFF", cursor:"pointer", padding:"8px", transition:"transform 0.15s" },
   textarea: { width:"100%", minHeight:120, padding:"12px 14px", border:"2px solid #E3F2FD", borderRadius:14, fontFamily:"'Nunito',sans-serif", fontSize:"0.92rem", fontWeight:600, resize:"none", outline:"none", color:"#37474F" },
-  finBtn:   { padding:"13px 32px", background:"linear-gradient(135deg,#1565C0,#1976D2)", color:"#fff", border:"none", borderRadius:"50px", fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(21,101,192,0.3)" },
+  finBtn:   { padding:"13px 32px", background:"linear-gradient(135deg,#1565C0,#1976D2)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(21,101,192,0.3)" },
 };
 
 // ── Nearby Establishments ─────────────────────────────────────────────────────
+// Course types to search for in any city
+const COURSE_TYPES = [
+  { key:"coding",    emoji:"💻", query:"coding school children",    ru:"Программирование", uz:"Dasturlash",    en:"Coding"     },
+  { key:"robotics",  emoji:"🤖", query:"robotics kids club",        ru:"Робототехника",    uz:"Robototexnika", en:"Robotics"   },
+  { key:"chess",     emoji:"🏆", query:"chess school",              ru:"Шахматы",          uz:"Shaxmat",       en:"Chess"      },
+  { key:"music",     emoji:"🎵", query:"music school children",     ru:"Музыкальная школа",uz:"Musiqa maktabi",en:"Music"      },
+  { key:"art",       emoji:"🎨", query:"art school children",       ru:"Школа рисования",  uz:"Rasm maktabi",  en:"Art school" },
+  { key:"math",      emoji:"🔢", query:"math olympiad center kids", ru:"Олимпиадная математика", uz:"Matematika olimpiadasi", en:"Math olympiad"},
+];
+
 function EstablishmentsMap({ lang }) {
-  const [status, setStatus] = useState("idle");
-  const PLACES = [
-    { name:"IT School Uzbekistan",    type:{ru:"Программирование", uz:"Dasturlash",    en:"Coding"},    dist:"1.2 km", emoji:"💻" },
-    { name:"Robotics Hub Tashkent",   type:{ru:"Робототехника",    uz:"Robototexnika", en:"Robotics"},  dist:"2.8 km", emoji:"🤖" },
-    { name:"Chess Academy",           type:{ru:"Шахматы",          uz:"Shaxmat",       en:"Chess"},     dist:"0.9 km", emoji:"🏆" },
-    { name:"Music School No.5",       type:{ru:"Музыка",           uz:"Musiqa",        en:"Music"},     dist:"1.5 km", emoji:"🎵" },
-    { name:"Art Studio Palitra",      type:{ru:"Рисование",        uz:"Rasm",          en:"Art"},       dist:"3.1 km", emoji:"🎨" },
-    { name:"Math Olympiad Center",    type:{ru:"Математика",       uz:"Matematika",    en:"Math"},      dist:"2.2 km", emoji:"🔢" },
-  ];
+  const [step, setStep]     = useState("pick");   // pick | gps | done
+  const [city, setCity]     = useState("");
+  const [input, setInput]   = useState("");
+  const [gpsErr, setGpsErr] = useState(false);
 
   const L = {
-    btn:     { ru:"📍 Найти рядом", uz:"📍 Yaqinimni top", en:"📍 Find near me" },
-    title:   { ru:"Курсы рядом с вами", uz:"Sizga yaqin kurslar", en:"Courses near you" },
-    loading: { ru:"Определяем местоположение...", uz:"Joylashuv aniqlanmoqda...", en:"Finding your location..." },
-    open:    { ru:"На карте ↗", uz:"Xaritada ↗", en:"View map ↗" },
-    dist:    { ru:"от вас", uz:"uzoqlikda", en:"away" },
+    title:      { ru:"Курсы рядом с тобой",       uz:"Yaqingingizdagi kurslar",     en:"Courses near you"           },
+    subtitle:   { ru:"Введи свой город или используй GPS", uz:"Shahar kiriting yoki GPS ishlating", en:"Enter your city or use GPS" },
+    placeholder:{ ru:"Например: Ташкент, Самарканд...", uz:"Masalan: Toshkent, Samarqand...", en:"e.g. Tashkent, Samarkand..." },
+    searchBtn:  { ru:"Найти курсы",               uz:"Kurslarni topish",             en:"Find courses"               },
+    gpsBtn:     { ru:"Использовать GPS",          uz:"GPS ishlatish",                en:"Use GPS"                    },
+    gpsErr:     { ru:"GPS недоступен. Введи город вручную.", uz:"GPS ishlamadi. Shaharni qo'lda kiriting.", en:"GPS unavailable. Enter city manually." },
+    searching:  { ru:"Ищем курсы в",             uz:"Kurslar qidirilmoqda:",         en:"Searching courses in"       },
+    open:       { ru:"Открыть карту ↗",          uz:"Xaritani ochish ↗",            en:"Open map ↗"                 },
+    change:     { ru:"Изменить город",            uz:"Shaharni ozgartirish",          en:"Change city"                },
+    results:    { ru:"курсов найдено в",          uz:"ta kurs topildi:",              en:"courses found in"           },
   };
 
-  const find = () => {
-    setStatus("loading");
-    setTimeout(() => setStatus("done"), 1200); // simulate geolocation
+  const useGPS = () => {
+    setStep("gps");
+    setGpsErr(false);
+    if (!navigator.geolocation) { setGpsErr(true); setStep("pick"); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        // Reverse geocode using nominatim (free, no key needed)
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`)
+          .then((r) => r.json())
+          .then((d) => {
+            const detected = d.address?.city || d.address?.town || d.address?.village || d.address?.county || "Tashkent";
+            setCity(detected);
+            setStep("done");
+          })
+          .catch(() => { setCity("Tashkent"); setStep("done"); });
+      },
+      () => { setGpsErr(true); setStep("pick"); },
+      { timeout: 6000 }
+    );
+  };
+
+  const searchCity = () => {
+    if (!input.trim()) return;
+    setCity(input.trim());
+    setStep("done");
   };
 
   return (
     <div style={M.wrap}>
+      {/* Header */}
       <div style={M.header}>
         <span style={{ fontSize:"1.4rem" }}>🗺️</span>
-        <span style={M.title}>{status === "done" ? L.title[lang] : (lang==="ru"?"Найди курсы рядом":lang==="uz"?"Yaqin kurslarni top":"Find nearby courses")}</span>
+        <span style={M.title}>{L.title[lang]}</span>
+        {step === "done" && (
+          <button onClick={() => { setStep("pick"); setInput(""); setCity(""); }} style={M.changeBtn}>
+            {L.change[lang]}
+          </button>
+        )}
       </div>
 
-      {status === "idle" && (
-        <button style={M.btn} onClick={find}>{L.btn[lang]||L.btn.ru}</button>
-      )}
+      {/* Step 1: Pick location */}
+      {(step === "pick" || step === "gps") && (
+        <div style={M.pickWrap}>
+          <p style={M.subtitle}>{L.subtitle[lang]}</p>
 
-      {status === "loading" && (
-        <div style={{ padding:"20px 0", textAlign:"center", color:"#90A4AE", fontWeight:700 }}>
-          ⏳ {L.loading[lang]||L.loading.ru}
+          {gpsErr && (
+            <div style={M.errBox}>{L.gpsErr[lang]}</div>
+          )}
+
+          {/* City input */}
+          <div style={M.inputRow}>
+            <input
+              style={M.input}
+              placeholder={L.placeholder[lang]}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && searchCity()}
+            />
+            <button style={M.searchBtn} onClick={searchCity}>
+              {L.searchBtn[lang]}
+            </button>
+          </div>
+
+          {/* Quick city buttons */}
+          <div style={M.quickCities}>
+            {["Toshkent", "Samarqand", "Buxoro", "Namangan", "Andijon"].map((c) => (
+              <button key={c} style={M.cityChip}
+                onClick={() => { setCity(c); setStep("done"); }}>
+                {c}
+              </button>
+            ))}
+          </div>
+
+          <div style={M.divider}><span style={M.dividerText}>{lang==="ru"?"или":lang==="uz"?"yoki":"or"}</span></div>
+
+          {/* GPS button */}
+          <button style={M.gpsBtn} onClick={useGPS} disabled={step === "gps"}>
+            {step === "gps"
+              ? (lang==="ru"?"Определяем...":lang==="uz"?"Aniqlanmoqda...":"Detecting...")
+              : L.gpsBtn[lang]}
+          </button>
         </div>
       )}
 
-      {status === "done" && (
-        <div style={M.list}>
-          {PLACES.map((p, i) => (
-            <div key={i} style={{ ...M.card, animationDelay:`${i*0.07}s`, animation:"listItemIn 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
-              <div style={M.left}>
-                <span style={{ fontSize:"1.7rem" }}>{p.emoji}</span>
-                <div>
-                  <div style={M.name}>{p.name}</div>
-                  <div style={M.type}>{p.type[lang]||p.type.ru}</div>
+      {/* Step 2: Show results */}
+      {step === "done" && city && (
+        <div>
+          <p style={M.cityLabel}>
+            <span style={{ color:"#FF7043", fontWeight:900 }}>📍 {city}</span>
+            {" — "}{COURSE_TYPES.length} {L.results[lang]} {city}
+          </p>
+          <div style={M.list}>
+            {COURSE_TYPES.map((c, i) => {
+              const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(c.query + " " + city)}`;
+              return (
+                <div key={c.key} style={{ ...M.card, animationDelay:`${i * 0.07}s`, animation:"listItemIn 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
+                  <div style={M.left}>
+                    <span style={{ fontSize:"1.8rem" }}>{c.emoji}</span>
+                    <div>
+                      <div style={M.name}>{c[lang] || c.en}</div>
+                      <div style={M.type}>{c.query} · {city}</div>
+                    </div>
+                  </div>
+                  <a href={mapsUrl} target="_blank" rel="noreferrer" style={M.openBtn}>
+                    {L.open[lang]}
+                  </a>
                 </div>
-              </div>
-              <div style={M.right}>
-                <span style={M.dist}>{p.dist} {L.dist[lang]||L.dist.ru}</span>
-                <a href={`https://www.google.com/maps/search/${encodeURIComponent(p.name+" Tashkent")}`}
-                  target="_blank" rel="noreferrer" style={M.openBtn}>
-                  {L.open[lang]||L.open.ru}
-                </a>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -318,18 +396,28 @@ function EstablishmentsMap({ lang }) {
 }
 
 const M = {
-  wrap:    { background:"#F8FBFF", borderRadius:20, padding:"20px 20px", border:"1.5px solid #E3F2FD", marginTop:24 },
-  header:  { display:"flex", alignItems:"center", gap:10, marginBottom:16 },
-  title:   { fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", color:"#1565C0" },
-  btn:     { width:"100%", padding:"13px", background:"linear-gradient(135deg,#1565C0,#1976D2)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer", boxShadow:"0 4px 16px rgba(21,101,192,0.25)" },
-  list:    { display:"flex", flexDirection:"column", gap:10 },
-  card:    { background:"#fff", borderRadius:14, padding:"12px 16px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1.5px solid #E3F2FD", transition:"transform 0.2s, box-shadow 0.2s" },
-  left:    { display:"flex", alignItems:"center", gap:12 },
-  name:    { fontWeight:800, color:"#1A237E", fontSize:"0.88rem" },
-  type:    { fontSize:"0.76rem", color:"#90A4AE", fontWeight:600, marginTop:2 },
-  right:   { display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 },
-  dist:    { fontSize:"0.78rem", fontWeight:800, color:"#FF7043" },
-  openBtn: { fontSize:"0.74rem", fontWeight:800, color:"#1565C0", textDecoration:"none", background:"#E3F2FD", padding:"3px 10px", borderRadius:99 },
+  wrap:        { background:"#F8FBFF", borderRadius:20, padding:"20px", border:"1.5px solid #E3F2FD", marginTop:24 },
+  header:      { display:"flex", alignItems:"center", gap:10, marginBottom:16, flexWrap:"wrap" },
+  title:       { fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", color:"#1565C0", flex:1 },
+  changeBtn:   { border:"none", background:"#FFF3E0", color:"#E64A19", borderRadius:99, padding:"4px 12px", fontWeight:800, cursor:"pointer", fontSize:"0.78rem", fontFamily:"'Nunito',sans-serif" },
+  pickWrap:    { display:"flex", flexDirection:"column", gap:12 },
+  subtitle:    { fontSize:"0.88rem", fontWeight:700, color:"#78909C", textAlign:"center" },
+  errBox:      { background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"8px 14px", color:"#C62828", fontSize:"0.85rem", fontWeight:700 },
+  inputRow:    { display:"flex", gap:8 },
+  input:       { flex:1, padding:"11px 14px", border:"2px solid #E3F2FD", borderRadius:12, fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", outline:"none", color:"#1A237E" },
+  searchBtn:   { padding:"11px 18px", background:"linear-gradient(135deg,#1565C0,#1976D2)", color:"#fff", border:"none", borderRadius:12, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer", whiteSpace:"nowrap" },
+  quickCities: { display:"flex", flexWrap:"wrap", gap:8, justifyContent:"center" },
+  cityChip:    { border:"1.5px solid #BBDEFB", background:"#E3F2FD", color:"#1565C0", borderRadius:99, padding:"5px 14px", fontWeight:800, fontSize:"0.82rem", cursor:"pointer", fontFamily:"'Nunito',sans-serif", transition:"all 0.15s" },
+  divider:     { display:"flex", alignItems:"center", gap:8 },
+  dividerText: { fontSize:"0.8rem", color:"#B0BEC5", fontWeight:700, padding:"0 8px", background:"#F8FBFF" },
+  gpsBtn:      { width:"100%", padding:"12px", background:"linear-gradient(135deg,#FF7043,#FF8A65)", color:"#fff", border:"none", borderRadius:12, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer", boxShadow:"0 4px 14px rgba(255,112,67,0.3)", transition:"opacity 0.2s" },
+  cityLabel:   { fontSize:"0.88rem", fontWeight:700, color:"#546E7A", marginBottom:12, textAlign:"center" },
+  list:        { display:"flex", flexDirection:"column", gap:10 },
+  card:        { background:"#fff", borderRadius:14, padding:"12px 16px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1.5px solid #E3F2FD", transition:"transform 0.2s, box-shadow 0.2s" },
+  left:        { display:"flex", alignItems:"center", gap:12 },
+  name:        { fontWeight:800, color:"#1A237E", fontSize:"0.88rem" },
+  type:        { fontSize:"0.74rem", color:"#90A4AE", fontWeight:600, marginTop:2 },
+  openBtn:     { fontSize:"0.78rem", fontWeight:800, color:"#1565C0", textDecoration:"none", background:"#E3F2FD", padding:"6px 12px", borderRadius:99, whiteSpace:"nowrap" },
 };
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
