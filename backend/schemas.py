@@ -54,6 +54,13 @@ class TokenOut(BaseModel):
 
 
 # ── Quiz ──────────────────────────────────────────────────────────────────────
+class TaskResultCreate(BaseModel):
+    task_scores: dict[str, float] = Field(
+        ..., example={"logic": 80, "creativity": 60, "memory": 70, "leadership": 90}
+    )
+    lang: str = Field("ru", pattern="^(uz|ru|en)$")
+
+
 class ResultCreate(BaseModel):
     answers: dict[str, int] = Field(
         ...,

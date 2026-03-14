@@ -175,6 +175,55 @@ def latest_result(db: Session = Depends(get_db), current_user: models.User = Dep
     return result
 
 
+# ── Task-based results ────────────────────────────────────────────────────────
+@app.post("/results/tasks", status_code=201)
+async def submit_task_results(
+    body: schemas.TaskResultCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    """
+    Submit scores from mini-games (Tasks page).
+    Merges with latest quiz result or creates a new one.
+    task_scores: { logic: 80, creativity: 60, memory: 70, leadership: 90 }
+    """
+    ts = body.task_scores
+
+    # Try to find and update the latest result for this user
+    existing = db.query(models.QuizResult)\
+        .filter(models.QuizResult.user_id == current_user.id)\
+        .order_by(models.QuizResult.created_at.desc()).first()
+
+    if existing:
+        # Blend task scores with quiz scores (average them)
+        if ts.get("logic")      is not None: existing.score_logic      = (existing.score_logic      + ts["logic"])      / 2
+        if ts.get("creativity") is not None: existing.score_creativity = (existing.score_creativity + ts["creativity"]) / 2
+        if ts.get("memory")     is not None: existing.score_memory     = (existing.score_memory     + ts["memory"])     / 2
+        if ts.get("leadership") is not None: existing.score_leadership = (existing.score_leadership + ts["leadership"]) / 2
+        db.commit()
+        db.refresh(existing)
+        return { "message": "Task scores merged with quiz results", "result_id": existing.id }
+    else:
+        # No quiz taken yet — create a new result from task scores only
+        result = models.QuizResult(
+            user_id=current_user.id,
+            lang=body.lang,
+            answers="{}",
+            score_logic=ts.get("logic", 0),
+            score_creativity=ts.get("creativity", 0),
+            score_memory=ts.get("memory", 0),
+            score_leadership=ts.get("leadership", 0),
+            score_languages=0,
+            score_music=0,
+            top_talent=max(ts, key=ts.get) if ts else "",
+            top_career="",
+        )
+        db.add(result)
+        db.commit()
+        db.refresh(result)
+        return { "message": "Task results saved", "result_id": result.id }
+
+
 # ── Leaderboard ───────────────────────────────────────────────────────────────
 @app.get("/leaderboard")
 def leaderboard(talent: str = "logic", db: Session = Depends(get_db)):
