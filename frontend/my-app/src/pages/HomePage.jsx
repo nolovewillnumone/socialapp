@@ -1,16 +1,16 @@
 import Nav from "../components/Nav";
+import { t } from "../i18n";
 
-export default function HomePage({ setPage }) {
+export default function HomePage({ setPage, user, onLogout, lang, dark }) {
   return (
     <div className="page-wrap">
-      <Nav page="home" setPage={setPage} />
+      <Nav page="home" setPage={setPage} lang={lang} dark={dark} user={user} onLogout={onLogout} />
 
-      {/* Hero */}
       <div className="hero">
         <div className="hero-text">
-          <h1 className="hero-title">Узнай свои<br />таланты!</h1>
+          <h1 className="hero-title">{t(lang, "home.title")}</h1>
           <button className="hero-cta" onClick={() => setPage("quiz")}>
-            Начать тест
+            {t(lang, "home.cta")}
           </button>
         </div>
         <div className="hero-icons">
@@ -20,24 +20,23 @@ export default function HomePage({ setPage }) {
         </div>
       </div>
 
-      {/* Steps */}
       <div className="steps">
         <div className="step">
           <div className="step-icon">🎮</div>
-          <div className="step-title">Играй</div>
-          <div className="step-desc">Проходи весёлые мини-игры</div>
+          <div className="step-title">{t(lang, "home.step1")}</div>
+          <div className="step-desc">{t(lang, "home.step1desc")}</div>
         </div>
         <div className="step-arrow">›</div>
         <div className="step">
           <div className="step-icon">📊</div>
-          <div className="step-title">Получай результат</div>
-          <div className="step-desc">Узнай свои сильные стороны</div>
+          <div className="step-title">{t(lang, "home.step2")}</div>
+          <div className="step-desc">{t(lang, "home.step2desc")}</div>
         </div>
         <div className="step-arrow">›</div>
         <div className="step">
           <div className="step-icon">🚀</div>
-          <div className="step-title">Развивайся</div>
-          <div className="step-desc">Найди подходящее занятие</div>
+          <div className="step-title">{t(lang, "home.step3")}</div>
+          <div className="step-desc">{t(lang, "home.step3desc")}</div>
         </div>
       </div>
     </div>
