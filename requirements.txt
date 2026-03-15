@@ -14,3 +14,6 @@ scikit-learn==1.5.0
 
 # PostgreSQL (uncomment for production)
 # psycopg2-binary==2.9.9
+
+
+web: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
