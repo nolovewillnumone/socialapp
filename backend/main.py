@@ -37,7 +37,7 @@ app.add_middleware(
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-ML_SERVICE_URL = "http://localhost:8001"
+ML_SERVICE_URL = "https://your-ml-service.railway.app"
 
 
 # ── Auth dependency ───────────────────────────────────────────────────────────
