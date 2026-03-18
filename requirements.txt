@@ -1,17 +1,17 @@
+--only-binary :all:
+
 # Backend
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi==0.95.2
+uvicorn[standard]==0.22.0
 sqlalchemy==2.0.23
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
-httpx==0.25.2
-pydantic==2.5.0
-pydantic-core==2.14.1
-email-validator==2.1.0
+httpx==0.24.1
+pydantic[email]==1.10.13
 
 # ML Engine
-numpy==1.26.2
+numpy==1.24.3
 scikit-learn==1.3.2
 
 # PostgreSQL
