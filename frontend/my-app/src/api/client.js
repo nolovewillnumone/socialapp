@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const backend = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "web-production-84f4ae.up.railway.app",
   headers: { "Content-Type": "application/json" },
 });
 
