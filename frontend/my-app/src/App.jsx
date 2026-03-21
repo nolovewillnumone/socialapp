@@ -40,7 +40,7 @@ export default function App() {
       case "tasks":   return <TasksPage   setPage={setPage} {...shared} />;
       case "quiz":    return <QuizPage    setPage={setPage} setResults={setResults} {...shared} />;
       case "results": return <ResultsPage setPage={setPage} results={results} {...shared} />;
-      case "develop": return <DevelopPage setPage={setPage} {...shared} />;
+      case "develop": return <DevelopPage setPage={setPage} results={results} {...shared} />;
       default:        return <AuthPage    setPage={setPage} setUser={setUser} {...shared} />;
     }
   };
