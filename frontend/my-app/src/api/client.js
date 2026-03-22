@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const backend = axios.create({
-  baseURL: "web-production-84f4ae.up.railway.app",
+  baseURL: "https://karta-talantov-backend.onrender.com",
   headers: { "Content-Type": "application/json" },
 });
 

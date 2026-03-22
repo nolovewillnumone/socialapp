@@ -160,7 +160,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         const res = await quizAPI.submitAnswers(newAnswers, lang);
         data = res.data;
       } else {
-        const res = await fetch("http://localhost:8001/analyze", {
+        const res = await fetch("https://karta-talantov-ml.onrender.com/analyze",  {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ answers: newAnswers, lang }),
