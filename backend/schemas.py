@@ -1,18 +1,17 @@
-"""Pydantic schemas for Karta Talantov."""
+"""Pydantic schemas — compatible with pydantic v1 (1.10.13)"""
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
 
-# ── User ──────────────────────────────────────────────────────────────────────
 class UserCreate(BaseModel):
-    name:     str      = Field(..., min_length=2, max_length=100, example="Azizbek")
-    email:    EmailStr = Field(..., example="azizbek@mail.ru")
-    password: str      = Field(..., min_length=6)
-    age:      Optional[int] = Field(None, ge=6, le=18)
-    lang:     str      = Field("ru", pattern="^(uz|ru|en)$")
-    role:     str      = Field("child", pattern="^(child|parent|teacher)$")
+    name:     str
+    email:    EmailStr
+    password: str
+    age:      Optional[int] = None
+    lang:     Optional[str] = "ru"
+    role:     Optional[str] = "child"
 
 
 class UserUpdate(BaseModel):
@@ -32,7 +31,7 @@ class UserOut(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class UserPublic(BaseModel):
@@ -43,66 +42,36 @@ class UserPublic(BaseModel):
     role: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
-# ── Auth ──────────────────────────────────────────────────────────────────────
 class TokenOut(BaseModel):
     access_token: str
     token_type:   str
     user:         UserOut
 
 
-# ── Quiz ──────────────────────────────────────────────────────────────────────
-class TaskResultCreate(BaseModel):
-    task_scores: dict[str, float] = Field(
-        ..., example={"logic": 80, "creativity": 60, "memory": 70, "leadership": 90}
-    )
-    lang: str = Field("ru", pattern="^(uz|ru|en)$")
-
-
 class ResultCreate(BaseModel):
-    answers: dict[str, int] = Field(
-        ...,
-        example={"q1": 1, "q2": 3, "q3": 1, "q4": 2, "q5": 2, "q6": 2, "q7": 0, "q8": 1, "q9": 2, "q10": 1}
-    )
-    lang: str = Field("ru", pattern="^(uz|ru|en)$")
-
-
-class CareerResult(BaseModel):
-    id:            str
-    name:          str
-    icon:          str
-    match_percent: float
+    answers: dict
+    lang:    Optional[str] = "ru"
 
 
 class ResultOut(BaseModel):
-    id:          int
-    user_id:     int
-    lang:        str
-    scores:      dict[str, float]
-    top_talents: list[str]
-    careers:     list[CareerResult]
-    strengths:   list[str]
-    created_at:  datetime
-
-    class Config:
-        from_attributes = True
-
-
-class ResultSummary(BaseModel):
     id:              int
     user_id:         int
-    lang:            str
+    top_talent:      Optional[str]
+    top_career:      Optional[str]
     score_logic:     float
     score_creativity: float
     score_memory:    float
     score_leadership: float
     score_languages: float
     score_music:     float
-    top_talent:      str
-    top_career:      str
     created_at:      datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+
+class TaskResultCreate(BaseModel):
+    task_scores: dict
