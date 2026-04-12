@@ -31,7 +31,7 @@ class UserOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserPublic(BaseModel):
@@ -42,7 +42,7 @@ class UserPublic(BaseModel):
     role: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TokenOut(BaseModel):
@@ -70,7 +70,7 @@ class ResultOut(BaseModel):
     created_at:      datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TaskResultCreate(BaseModel):

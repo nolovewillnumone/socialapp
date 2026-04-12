@@ -155,14 +155,14 @@ async def submit_result(
     )
 
 
-@app.get("/results/me", response_model=list[schemas.ResultSummary])
+@app.get("/results/me", response_model=list[schemas.ResultOut])
 def my_results(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     return db.query(models.QuizResult)\
         .filter(models.QuizResult.user_id == current_user.id)\
         .order_by(models.QuizResult.created_at.desc()).all()
 
 
-@app.get("/results/me/latest", response_model=schemas.ResultSummary)
+@app.get("/results/me/latest", response_model=schemas.ResultOut)
 def latest_result(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     result = db.query(models.QuizResult)\
         .filter(models.QuizResult.user_id == current_user.id)\
