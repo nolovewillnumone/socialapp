@@ -129,28 +129,27 @@ function Visual({ type, accent }) {
   );
   return null;
 }
-const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E3F2FD", padding:16, minHeight:160, minWidth:180, boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
+const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E3F2FD", padding:16, minHeight:140, width:"100%", maxWidth:280, boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
 
 function BenefitSection({ benefit, index, lang, dark }) {
   const [ref, visible] = useInView(0.15);
-  const isEven = index % 2 === 0;
   return (
-    <div ref={ref} style={{ padding:"64px 24px", borderBottom:"1px solid rgba(21,101,192,0.06)", background: dark ? "transparent" : benefit.bg, opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(48px)", transition:"opacity 0.7s ease, transform 0.7s ease", transitionDelay:`${index*0.05}s` }}>
-      <div style={{ maxWidth:900, margin:"0 auto", display:"flex", alignItems:"center", gap:48, flexWrap:"wrap", flexDirection: isEven?"row":"row-reverse" }}>
-        <div style={{ flex:1, minWidth:260 }}>
-          <div style={{ fontSize:"1.8rem", marginBottom:12 }}>{benefit.emoji}</div>
-          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", lineHeight:1.2, marginBottom:14, color: dark?"#E3F2FD":"#1A237E" }}>{benefit.title[lang]||benefit.title.en}</h2>
-          <p style={{ fontSize:"0.98rem", fontWeight:600, lineHeight:1.7, marginBottom:24, color: dark?"#B0BEC5":"#546E7A" }}>{benefit.desc[lang]||benefit.desc.en}</p>
-          <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+    <div ref={ref} style={{ padding: isMobile?"32px 16px":"64px 24px", borderBottom:"1px solid rgba(21,101,192,0.06)", background: dark ? "transparent" : benefit.bg, opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(48px)", transition:"opacity 0.7s ease, transform 0.7s ease", transitionDelay:`${index*0.05}s` }}>
+      <div className="benefit-inner" style={{ maxWidth:900, margin:"0 auto", display:"flex", alignItems:"center", gap:48, flexWrap:"wrap", flexDirection:"column" }}>
+        <div className="benefit-text" style={{ width:"100%" }}>
+          <div style={{ fontSize:"1.6rem", marginBottom:10 }}>{benefit.emoji}</div>
+          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize: isMobile?"1.6rem":"2rem", lineHeight:1.2, marginBottom:12, color: dark?"#E3F2FD":"#1A237E" }}>{benefit.title[lang]||benefit.title.en}</h2>
+          <p style={{ fontSize: isMobile?"0.88rem":"0.98rem", fontWeight:600, lineHeight:1.7, marginBottom:20, color: dark?"#B0BEC5":"#546E7A" }}>{benefit.desc[lang]||benefit.desc.en}</p>
+          <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
             {benefit.stats.map((stat,i) => (
-              <div key={i} style={{ borderRadius:14, padding:"12px 18px", display:"flex", flexDirection:"column", gap:4, background: dark?"#1A2A3A":"#fff", border:`1.5px solid ${benefit.accent}33`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)", opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:`opacity 0.5s ease ${0.3+i*0.1}s, transform 0.5s ease ${0.3+i*0.1}s` }}>
-                <span style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.6rem", color:benefit.accent }}>{stat.value}</span>
-                <span style={{ fontSize:"0.76rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", color: dark?"#90CAF9":"#78909C" }}>{stat.label[lang]||stat.label.en}</span>
+              <div key={i} style={{ borderRadius:14, padding: isMobile?"10px 14px":"12px 18px", display:"flex", flexDirection:"column", gap:4, background: dark?"#1A2A3A":"#fff", border:`1.5px solid ${benefit.accent}33`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)", opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:`opacity 0.5s ease ${0.3+i*0.1}s, transform 0.5s ease ${0.3+i*0.1}s`, flex:1, minWidth:80 }}>
+                <span style={{ fontFamily:"'Fredoka One',cursive", fontSize: isMobile?"1.3rem":"1.6rem", color:benefit.accent }}>{stat.value}</span>
+                <span style={{ fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", color: dark?"#90CAF9":"#78909C" }}>{stat.label[lang]||stat.label.en}</span>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ opacity:visible?1:0, transform:visible?"scale(1)":"scale(0.88)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s" }}>
+        <div className="benefit-visual" style={{ opacity:visible?1:0, transform:visible?"scale(1)":"scale(0.88)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s", width:"100%", display:"flex", justifyContent:"center" }}>
           <Visual type={benefit.visual} accent={benefit.accent} />
         </div>
       </div>
@@ -224,18 +223,18 @@ function AIDemoSection({ lang, dark }) {
   }[lang] || {};
 
   return (
-    <div ref={ref} style={{ padding:"72px 24px", background: dark ? "#0F1923" : "#0D1117", overflow:"hidden" }}>
+    <div ref={ref} style={{ padding: typeof window!=="undefined" && window.innerWidth<=768 ? "40px 16px" : "72px 24px", background: dark ? "#0F1923" : "#0D1117", overflow:"hidden" }}>
       {/* Section header */}
       <div style={{ textAlign:"center", marginBottom:48, opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(30px)", transition:"opacity 0.6s ease, transform 0.6s ease" }}>
         <div style={{ display:"inline-block", background:"rgba(66,165,245,0.15)", border:"1px solid rgba(66,165,245,0.3)", borderRadius:99, padding:"4px 16px", fontSize:"0.78rem", fontWeight:800, color:"#42A5F5", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:16 }}>
           AI-POWERED
         </div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:"#E3F2FD", marginBottom:12 }}>{label.title}</h2>
+        <h2 className="ai-demo-title" style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:"#E3F2FD", marginBottom:12 }}>{label.title}</h2>
         <p style={{ color:"#78909C", fontWeight:600, fontSize:"0.95rem" }}>{label.sub}</p>
       </div>
 
       {/* Demo window */}
-      <div style={{ maxWidth:900, margin:"0 auto", borderRadius:16, overflow:"hidden", boxShadow:"0 24px 80px rgba(0,0,0,0.5)", border:"1px solid rgba(255,255,255,0.08)", opacity:visible?1:0, transform:visible?"translateY(0) scale(1)":"translateY(40px) scale(0.97)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s" }}>
+      <div className="ai-demo-window" style={{ maxWidth:900, margin:"0 auto", borderRadius:16, overflow:"hidden", boxShadow:"0 24px 80px rgba(0,0,0,0.5)", border:"1px solid rgba(255,255,255,0.08)", opacity:visible?1:0, transform:visible?"translateY(0) scale(1)":"translateY(40px) scale(0.97)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s" }}>
 
         {/* Window chrome */}
         <div style={{ background:"#161B22", padding:"12px 16px", display:"flex", alignItems:"center", gap:8, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
@@ -255,7 +254,7 @@ function AIDemoSection({ lang, dark }) {
         <div style={{ display:"flex", height:340 }}>
 
           {/* LEFT: Chat panel */}
-          <div style={{ width:"42%", background:"#161B22", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column" }}>
+          <div className="ai-demo-chat" style={{ width:"42%", background:"#161B22", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column" }}>
             <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", fontSize:"0.72rem", fontWeight:800, color:"#78909C", letterSpacing:"0.1em", textTransform:"uppercase" }}>
               KARTA TALANTOV: AI CHAT
             </div>
@@ -281,8 +280,8 @@ function AIDemoSection({ lang, dark }) {
             </div>
           </div>
 
-          {/* RIGHT: Code editor */}
-          <div style={{ flex:1, background:"#0D1117", overflow:"hidden", fontFamily:"'Courier New', monospace", fontSize:"0.78rem" }}>
+          {/* RIGHT: Code editor — hidden on mobile */}
+          <div className="ai-demo-code" style={{ flex:1, background:"#0D1117", overflow:"hidden", fontFamily:"'Courier New', monospace", fontSize:"0.78rem" }}>
             <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", gap:16 }}>
               {["76","77","78"].map((n) => <span key={n} style={{ fontSize:"0.72rem", color:"#30363D", fontWeight:700 }}>{n}</span>)}
             </div>
@@ -469,10 +468,52 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         @keyframes infiniteScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
         @keyframes heroFadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
         @keyframes scrollBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(6px); } }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+        /* ── Mobile fixes for HomePage ── */
+        @media (max-width: 768px) {
+          .home-hero {
+            padding: 48px 16px 40px !important;
+          }
+          .home-hero h1 {
+            font-size: 1.9rem !important;
+          }
+          .home-hero p {
+            font-size: 0.9rem !important;
+          }
+          .home-hero-btns {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 10px !important;
+          }
+          .home-hero-btns button {
+            width: 100% !important;
+            max-width: 300px !important;
+            font-size: 1rem !important;
+            padding: 13px 24px !important;
+          }
+          .ai-demo-code { display: none !important; }
+          .ai-demo-chat { width: 100% !important; }
+          .ai-demo-title { font-size: 1.4rem !important; }
+          .ai-demo-window { height: 280px !important; }
+          .benefit-inner {
+            flex-direction: column !important;
+            gap: 20px !important;
+            padding: 0 !important;
+          }
+          .benefit-text { min-width: unset !important; }
+          .benefit-visual { width: 100% !important; display: flex !important; justify-content: center !important; }
+          .final-cta h2 { font-size: 1.5rem !important; }
+        }
+
+        @media (max-width: 480px) {
+          .home-hero h1 { font-size: 1.6rem !important; }
+          .ai-demo-title { font-size: 1.2rem !important; }
+        }
       `}</style>
 
       {/* ── GITHUB-STYLE CENTRED HERO — mascot + headline + CTA ── */}
-      <div style={{
+      <div className="home-hero" style={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #0D1117 0%, #0D1117 70%, #161B22 100%)",
         display: "flex",
@@ -490,7 +531,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(21,101,192,0.10) 0%, transparent 70%)", pointerEvents:"none" }} />
 
         {/* Mascot — centred */}
-        <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both", marginBottom:8, transform:"scale(1.3)" }}>
+        <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both", marginBottom:8, transform: typeof window!=="undefined" && window.innerWidth<=768 ? "scale(0.9)" : "scale(1.3)" }}>
           <StarMascot />
         </div>
 
@@ -523,7 +564,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         </p>
 
         {/* CTA buttons */}
-        <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.4s both" }}>
+        <div className="home-hero-btns" style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.4s both" }}>
           <button
             onClick={() => setPage("quiz")}
             style={{ padding:"14px 32px", background:"linear-gradient(135deg,#7C4DFF,#5C35CC)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 6px 24px rgba(92,53,204,0.45)", transition:"transform 0.2s, box-shadow 0.2s" }}
@@ -592,7 +633,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
       </div>
 
       {/* Final CTA */}
-      <div style={{ textAlign:"center", padding:"60px 24px 80px", background: dark?"linear-gradient(135deg,#1A2A3A,#0F1923)":"linear-gradient(135deg,#E3F2FD,#FFF8E1)" }}>
+      <div className="final-cta" style={{ textAlign:"center", padding:"60px 24px 80px", background: dark?"linear-gradient(135deg,#1A2A3A,#0F1923)":"linear-gradient(135deg,#E3F2FD,#FFF8E1)" }}>
         <div style={{ fontSize:"2.8rem", marginBottom:16 }}>🌟</div>
         <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color: dark?"#E3F2FD":"#1565C0", marginBottom:12 }}>
           {lang==="ru"?"Готов узнать свои таланты?":lang==="uz"?"Iste'dodingizni bilishga tayyormisiz?":"Ready to discover your talents?"}
@@ -605,3 +646,4 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
     </div>
   );
 }
+// 
