@@ -139,16 +139,16 @@ const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", 
 function BenefitSection({ benefit, index, lang, dark }) {
   const [ref, visible] = useInView(0.15);
   return (
-    <div ref={ref} style={{ padding: isMobile?"32px 16px":"64px 24px", borderBottom:"1px solid rgba(21,101,192,0.06)", background: dark ? "transparent" : benefit.bg, opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(48px)", transition:"opacity 0.7s ease, transform 0.7s ease", transitionDelay:`${index*0.05}s` }}>
+    <div ref={ref} style={{ padding:"64px 24px", borderBottom:"1px solid rgba(21,101,192,0.06)", background: dark ? "transparent" : benefit.bg, opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(48px)", transition:"opacity 0.7s ease, transform 0.7s ease", transitionDelay:`${index*0.05}s` }}>
       <div className="benefit-inner" style={{ maxWidth:900, margin:"0 auto", display:"flex", alignItems:"center", gap:48, flexWrap:"wrap", flexDirection:"column" }}>
         <div className="benefit-text" style={{ width:"100%" }}>
           <div style={{ fontSize:"1.6rem", marginBottom:10 }}>{benefit.emoji}</div>
-          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize: isMobile?"1.6rem":"2rem", lineHeight:1.2, marginBottom:12, color: dark?"#E3F2FD":"#1A237E" }}>{benefit.title[lang]||benefit.title.en}</h2>
-          <p style={{ fontSize: isMobile?"0.88rem":"0.98rem", fontWeight:600, lineHeight:1.7, marginBottom:20, color: dark?"#B0BEC5":"#546E7A" }}>{benefit.desc[lang]||benefit.desc.en}</p>
+          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", lineHeight:1.2, marginBottom:12, color: dark?"#E3F2FD":"#1A237E" }}>{benefit.title[lang]||benefit.title.en}</h2>
+          <p style={{ fontSize:"0.98rem", fontWeight:600, lineHeight:1.7, marginBottom:20, color: dark?"#B0BEC5":"#546E7A" }}>{benefit.desc[lang]||benefit.desc.en}</p>
           <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
             {benefit.stats.map((stat,i) => (
-              <div key={i} style={{ borderRadius:14, padding: isMobile?"10px 14px":"12px 18px", display:"flex", flexDirection:"column", gap:4, background: dark?"#1A2A3A":"#fff", border:`1.5px solid ${benefit.accent}33`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)", opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:`opacity 0.5s ease ${0.3+i*0.1}s, transform 0.5s ease ${0.3+i*0.1}s`, flex:1, minWidth:80 }}>
-                <span style={{ fontFamily:"'Fredoka One',cursive", fontSize: isMobile?"1.3rem":"1.6rem", color:benefit.accent }}>{stat.value}</span>
+              <div key={i} style={{ borderRadius:14, padding:"12px 18px", display:"flex", flexDirection:"column", gap:4, background: dark?"#1A2A3A":"#fff", border:`1.5px solid ${benefit.accent}33`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)", opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:`opacity 0.5s ease ${0.3+i*0.1}s, transform 0.5s ease ${0.3+i*0.1}s`, flex:1, minWidth:80 }}>
+                <span style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.6rem", color:benefit.accent }}>{stat.value}</span>
                 <span style={{ fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", color: dark?"#90CAF9":"#78909C" }}>{stat.label[lang]||stat.label.en}</span>
               </div>
             ))}
