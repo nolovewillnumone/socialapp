@@ -312,9 +312,7 @@ function AIDemoSection({ lang, dark }) {
         </div>
       </div>
 
-      <style>{`
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-      `}</style>
+
     </div>
   );
 }
@@ -353,27 +351,7 @@ function StarMascot() {
 
   return (
     <div ref={wrapRef} style={{ position:"relative", width:160, height:180, flexShrink:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-      <style>{`
-        @keyframes mascotFloat {
-          0%,100% { transform: translateY(0px);   }
-          50%      { transform: translateY(-14px); }
-        }
-        @keyframes mascotGlow {
-          0%,100% { filter: drop-shadow(0 0 16px rgba(255,215,0,0.7)) drop-shadow(0 0 36px rgba(92,53,204,0.5)); }
-          50%      { filter: drop-shadow(0 0 28px rgba(255,215,0,1))   drop-shadow(0 0 56px rgba(92,53,204,0.8)); }
-        }
-        @keyframes shadowPulse {
-          0%,100% { transform: scaleX(1);   opacity: 0.3;  }
-          50%      { transform: scaleX(0.6); opacity: 0.12; }
-        }
-        @keyframes orbitSpark  { from { transform: rotate(0deg)   translateX(62px) rotate(0deg);    } to { transform: rotate(360deg)  translateX(62px) rotate(-360deg);  } }
-        @keyframes orbitSpark2 { from { transform: rotate(120deg) translateX(58px) rotate(-120deg); } to { transform: rotate(480deg)  translateX(58px) rotate(-480deg);  } }
-        @keyframes orbitSpark3 { from { transform: rotate(240deg) translateX(54px) rotate(-240deg); } to { transform: rotate(600deg)  translateX(54px) rotate(-600deg);  } }
-        @keyframes eyeBlink {
-          0%,88%,100% { transform: scaleY(1);    }
-          93%          { transform: scaleY(0.07); }
-        }
-      `}</style>
+
 
       {/* Orbiting sparkles */}
       <div style={{ position:"absolute", top:"50%", left:"50%", width:0, height:0, zIndex:3 }}>
@@ -474,6 +452,14 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         @keyframes heroFadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
         @keyframes scrollBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(6px); } }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes mascotFloat { 0%,100% { transform:translateY(0px); } 50% { transform:translateY(-14px); } }
+        @keyframes mascotGlow { 0%,100% { filter:drop-shadow(0 0 16px rgba(255,215,0,0.7)) drop-shadow(0 0 36px rgba(92,53,204,0.5)); } 50% { filter:drop-shadow(0 0 28px rgba(255,215,0,1)) drop-shadow(0 0 56px rgba(92,53,204,0.8)); } }
+        @keyframes shadowPulse { 0%,100% { transform:scaleX(1); opacity:0.3; } 50% { transform:scaleX(0.6); opacity:0.12; } }
+        @keyframes orbitSpark  { from { transform:rotate(0deg)   translateX(62px) rotate(0deg);    } to { transform:rotate(360deg)  translateX(62px) rotate(-360deg);  } }
+        @keyframes orbitSpark2 { from { transform:rotate(120deg) translateX(58px) rotate(-120deg); } to { transform:rotate(480deg)  translateX(58px) rotate(-480deg);  } }
+        @keyframes orbitSpark3 { from { transform:rotate(240deg) translateX(54px) rotate(-240deg); } to { transform:rotate(600deg)  translateX(54px) rotate(-600deg);  } }
+        @keyframes eyeBlink { 0%,88%,100% { transform:scaleY(1); } 93% { transform:scaleY(0.07); } }
 
         /* ── Mobile fixes for HomePage ── */
         @media (max-width: 768px) {
