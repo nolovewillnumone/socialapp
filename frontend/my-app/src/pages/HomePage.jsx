@@ -91,7 +91,7 @@ function useInView(threshold = 0.15) {
 // ── Visual accents ────────────────────────────────────────────────────────────
 function Visual({ type, accent }) {
   if (type === "radar") return (
-    <div style={V.box}>
+    <div style={{ ...V.box, alignItems:"center", justifyContent:"center" }}>
       <svg width="120" height="120" viewBox="0 0 120 120">
         {[0.3,0.6,1].map((l) => (
           <polygon key={l} points={[0,1,2,3,4,5].map((i) => { const a=(Math.PI*2*i)/6-Math.PI/2; return `${60+48*l*Math.cos(a)},${60+48*l*Math.sin(a)}`; }).join(" ")} fill="none" stroke={accent+"44"} strokeWidth="1.5" />
@@ -102,16 +102,21 @@ function Visual({ type, accent }) {
     </div>
   );
   if (type === "games") return (
-    <div style={{ ...V.box, flexWrap:"wrap", gap:10, padding:20 }}>
-      {["🧠","🃏","🎨","👑"].map((e,i) => <div key={i} style={{ width:60, height:60, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", background:accent+"18", border:`1.5px solid ${accent}44`, fontSize:"1.6rem" }}>{e}</div>)}
+    <div style={{ ...V.box, padding:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, width:"100%" }}>
+        {["🧠","🃏","🎨","👑"].map((e,i) => (
+          <div key={i} style={{ height:70, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", background:accent+"18", border:`1.5px solid ${accent}44`, fontSize:"1.8rem" }}>{e}</div>
+        ))}
+      </div>
     </div>
   );
   if (type === "map") return (
-    <div style={{ ...V.box, gap:8, padding:20, alignItems:"stretch" }}>
-      {["💻 IT School","🤖 Robotics Hub","🏆 Chess Academy"].map((p,i) => (
-        <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"8px 12px", borderRadius:10, background:accent+"12", border:`1px solid ${accent}33` }}>
-          <span style={{ fontSize:"0.82rem", fontWeight:800, color:"#1A237E" }}>{p}</span>
-          <span style={{ fontSize:"0.75rem", fontWeight:700, color:accent }}>{["0.9km","1.2km","2.8km"][i]}</span>
+    <div style={{ ...V.box, gap:10, padding:20, alignItems:"stretch" }}>
+      {[["💻","IT School","0.9km"],["🤖","Robotics Hub","1.2km"],["🏆","Chess Academy","2.8km"]].map(([em,name,dist],i) => (
+        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:12, background:accent+"12", border:`1px solid ${accent}33` }}>
+          <span style={{ fontSize:"1.3rem" }}>{em}</span>
+          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#1A237E", flex:1 }}>{name}</span>
+          <span style={{ fontSize:"0.78rem", fontWeight:700, color:accent, background:accent+"18", padding:"2px 8px", borderRadius:99 }}>{dist}</span>
         </div>
       ))}
     </div>
@@ -119,17 +124,17 @@ function Visual({ type, accent }) {
   if (type === "lang") return (
     <div style={{ ...V.box, gap:10, padding:20, alignItems:"stretch" }}>
       {[["🇷🇺","Карта Талантов","Русский"],["🇺🇿","Iste'dod Xaritasi","O'zbek"],["🇬🇧","Talent Map","English"]].map(([f,n,l],i) => (
-        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 12px", borderRadius:10, background:i===0?accent+"18":"transparent", border:`1.5px solid ${i===0?accent:accent+"33"}` }}>
-          <span style={{ fontSize:"1.1rem" }}>{f}</span>
-          <span style={{ fontSize:"0.82rem", fontWeight:800, color:"#1A237E" }}>{n}</span>
-          <span style={{ fontSize:"0.72rem", fontWeight:700, color:accent, marginLeft:"auto" }}>{l}</span>
+        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:12, background:i===0?accent+"18":"transparent", border:`1.5px solid ${i===0?accent:accent+"33"}` }}>
+          <span style={{ fontSize:"1.3rem" }}>{f}</span>
+          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#1A237E", flex:1 }}>{n}</span>
+          <span style={{ fontSize:"0.78rem", fontWeight:700, color:accent }}>{l}</span>
         </div>
       ))}
     </div>
   );
   return null;
 }
-const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E3F2FD", padding:16, minHeight:140, width:"100%", maxWidth:280, boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
+const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E3F2FD", padding:20, width:"100%", maxWidth:320, margin:"0 auto", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
 
 function BenefitSection({ benefit, index, lang, dark }) {
   const [ref, visible] = useInView(0.15);
@@ -149,7 +154,7 @@ function BenefitSection({ benefit, index, lang, dark }) {
             ))}
           </div>
         </div>
-        <div className="benefit-visual" style={{ opacity:visible?1:0, transform:visible?"scale(1)":"scale(0.88)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s", width:"100%", display:"flex", justifyContent:"center" }}>
+        <div className="benefit-visual" style={{ opacity:visible?1:0, transform:visible?"scale(1)":"scale(0.88)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s", width:"100%", display:"flex", justifyContent:"center", padding:"0 16px" }}>
           <Visual type={benefit.visual} accent={benefit.accent} />
         </div>
       </div>
@@ -510,6 +515,20 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
           .home-hero h1 { font-size: 1.6rem !important; }
           .ai-demo-title { font-size: 1.2rem !important; }
         }
+
+        /* Visual box always centered and full-width */
+        .benefit-visual > div {
+          width: 100% !important;
+          max-width: 320px !important;
+          margin: 0 auto !important;
+        }
+
+        /* Benefit section padding */
+        @media (max-width: 768px) {
+          .benefit-inner {
+            padding: 0 4px !important;
+          }
+        }
       `}</style>
 
       {/* ── GITHUB-STYLE CENTRED HERO — mascot + headline + CTA ── */}
@@ -646,4 +665,3 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
     </div>
   );
 }
-// 
