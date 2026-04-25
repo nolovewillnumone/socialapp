@@ -36,10 +36,31 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
     </div>
   );
 
-  const data     = results || fetched || DEMO;
-  const isDemo   = !results && !fetched;
-  const scores   = data.scores   || DEMO.scores;
-  const careers  = data.careers  || DEMO.careers;
+  // No results and not logged in → redirect to quiz
+  const isDemo = !results && !fetched;
+  if (isDemo && !localStorage.getItem("token")) {
+    return (
+      <div className="page-wrap">
+        <Nav page="results" setPage={setPage} lang={lang} dark={dark} />
+        <div style={{ textAlign:"center", padding:"80px 24px" }}>
+          <div style={{ fontSize:"3rem", marginBottom:16 }}>📊</div>
+          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color: dark?"#E3F2FD":"#1565C0", marginBottom:12 }}>
+            {lang==="ru"?"Сначала пройди тест!":lang==="uz"?"Avval testni o'ting!":"Take the quiz first!"}
+          </h2>
+          <p style={{ color: dark?"#90CAF9":"#78909C", fontWeight:600, marginBottom:28 }}>
+            {lang==="ru"?"Чтобы увидеть свою карту талантов, нужно пройти тест.":lang==="uz"?"Iste'dod xaritangizni ko'rish uchun testni o'ting.":"You need to take the quiz to see your talent map."}
+          </p>
+          <button className="hero-cta" onClick={() => setPage("quiz")}>
+            {lang==="ru"?"Начать тест →":lang==="uz"?"Testni boshlash →":"Start quiz →"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const data      = results || fetched || DEMO;
+  const scores    = data.scores   || DEMO.scores;
+  const careers   = data.careers  || DEMO.careers;
   const strengths = data.strengths || DEMO.strengths;
 
   const radarData = Object.entries(scores).map(([key, value]) => ({
@@ -52,17 +73,13 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
   return (
     <div className="page-wrap">
       <Nav page="results" setPage={setPage} lang={lang} dark={dark} />
-      <div className="map-section">
+      <div className="map-section" style={{ margin:"24px auto", display:"block" }}>
         <div className="map-banner">
           <span className="map-banner-title">{t(lang,"results.title")}</span>
           <span className="map-banner-stars">⭐ ⭐ ⭐</span>
         </div>
 
-        {isDemo && (
-          <div style={{ background:"#FFF8E1", border:"1.5px solid #FFB300", borderRadius:10, padding:"8px 16px", margin:"0 0 12px 0", color:"#E65100", fontSize:"0.85rem", fontWeight:700, textAlign:"center" }}>
-            {t(lang,"results.demo")}
-          </div>
-        )}
+
 
         <div className="map-progress-row">
           <span className="map-progress-label">{t(lang,"results.progress")}: {avgScore}%</span>
@@ -71,7 +88,7 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
           </div>
         </div>
 
-        <div className="map-content">
+        <div className="map-content" style={{ justifyContent:"center" }}>
           <div className="radar-wrap">
             <RadarChart data={radarData} />
             <div className="radar-labels">

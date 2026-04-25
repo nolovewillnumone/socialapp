@@ -324,6 +324,7 @@ const styles = `
     background: #fff;
     border-radius: 24px;
     box-shadow: 0 8px 40px rgba(21,101,192,0.10);
+    width: calc(100% - 48px);
   }
 
   .map-banner {
@@ -362,13 +363,14 @@ const styles = `
   .map-progress-bar   { flex: 1; height: 10px; background: #E3F2FD; border-radius: 99px; overflow: hidden; }
   .map-progress-fill  { height: 100%; background: linear-gradient(90deg,#1565C0,#42A5F5,#FF7043); border-radius: 99px; transition: width 1s; }
 
-  .map-content { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .map-content { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
 
   .radar-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    flex: 0 0 auto;
   }
 
   .radar-svg { filter: drop-shadow(0 4px 16px rgba(21,101,192,0.15)); }
