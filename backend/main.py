@@ -270,3 +270,11 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+# Keep only last 100 results per user
+@app.on_event("startup")
+async def cleanup():
+    db = next(get_db())
+    db.execute(text("DELETE FROM quiz_results WHERE id NOT IN (SELECT id FROM quiz_results ORDER BY created_at DESC LIMIT 100)"))
+    db.commit()
