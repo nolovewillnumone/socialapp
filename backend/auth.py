@@ -11,16 +11,16 @@ SECRET_KEY           = os.getenv("SECRET_KEY", "karta-talantov-change-in-product
 ALGORITHM            = "HS256"
 TOKEN_EXPIRE_MINUTES = 60 * 24 * 7   # 7 days
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# sha256_crypt has no 72-byte limit unlike bcrypt
+pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    # bcrypt limit is 72 bytes — truncate to be safe
-    return pwd_context.hash(password[:72])
+    return pwd_context.hash(password)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain[:72], hashed)
+    return pwd_context.verify(plain, hashed)
 
 
 def create_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
