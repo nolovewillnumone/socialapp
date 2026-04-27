@@ -7,12 +7,16 @@ Run:  uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 Docs: http://localhost:8000/docs
 """
 
+from pydoc import text
+
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import httpx
 import os
+from sqlalchemy import text
+
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
