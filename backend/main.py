@@ -7,16 +7,15 @@ Run:  uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 Docs: http://localhost:8000/docs
 """
 
-from pydoc import text
-
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 import httpx
 import os
-from sqlalchemy import text
-
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
@@ -36,6 +35,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Compress responses — reduces payload size up to 70%
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "https://karta-talantov-ml.onrender.com")
@@ -59,26 +61,35 @@ async def get_current_user(
 # ── Health ────────────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "karta-talantov-backend"}
+    return JSONResponse(
+        content={"status": "ok", "service": "karta-talantov-backend"},
+        headers={"Cache-Control": "no-cache"}
+    )
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
 @app.post("/auth/register", response_model=schemas.UserOut, status_code=201)
 def register(body: schemas.UserCreate, db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == body.email).first():
-        raise HTTPException(status_code=400, detail="Email already registered")
-    user = models.User(
-        name=body.name,
-        email=body.email,
-        age=body.age,
-        lang=body.lang,
-        hashed_password=auth.hash_password(body.password),
-        role=body.role,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+    try:
+        if db.query(models.User).filter(models.User.email == body.email).first():
+            raise HTTPException(status_code=400, detail="Email already registered")
+        user = models.User(
+            name=body.name,
+            email=body.email,
+            age=body.age,
+            lang=body.lang or "ru",
+            hashed_password=auth.hash_password(body.password),
+            role=body.role or "child",
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 
 @app.post("/auth/login", response_model=schemas.TokenOut)
@@ -274,11 +285,3 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
-
-
-# Keep only last 100 results per user
-@app.on_event("startup")
-async def cleanup():
-    db = next(get_db())
-    db.execute(text("DELETE FROM quiz_results WHERE id NOT IN (SELECT id FROM quiz_results ORDER BY created_at DESC LIMIT 100)"))
-    db.commit()
