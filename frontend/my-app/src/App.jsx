@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ChatBot from "./components/ChatBot";
 import globalStyles from "./styles";
 import AuthPage    from "./pages/AuthPage";
 import HomePage    from "./pages/HomePage";
@@ -63,6 +64,7 @@ export default function App() {
       </div>
 
       {renderPage()}
+      {page !== "auth" && <ChatBot lang={lang} dark={dark} results={results} />}
     </>
   );
 }
