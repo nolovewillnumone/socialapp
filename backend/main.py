@@ -7,15 +7,20 @@ Run:  uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 Docs: http://localhost:8000/docs
 """
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from collections import defaultdict
+from datetime import datetime, timedelta
 import httpx
 import os
+import re
+import time
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
@@ -38,6 +43,35 @@ app.add_middleware(
 
 # Compress responses — reduces payload size up to 70%
 app.add_middleware(GZipMiddleware, minimum_size=500)
+
+# ── Simple in-memory rate limiter ─────────────────────────────────────────────
+_rate_store: dict = defaultdict(list)
+
+def rate_limit(request: Request, max_calls: int = 10, window_seconds: int = 60):
+    """Block IP if it exceeds max_calls in window_seconds."""
+    ip  = request.client.host if request.client else "unknown"
+    now = time.time()
+    # Remove old timestamps
+    _rate_store[ip] = [t for t in _rate_store[ip] if now - t < window_seconds]
+    if len(_rate_store[ip]) >= max_calls:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many requests. Try again in {window_seconds} seconds."
+        )
+    _rate_store[ip].append(now)
+
+def auth_rate_limit(request: Request):
+    """Strict limit for auth endpoints — 5 attempts per minute."""
+    rate_limit(request, max_calls=5, window_seconds=60)
+
+# ── Input sanitizer ───────────────────────────────────────────────────────────
+def sanitize(value: str, max_len: int = 200) -> str:
+    """Strip dangerous characters and limit length."""
+    if not value:
+        return value
+    # Remove potential SQL injection and script injection chars
+    cleaned = re.sub(r"[<>"'%;()&+]", "", value)
+    return cleaned[:max_len].strip()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "https://karta-talantov-ml.onrender.com")
@@ -69,17 +103,17 @@ def health():
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
 @app.post("/auth/register", response_model=schemas.UserOut, status_code=201)
-def register(body: schemas.UserCreate, db: Session = Depends(get_db)):
+def register(request: Request, body: schemas.UserCreate, db: Session = Depends(get_db), _: None = Depends(auth_rate_limit)):
     try:
         if db.query(models.User).filter(models.User.email == body.email).first():
             raise HTTPException(status_code=400, detail="Email already registered")
         user = models.User(
-            name=body.name,
-            email=body.email,
+            name=sanitize(body.name, 100),
+            email=sanitize(body.email, 200),
             age=body.age,
-            lang=body.lang or "ru",
+            lang=body.lang if body.lang in ["ru","uz","en"] else "ru",
             hashed_password=auth.hash_password(body.password),
-            role=body.role or "child",
+            role="child",  # always set to child — ignore user input
         )
         db.add(user)
         db.commit()
@@ -93,7 +127,7 @@ def register(body: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/auth/login", response_model=schemas.TokenOut)
-def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(request: Request, form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db), _: None = Depends(auth_rate_limit)):
     user = db.query(models.User).filter(models.User.email == form.username).first()
     if not user or not auth.verify_password(form.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
@@ -285,3 +319,4 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
