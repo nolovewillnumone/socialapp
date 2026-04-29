@@ -323,11 +323,13 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 # ── AI Chat ───────────────────────────────────────────────────────────────────
-class ChatMessage(BaseModel):
-    role: str    # "user" or "assistant"
+from pydantic import BaseModel as PydanticBase
+
+class ChatMessage(PydanticBase):
+    role: str
     text: str
 
-class ChatRequest(BaseModel):
+class ChatRequest(PydanticBase):
     messages: list
     lang:     str = "ru"
     scores:   dict = {}
