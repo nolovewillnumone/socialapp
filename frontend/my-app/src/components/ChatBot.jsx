@@ -69,41 +69,23 @@ export default function ChatBot({ lang, dark, results }) {
     setLoading(true);
 
     try {
-      // Build context about the user's results
-      const resultsContext = results?.scores
-        ? `User's talent scores: Logic ${results.scores.logic}%, Creativity ${results.scores.creativity}%, Memory ${results.scores.memory}%, Leadership ${results.scores.leadership}%, Languages ${results.scores.languages}%, Music ${results.scores.music}%. Top careers: ${results.careers?.map(c => c.name).join(", ") || "not yet determined"}.`
-        : "User hasn't taken the talent quiz yet.";
-
-      const systemPrompt = `You are a friendly AI talent advisor for "Karta Talantov" (Talent Map), a kids talent discovery platform for ages 8-16. 
-      
-You specialize in Howard Gardner's Multiple Intelligences theory (Harvard, 1983), Stanford-Binet intelligence assessment, career guidance for children, and educational recommendations.
-
-${resultsContext}
-
-Always respond in ${lang === "ru" ? "Russian" : lang === "uz" ? "Uzbek" : "English"}. 
-Keep responses concise, warm and encouraging — remember you're talking to kids aged 8-16.
-Use emojis to make responses fun. Max 3-4 sentences per response.
-If asked about careers or universities, reference MIT, Stanford, Harvard, Oxford, INHA Tashkent where relevant.
-Never give medical advice. Always be positive and supportive.`;
-
-      const history = newMsgs.slice(-6).map(m => ({
+      const history = newMsgs.slice(-10).map(m => ({
         role: m.role === "ai" ? "assistant" : "user",
-        content: m.text,
+        text: m.text,
       }));
 
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("https://karta-talantov-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model:      "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system:     systemPrompt,
-          messages:   history,
+          messages: history,
+          lang:     lang,
+          scores:   results?.scores || {},
         }),
       });
 
       const data = await response.json();
-      const reply = data.content?.[0]?.text || "Sorry, I couldn't respond. Try again!";
+      const reply = data.reply || "Sorry, I couldn't respond. Try again!";
       setMsgs(prev => [...prev, { role:"ai", text:reply, ts: Date.now() }]);
     } catch {
       setMsgs(prev => [...prev, { role:"ai", text: lang==="ru"?"Извини, произошла ошибка. Попробуй ещё раз! 🙏":lang==="uz"?"Kechirasiz, xato yuz berdi. Qayta urinib ko'ring! 🙏":"Sorry, an error occurred. Please try again! 🙏", ts: Date.now() }]);

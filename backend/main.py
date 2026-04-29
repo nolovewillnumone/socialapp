@@ -21,6 +21,7 @@ import httpx
 import os
 import re
 import time
+import anthropic
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
@@ -320,3 +321,60 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+# ── AI Chat ───────────────────────────────────────────────────────────────────
+class ChatMessage(BaseModel):
+    role: str    # "user" or "assistant"
+    text: str
+
+class ChatRequest(BaseModel):
+    messages: list
+    lang:     str = "ru"
+    scores:   dict = {}
+
+@app.post("/chat")
+async def chat(body: ChatRequest):
+    """AI talent advisor chatbot powered by Claude."""
+    try:
+        client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+
+        # Build scores context
+        scores_ctx = ""
+        if body.scores:
+            scores_ctx = f"User talent scores: Logic {body.scores.get('logic',0)}%, Creativity {body.scores.get('creativity',0)}%, Memory {body.scores.get('memory',0)}%, Leadership {body.scores.get('leadership',0)}%, Languages {body.scores.get('languages',0)}%, Music {body.scores.get('music',0)}%."
+
+        lang_name = {"ru": "Russian", "uz": "Uzbek", "en": "English"}.get(body.lang, "Russian")
+
+        system_prompt = f"""You are a friendly AI talent advisor for "Karta Talantov" (Talent Map), a kids talent discovery platform for ages 8-16.
+
+You specialize in Howard Gardner's Multiple Intelligences theory (Harvard, 1983), career guidance for children, and educational recommendations from MIT, Stanford, Harvard, Oxford, and INHA Tashkent.
+
+{scores_ctx if scores_ctx else "The user hasn't taken the talent quiz yet. Encourage them to take it!"}
+
+Rules:
+- Always respond in {lang_name}
+- Keep responses short, warm and encouraging (max 3-4 sentences)
+- Use emojis to make it fun for kids
+- Always be positive and supportive
+- Never give medical or legal advice
+- If asked about careers, reference top universities relevant to that field"""
+
+        # Convert messages to Anthropic format
+        messages = [
+            {"role": "user" if m["role"] == "user" else "assistant", "content": m["text"]}
+            for m in body.messages[-10:]  # Last 10 messages only
+        ]
+
+        response = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=300,
+            system=system_prompt,
+            messages=messages,
+        )
+
+        return {"reply": response.content[0].text}
+
+    except anthropic.AuthenticationError:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
