@@ -71,7 +71,7 @@ def sanitize(value: str, max_len: int = 200) -> str:
     if not value:
         return value
     # Remove potential SQL injection and script injection chars
-    cleaned = re.sub(r"[<>"'%;()&+]", "", value)
+    cleaned = re.sub(r"[<>%;()&+]", "", value)
     return cleaned[:max_len].strip()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
