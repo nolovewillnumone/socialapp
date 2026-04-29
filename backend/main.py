@@ -322,61 +322,202 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return user
 
 
-# ── AI Chat ───────────────────────────────────────────────────────────────────
+# ── Rule-based AI Chatbot (no external API needed) ──────────────────────────
 from pydantic import BaseModel as PydanticBase
 
-class ChatMessage(PydanticBase):
-    role: str
-    text: str
-
 class ChatRequest(PydanticBase):
-    messages: list
-    lang:     str = "ru"
-    scores:   dict = {}
+    message: str  = ""
+    lang:    str  = "ru"
+    scores:  dict = {}
+
+# ── Response database ─────────────────────────────────────────────────────────
+RESPONSES = {
+    # Greetings
+    "greet": {
+        "keywords": ["hello","hi","hey","привет","салам","salom","хай","здравствуй"],
+        "ru": ["Привет! 👋 Я твой AI-советник по талантам! Спроси меня о своих способностях, карьере или университетах 🌟",
+               "Привет! 😊 Готов помочь тебе раскрыть твои таланты! О чём хочешь узнать?"],
+        "uz": ["Salom! 👋 Men sizning iste'dod maslahatchimanman! Qobiliyatlar, kasb yoki universitetlar haqida so'rang 🌟",
+               "Salom! 😊 Iste'dodlaringizni ochishga yordam berishga tayyorman!"],
+        "en": ["Hi there! 👋 I'm your talent advisor! Ask me about your abilities, careers or universities 🌟",
+               "Hello! 😊 Ready to help you discover your talents! What would you like to know?"],
+    },
+    # Quiz
+    "quiz": {
+        "keywords": ["quiz","тест","test","вопрос","question","пройти","пройди","savol","topshiriq"],
+        "ru": ["Тест состоит из 15 вопросов и занимает около 5 минут 🎯 Он основан на теории множественного интеллекта Гарднера (Гарвард). Нажми 'Тест' в меню чтобы начать!",
+               "Наш тест проверяет 6 талантов: Логику, Творчество, Память, Лидерство, Языки и Музыку 🧠 Пройди его чтобы узнать свои сильные стороны!"],
+        "uz": ["Test 15 savoldan iborat va taxminan 5 daqiqa davom etadi 🎯 U Gardner nazariyasiga (Harvard) asoslangan. Boshlash uchun menyudagi 'Test' tugmasini bosing!",
+               "Testimiz 6 iste'dodni tekshiradi: Mantiq, Ijodkorlik, Xotira, Liderlik, Tillar va Musiqa 🧠"],
+        "en": ["The quiz has 15 questions and takes about 5 minutes 🎯 It's based on Gardner's Multiple Intelligences theory (Harvard). Click 'Quiz' in the menu to start!",
+               "Our quiz tests 6 talents: Logic, Creativity, Memory, Leadership, Languages and Music 🧠 Take it to discover your strengths!"],
+    },
+    # Logic
+    "logic": {
+        "keywords": ["logic","логика","mantiq","math","математика","matematika","программир","coding","код","code","dastur"],
+        "ru": ["Высокий логический интеллект — это дар! 🧠 Тебе подойдут профессии: Программист, Учёный, Инженер. Лучшие университеты: MIT, Stanford, INHA Tashkent!",
+               "Логика развивается через математику, шахматы и программирование 💻 Попробуй Khan Academy или Scratch для начала!"],
+        "uz": ["Yuqori mantiqiy intellekt — bu sovg'a! 🧠 Sizga mos kasblar: Dasturchi, Olim, Muhandis. Eng yaxshi universitetlar: MIT, Stanford, INHA Toshkent!",
+               "Mantiq matematika, shaxmat va dasturlash orqali rivojlanadi 💻 Khan Academy yoki Scratch bilan boshlang!"],
+        "en": ["High logical intelligence is a gift! 🧠 Great careers: Programmer, Scientist, Engineer. Top universities: MIT, Stanford, INHA Tashkent!",
+               "Logic develops through math, chess and coding 💻 Try Khan Academy or Scratch to start!"],
+    },
+    # Creativity
+    "creativity": {
+        "keywords": ["creativ","творч","ijodkor","art","искусств","рисов","design","дизайн","dizayn","rasm"],
+        "ru": ["Творческий интеллект — это суперсила! 🎨 Тебе подойдут: Дизайнер, Художник, Архитектор. Университеты: Rhode Island School of Design, O'zDSMI!",
+               "Развивай творчество через рисование, лепку и создание своих проектов 🌈 Попробуй Skillshare или Adobe Creative Cloud!"],
+        "uz": ["Ijodiy intellekt — bu superkuch! 🎨 Sizga mos: Dizayner, Rassom, Arxitektor. Universitetlar: Rhode Island School of Design, O'zDSMI!",
+               "Ijodkorlikni chizish, modellashtirish va loyihalar yaratish orqali rivojlantiring 🌈"],
+        "en": ["Creative intelligence is a superpower! 🎨 Great careers: Designer, Artist, Architect. Universities: Rhode Island School of Design, O'zDSMI!",
+               "Develop creativity through drawing, sculpting and making projects 🌈 Try Skillshare or Adobe Creative Cloud!"],
+    },
+    # Music
+    "music": {
+        "keywords": ["music","музык","musiqa","song","песн","qo'shiq","piano","гитар","guitar","нот","nota"],
+        "ru": ["Музыкальный интеллект развивает мозг! 🎵 Музыканты лучше учатся в школе. Университеты: Berklee College of Music, Juilliard, O'zbekiston Davlat Konservatoriyasi!",
+               "Занимайся на инструменте хотя бы 30 минут в день 🎹 Попробуй Simply Piano или Yousician — они бесплатные!"],
+        "uz": ["Musiqiy intellekt miyani rivojlantiradi! 🎵 Musiqachilar maktabda yaxshiroq o'qiydi. Universitetlar: Berklee, Juilliard, O'zbekiston Davlat Konservatoriyasi!",
+               "Har kuni kamida 30 daqiqa asbobda mashq qiling 🎹 Simply Piano yoki Yousician bepul!"],
+        "en": ["Musical intelligence develops the brain! 🎵 Musicians do better in school. Universities: Berklee College of Music, Juilliard, State Conservatory of Uzbekistan!",
+               "Practice an instrument at least 30 minutes daily 🎹 Try Simply Piano or Yousician — they're free!"],
+    },
+    # Leadership
+    "leadership": {
+        "keywords": ["leader","лидер","lider","boss","менеджер","manager","бизнес","business","biznes","управл","rahbar"],
+        "ru": ["Лидерский интеллект — редкий дар! 👑 Тебе подойдут: Менеджер, Предприниматель, Политик. Университеты: Harvard Business School, Westminster Tashkent!",
+               "Развивай лидерство через организацию мероприятий, дебатный клуб и волонтёрство 🌟 Учись слушать других — это главное качество лидера!"],
+        "uz": ["Liderlik intellekti — kam uchraydigan sovg'a! 👑 Sizga mos: Menejer, Tadbirkor, Siyosatchi. Universitetlar: Harvard Business School, Westminster Toshkent!",
+               "Liderlikni tadbirlar tashkil qilish, debat klubi va ko'ngillilik orqali rivojlantiring 🌟"],
+        "en": ["Leadership intelligence is a rare gift! 👑 Great careers: Manager, Entrepreneur, Politician. Universities: Harvard Business School, Westminster Tashkent!",
+               "Develop leadership by organizing events, joining debate club and volunteering 🌟 Learning to listen is the most important leadership skill!"],
+    },
+    # Languages
+    "languages": {
+        "keywords": ["language","язык","til","english","ingliz","ingliz","русский","french","франц","translat","перевод"],
+        "ru": ["Лингвистический интеллект открывает весь мир! 🌍 Карьеры: Переводчик, Дипломат, Журналист. Университеты: МГИМО, Georgetown, O'zDJTU!",
+               "Лучший способ учить язык — смотреть фильмы без субтитров и говорить с носителями 🗣️ Попробуй Duolingo или italki!"],
+        "uz": ["Lingvistik intellekt butun dunyoni ochadi! 🌍 Kasblar: Tarjimon, Diplomat, Jurnalist. Universitetlar: MGIMO, Georgetown, O'zDJTU!",
+               "Tilni o'rganishning eng yaxshi usuli — subtitrlar siz filmlar ko'rish va ona tili so'zlovchilari bilan gaplashish 🗣️"],
+        "en": ["Linguistic intelligence opens the whole world! 🌍 Careers: Translator, Diplomat, Journalist. Universities: MGIMO, Georgetown, O'zDJTU!",
+               "Best way to learn a language is watching films without subtitles and speaking with natives 🗣️ Try Duolingo or italki!"],
+    },
+    # Memory
+    "memory": {
+        "keywords": ["memory","память","xotira","remember","запомн","esla","study","учёба","o'qish","brain","мозг","miya"],
+        "ru": ["Отличная память — ключ к успеху в учёбе! 📚 Попробуй технику 'Дворец памяти' — её использовали Эйнштейн и Шерлок Холмс! Также помогает приложение Anki.",
+               "Память тренируется как мышца! 💪 Учи стихи, играй в шахматы, решай головоломки. Сон — лучший помощник для памяти!"],
+        "uz": ["A'lo xotira — o'qishdagi muvaffaqiyat kaliti! 📚 'Xotira saroyi' texnikasini sinab ko'ring — uni Eynshteyn ham ishlatgan! Anki ilovasi ham yordam beradi.",
+               "Xotira mushak kabi mashq qilinadi! 💪 She'r yod oling, shaxmat o'ynang, jumboqlar yeching!"],
+        "en": ["Great memory is the key to academic success! 📚 Try the 'Memory Palace' technique — Einstein used it! Anki app also helps a lot.",
+               "Memory trains like a muscle! 💪 Memorize poems, play chess, solve puzzles. Sleep is your memory's best friend!"],
+    },
+    # University
+    "university": {
+        "keywords": ["university","университет","univers","college","колледж","mit","stanford","harvard","oxford","inha","поступ","qabul"],
+        "ru": ["Топ университеты: 🧠 IT — MIT, Stanford, INHA. 🎨 Дизайн — Rhode Island. 🎵 Музыка — Berklee, Juilliard. 👑 Бизнес — Harvard Business, Westminster. 🌍 Языки — МГИМО, Georgetown.",
+               "Для поступления в топ университеты нужны: отличные оценки, олимпиады, портфолио и знание английского 📝 Начни готовиться прямо сейчас!"],
+        "uz": ["Top universitetlar: 🧠 IT — MIT, Stanford, INHA. 🎨 Dizayn — Rhode Island. 🎵 Musiqa — Berklee, Juilliard. 👑 Biznes — Harvard Business, Westminster. 🌍 Tillar — MGIMO, Georgetown.",
+               "Top universitetlarga kirish uchun: a'lo baholar, olimpiadalar, portfolio va ingliz tili kerak 📝"],
+        "en": ["Top universities: 🧠 IT — MIT, Stanford, INHA. 🎨 Design — Rhode Island. 🎵 Music — Berklee, Juilliard. 👑 Business — Harvard Business, Westminster. 🌍 Languages — MGIMO, Georgetown.",
+               "For top universities you need: excellent grades, olympiads, portfolio and English skills 📝 Start preparing now!"],
+    },
+    # Career
+    "career": {
+        "keywords": ["career","карьер","kasb","job","работ","ish","профессия","profession","future","будущ","kelajak"],
+        "ru": ["Выбор карьеры зависит от твоих талантов! 🚀 Пройди наш тест чтобы узнать свои сильные стороны, и я дам конкретные рекомендации!",
+               "Самые востребованные профессии будущего: Программист AI, Data Scientist, Кибербезопасность, Биоинженер 💡 Все они требуют сильной логики и математики!"],
+        "uz": ["Kasb tanlash iste'dodlaringizga bog'liq! 🚀 Kuchli tomonlaringizni bilish uchun testni topshiring!",
+               "Kelajakda eng ko'p talab qilinadigan kasblar: AI Dasturchi, Data Scientist, Kiberxavfsizlik, Bioinjener 💡"],
+        "en": ["Career choice depends on your talents! 🚀 Take our quiz to discover your strengths and I'll give specific recommendations!",
+               "Most in-demand future careers: AI Programmer, Data Scientist, Cybersecurity, Bioengineer 💡 All require strong logic and math!"],
+    },
+    # Help
+    "help": {
+        "keywords": ["help","помог","yordam","what can","что ты","что умеешь","nima qila","можешь","can you"],
+        "ru": ["Я могу помочь с: 🎯 анализом талантов, 🚀 выбором карьеры, 🎓 университетами, 📚 советами по развитию. Просто спроси!"],
+        "uz": ["Men yordam bera olaman: 🎯 iste'dodlar tahlili, 🚀 kasb tanlash, 🎓 universitetlar, 📚 rivojlanish maslahatlari. Shunchaki so'rang!"],
+        "en": ["I can help with: 🎯 talent analysis, 🚀 career choice, 🎓 university recommendations, 📚 development tips. Just ask!"],
+    },
+    # Thanks
+    "thanks": {
+        "keywords": ["thanks","thank","спасиб","рахмат","rahmat","merci","teşekk","sağ ol","пожалуйста"],
+        "ru": ["Всегда рад помочь! 😊 Удачи в раскрытии твоих талантов! 🌟", "Пожалуйста! 🤗 Ты можешь спросить меня о чём угодно!"],
+        "uz": ["Har doim yordam berishdan xursandman! 😊 Iste'dodlaringizni ochishda omad! 🌟", "Iltimos! 🤗 Istalgan narsa haqida so'rashingiz mumkin!"],
+        "en": ["Always happy to help! 😊 Good luck discovering your talents! 🌟", "You're welcome! 🤗 Feel free to ask me anything!"],
+    },
+}
+
+# Fallback responses when nothing matches
+FALLBACKS = {
+    "ru": [
+        "Интересный вопрос! 🤔 Попробуй спросить меня о своих талантах, карьере или университетах!",
+        "Я специализируюсь на талантах и карьере! 🌟 Спроси меня: 'Какая карьера мне подойдёт?' или 'Как развить логику?'",
+        "Хороший вопрос! Пройди наш тест чтобы узнать свои таланты, и я дам тебе персональные советы! 🎯",
+    ],
+    "uz": [
+        "Qiziq savol! 🤔 Iste'dodlar, kasb yoki universitetlar haqida so'rang!",
+        "Men iste'dod va kasbga ixtisoslashganman! 🌟 So'rang: 'Menga qanday kasb mos?' yoki 'Mantiqni qanday rivojlantirish?'",
+        "Testni topshiring va men sizga shaxsiy maslahatlar beraman! 🎯",
+    ],
+    "en": [
+        "Interesting question! 🤔 Try asking me about your talents, career or universities!",
+        "I specialize in talents and careers! 🌟 Ask me: 'What career suits me?' or 'How to develop logic?'",
+        "Take our quiz to discover your talents and I'll give you personalized advice! 🎯",
+    ],
+}
+
+import random
+
+def get_top_talent_response(scores: dict, lang: str) -> str:
+    """Generate a response based on the user's top talent score."""
+    if not scores:
+        return ""
+    top = max(scores, key=scores.get)
+    score = scores[top]
+    talent_msgs = {
+        "logic":      {"ru": f"Твой топ-талант — Логика ({score}%)! 🧠 Тебе отлично подойдут IT и наука!", "uz": f"Sizning top iste'dodingiz — Mantiq ({score}%)! 🧠", "en": f"Your top talent is Logic ({score}%)! 🧠 IT and science are perfect for you!"},
+        "creativity": {"ru": f"Твой топ-талант — Творчество ({score}%)! 🎨 Ты прирождённый дизайнер или художник!", "uz": f"Sizning top iste'dodingiz — Ijodkorlik ({score}%)! 🎨", "en": f"Your top talent is Creativity ({score}%)! 🎨 You're a natural designer or artist!"},
+        "memory":     {"ru": f"Твой топ-талант — Память ({score}%)! 📚 Ты можешь стать отличным учёным или врачом!", "uz": f"Sizning top iste'dodingiz — Xotira ({score}%)! 📚", "en": f"Your top talent is Memory ({score}%)! 📚 You could be a great scientist or doctor!"},
+        "leadership": {"ru": f"Твой топ-талант — Лидерство ({score}%)! 👑 Ты рождён быть руководителем!", "uz": f"Sizning top iste'dodingiz — Liderlik ({score}%)! 👑", "en": f"Your top talent is Leadership ({score}%)! 👑 You were born to lead!"},
+        "languages":  {"ru": f"Твой топ-талант — Языки ({score}%)! 🌍 Мир открыт для тебя!", "uz": f"Sizning top iste'dodingiz — Tillar ({score}%)! 🌍", "en": f"Your top talent is Languages ({score}%)! 🌍 The whole world is open to you!"},
+        "music":      {"ru": f"Твой топ-талант — Музыка ({score}%)! 🎵 Ты настоящий музыкант!", "uz": f"Sizning top iste'dodingiz — Musiqa ({score}%)! 🎵", "en": f"Your top talent is Music ({score}%)! 🎵 You're a true musician!"},
+    }
+    return talent_msgs.get(top, {}).get(lang, "")
+
+
+def find_response(message: str, lang: str, scores: dict) -> str:
+    msg_lower = message.lower().strip()
+
+    # Check for talent-related questions with scores context
+    talent_keywords = ["my talent","мой талант","мои способ","qobilyat","iste'dod","my score","мои резуль","result","результ","natija"]
+    if any(k in msg_lower for k in talent_keywords) and scores:
+        talent_resp = get_top_talent_response(scores, lang)
+        if talent_resp:
+            return talent_resp
+
+    # Match keywords to response categories
+    for category, data in RESPONSES.items():
+        if any(kw in msg_lower for kw in data["keywords"]):
+            options = data.get(lang, data.get("en", []))
+            if options:
+                return random.choice(options)
+
+    # Fallback
+    return random.choice(FALLBACKS.get(lang, FALLBACKS["en"]))
+
 
 @app.post("/chat")
-async def chat(body: ChatRequest):
-    """AI talent advisor chatbot powered by Claude."""
+def chat(body: ChatRequest):
+    """Rule-based AI talent advisor chatbot."""
     try:
-        client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+        message = body.message.strip()
+        if not message:
+            greet_data = RESPONSES["greet"]
+            return {"reply": random.choice(greet_data.get(body.lang, greet_data["en"]))}
 
-        # Build scores context
-        scores_ctx = ""
-        if body.scores:
-            scores_ctx = f"User talent scores: Logic {body.scores.get('logic',0)}%, Creativity {body.scores.get('creativity',0)}%, Memory {body.scores.get('memory',0)}%, Leadership {body.scores.get('leadership',0)}%, Languages {body.scores.get('languages',0)}%, Music {body.scores.get('music',0)}%."
+        reply = find_response(message, body.lang, body.scores)
+        return {"reply": reply}
 
-        lang_name = {"ru": "Russian", "uz": "Uzbek", "en": "English"}.get(body.lang, "Russian")
-
-        system_prompt = f"""You are a friendly AI talent advisor for "Karta Talantov" (Talent Map), a kids talent discovery platform for ages 8-16.
-
-You specialize in Howard Gardner's Multiple Intelligences theory (Harvard, 1983), career guidance for children, and educational recommendations from MIT, Stanford, Harvard, Oxford, and INHA Tashkent.
-
-{scores_ctx if scores_ctx else "The user hasn't taken the talent quiz yet. Encourage them to take it!"}
-
-Rules:
-- Always respond in {lang_name}
-- Keep responses short, warm and encouraging (max 3-4 sentences)
-- Use emojis to make it fun for kids
-- Always be positive and supportive
-- Never give medical or legal advice
-- If asked about careers, reference top universities relevant to that field"""
-
-        # Convert messages to Anthropic format
-        messages = [
-            {"role": "user" if m["role"] == "user" else "assistant", "content": m["text"]}
-            for m in body.messages[-10:]  # Last 10 messages only
-        ]
-
-        response = client.messages.create(
-            model="claude-opus-4-5",
-            max_tokens=300,
-            system=system_prompt,
-            messages=messages,
-        )
-
-        return {"reply": response.content[0].text}
-
-    except anthropic.AuthenticationError:
-        raise HTTPException(status_code=401, detail="Invalid API key")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")

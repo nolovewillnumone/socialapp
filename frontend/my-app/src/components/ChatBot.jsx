@@ -69,18 +69,15 @@ export default function ChatBot({ lang, dark, results }) {
     setLoading(true);
 
     try {
-      const history = newMsgs.slice(-10).map(m => ({
-        role: m.role === "ai" ? "assistant" : "user",
-        text: m.text,
-      }));
+
 
       const response = await fetch("https://karta-talantov-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: history,
-          lang:     lang,
-          scores:   results?.scores || {},
+          message: q,
+          lang:    lang,
+          scores:  results?.scores || {},
         }),
       });
 
