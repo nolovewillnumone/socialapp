@@ -1,5 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import Nav from "../components/Nav";
+
+const TASK_CSS = `
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  @keyframes cardPop { from{opacity:0;transform:scale(0.9) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .game-opt:hover { transform: translateX(8px) !important; border-color: #90CAF9 !important; background: linear-gradient(135deg,#EEF6FF,#E3F2FD) !important; box-shadow: 0 6px 20px rgba(21,101,192,0.14) !important; }
+  .emoji-btn:hover { transform: scale(1.25) rotate(8deg) !important; box-shadow: 0 6px 20px rgba(21,101,192,0.2) !important; border-color: #90CAF9 !important; }
+  .fin-btn:hover { transform: translateY(-4px) scale(1.04) !important; box-shadow: 0 12px 32px rgba(21,101,192,0.45) !important; }
+  .city-chip:hover { transform: translateY(-3px) scale(1.06) !important; box-shadow: 0 6px 16px rgba(21,101,192,0.2) !important; background: linear-gradient(135deg,#BBDEFB,#E3F2FD) !important; }
+  .search-btn:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 20px rgba(21,101,192,0.4) !important; }
+  .gps-btn:hover { transform: translateY(-3px) scale(1.02) !important; box-shadow: 0 10px 28px rgba(255,112,67,0.45) !important; }
+  .map-card:hover { transform: translateX(6px) !important; box-shadow: 0 8px 24px rgba(21,101,192,0.12) !important; border-color: #90CAF9 !important; }
+  .map-open-btn:hover { background: linear-gradient(135deg,#1565C0,#42A5F5) !important; color: #fff !important; box-shadow: 0 4px 14px rgba(21,101,192,0.35) !important; }
+  .change-btn:hover { transform: scale(1.05) !important; box-shadow: 0 4px 12px rgba(230,74,19,0.25) !important; }
+`;
 import Loader from "../components/Loader";
 import { t } from "../i18n";
 
@@ -35,7 +50,7 @@ function LogicGame({ onFinish, lang }) {
       <p style={G.question}>{p.seq.join(" → ")} → <span style={{ color: "#FF7043", fontWeight: 900 }}>?</span></p>
       <div style={G.opts}>
         {p.opts.map((opt) => (
-          <button key={opt} style={{ ...G.opt, ...(selected === opt ? (opt === p.answer ? G.optRight : G.optWrong) : {}) }} onClick={() => pick(opt)}>
+          <button key={opt} className="game-opt" style={{ ...G.opt, ...(selected === opt ? (opt === p.answer ? G.optRight : G.optWrong) : {}) }} onClick={() => pick(opt)}>
             {opt}
           </button>
         ))}
@@ -98,7 +113,7 @@ function MemoryGame({ onFinish, lang }) {
           </p>
           <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center", maxWidth:300 }}>
             {POOL.slice(0, 9).map((e) => (
-              <button key={e} style={G.emojiBtn} onClick={() => pick(e)}>{e}</button>
+              <button key={e} className="emoji-btn" style={G.emojiBtn} onClick={() => pick(e)}>{e}</button>
             ))}
           </div>
         </>
@@ -230,7 +245,7 @@ function GameResult({ score, talent, onFinish, lang }) {
       <div style={{ fontSize:"3.5rem", animation:"float 2s ease-in-out infinite" }}>{emoji}</div>
       <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color }}>{score}%</div>
       <div style={{ fontWeight:800, color:"#546E7A", marginBottom:16 }}>{msg[lang]||msg.ru}</div>
-      <button style={G.finBtn} onClick={() => onFinish(talent, score)}>{btnLabel[lang]||btnLabel.ru}</button>
+      <button className="fin-btn" style={G.finBtn} onClick={() => onFinish(talent, score)}>{btnLabel[lang]||btnLabel.ru}</button>
     </div>
   );
 }
@@ -238,15 +253,15 @@ function GameResult({ score, talent, onFinish, lang }) {
 // ── Shared game styles ────────────────────────────────────────────────────────
 const G = {
   wrap:     { display:"flex", flexDirection:"column", alignItems:"center", gap:14, padding:"8px 0", minHeight:260 },
-  badge:    { background:"#E3F2FD", color:"#1565C0", fontWeight:800, fontSize:"0.85rem", padding:"4px 14px", borderRadius:99 },
-  question: { fontFamily:"'Fredoka One',cursive", fontSize:"1.15rem", color:"#1565C0", textAlign:"center", lineHeight:1.4 },
+  badge:    { background:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", color:"#1565C0", fontWeight:800, fontSize:"0.85rem", padding:"6px 16px", borderRadius:99, boxShadow:"0 2px 8px rgba(21,101,192,0.12)", letterSpacing:"0.04em" },
+  question: { fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem", color:"#1565C0", textAlign:"center", lineHeight:1.4, padding:"0 8px" },
   opts:     { display:"flex", flexDirection:"column", gap:10, width:"100%" },
-  opt:      { padding:"12px 16px", border:"2px solid #E3F2FD", borderRadius:14, background:"#F8FBFF", fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", color:"#37474F", cursor:"pointer", textAlign:"left", transition:"all 0.2s" },
-  optRight: { background:"#E8F5E9", borderColor:"#66BB6A", color:"#2E7D32" },
-  optWrong: { background:"#FFEBEE", borderColor:"#EF5350", color:"#C62828" },
-  emojiBtn: { fontSize:"1.6rem", border:"2px solid #E3F2FD", borderRadius:12, background:"#F8FBFF", cursor:"pointer", padding:"8px", transition:"transform 0.15s" },
-  textarea: { width:"100%", minHeight:120, padding:"12px 14px", border:"2px solid #E3F2FD", borderRadius:14, fontFamily:"'Nunito',sans-serif", fontSize:"0.92rem", fontWeight:600, resize:"none", outline:"none", color:"#37474F" },
-  finBtn:   { padding:"13px 32px", background:"linear-gradient(135deg,#1565C0,#1976D2)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(21,101,192,0.3)" },
+  opt:      { padding:"13px 18px", border:"2px solid #E3F2FD", borderRadius:16, background:"#F8FBFF", fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", color:"#37474F", cursor:"pointer", textAlign:"left", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(21,101,192,0.04)", position:"relative", overflow:"hidden" },
+  optRight: { background:"linear-gradient(135deg,#E8F5E9,#F1F8E9)", borderColor:"#66BB6A", color:"#2E7D32", boxShadow:"0 4px 16px rgba(102,187,106,0.25)", transform:"translateX(6px)" },
+  optWrong: { background:"linear-gradient(135deg,#FFEBEE,#FFF3E0)", borderColor:"#EF5350", color:"#C62828", boxShadow:"0 4px 16px rgba(239,83,80,0.2)", animation:"shake 0.4s ease" },
+  emojiBtn: { fontSize:"1.8rem", border:"2px solid #E3F2FD", borderRadius:14, background:"linear-gradient(135deg,#F8FBFF,#EEF6FF)", cursor:"pointer", padding:"10px", transition:"all 0.2s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(21,101,192,0.06)" },
+  textarea: { width:"100%", minHeight:120, padding:"14px 16px", border:"2px solid #E3F2FD", borderRadius:16, fontFamily:"'Nunito',sans-serif", fontSize:"0.92rem", fontWeight:600, resize:"none", outline:"none", color:"#37474F", boxShadow:"inset 0 2px 8px rgba(21,101,192,0.04)", transition:"border-color 0.2s" },
+  finBtn:   { padding:"14px 36px", background:"linear-gradient(135deg,#1565C0,#42A5F5)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 8px 24px rgba(21,101,192,0.35)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)", letterSpacing:"0.03em" },
 };
 
 // ── Nearby Establishments ─────────────────────────────────────────────────────
@@ -313,7 +328,7 @@ function EstablishmentsMap({ lang }) {
         <span style={{ fontSize:"1.4rem" }}>🗺️</span>
         <span style={M.title}>{L.title[lang]}</span>
         {step === "done" && (
-          <button onClick={() => { setStep("pick"); setInput(""); setCity(""); }} style={M.changeBtn}>
+          <button onClick={() => { setStep("pick"); setInput(""); setCity(""); }} className="change-btn" style={M.changeBtn}>
             {L.change[lang]}
           </button>
         )}
@@ -337,7 +352,7 @@ function EstablishmentsMap({ lang }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && searchCity()}
             />
-            <button style={M.searchBtn} onClick={searchCity}>
+            <button className="search-btn" style={M.searchBtn} onClick={searchCity}>
               {L.searchBtn[lang]}
             </button>
           </div>
@@ -345,7 +360,7 @@ function EstablishmentsMap({ lang }) {
           {/* Quick city buttons */}
           <div style={M.quickCities}>
             {["Toshkent", "Samarqand", "Buxoro", "Namangan", "Andijon"].map((c) => (
-              <button key={c} style={M.cityChip}
+              <button key={c} className="city-chip" style={M.cityChip}
                 onClick={() => { setCity(c); setStep("done"); }}>
                 {c}
               </button>
@@ -355,7 +370,7 @@ function EstablishmentsMap({ lang }) {
           <div style={M.divider}><span style={M.dividerText}>{lang==="ru"?"или":lang==="uz"?"yoki":"or"}</span></div>
 
           {/* GPS button */}
-          <button style={M.gpsBtn} onClick={useGPS} disabled={step === "gps"}>
+          <button className="gps-btn" style={M.gpsBtn} onClick={useGPS} disabled={step === "gps"}>
             {step === "gps"
               ? (lang==="ru"?"Определяем...":lang==="uz"?"Aniqlanmoqda...":"Detecting...")
               : L.gpsBtn[lang]}
@@ -382,7 +397,7 @@ function EstablishmentsMap({ lang }) {
                       <div style={M.type}>{c.query} · {city}</div>
                     </div>
                   </div>
-                  <a href={mapsUrl} target="_blank" rel="noreferrer" style={M.openBtn}>
+                  <a href={mapsUrl} target="_blank" rel="noreferrer" className="map-open-btn" style={M.openBtn}>
                     {L.open[lang]}
                   </a>
                 </div>
@@ -396,28 +411,28 @@ function EstablishmentsMap({ lang }) {
 }
 
 const M = {
-  wrap:        { background:"#F8FBFF", borderRadius:20, padding:"20px", border:"1.5px solid #E3F2FD", marginTop:24 },
-  header:      { display:"flex", alignItems:"center", gap:10, marginBottom:16, flexWrap:"wrap" },
-  title:       { fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", color:"#1565C0", flex:1 },
-  changeBtn:   { border:"none", background:"#FFF3E0", color:"#E64A19", borderRadius:99, padding:"4px 12px", fontWeight:800, cursor:"pointer", fontSize:"0.78rem", fontFamily:"'Nunito',sans-serif" },
-  pickWrap:    { display:"flex", flexDirection:"column", gap:12 },
+  wrap:        { background:"linear-gradient(135deg,#F8FBFF,#F0F7FF)", borderRadius:24, padding:"24px", border:"1.5px solid #E3F2FD", marginTop:24, boxShadow:"0 4px 20px rgba(21,101,192,0.06)" },
+  header:      { display:"flex", alignItems:"center", gap:10, marginBottom:18, flexWrap:"wrap" },
+  title:       { fontFamily:"'Fredoka One',cursive", fontSize:"1.15rem", color:"#1565C0", flex:1 },
+  changeBtn:   { border:"none", background:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", color:"#E64A19", borderRadius:99, padding:"6px 14px", fontWeight:800, cursor:"pointer", fontSize:"0.78rem", fontFamily:"'Nunito',sans-serif", boxShadow:"0 2px 8px rgba(230,74,19,0.15)", transition:"all 0.2s" },
+  pickWrap:    { display:"flex", flexDirection:"column", gap:14 },
   subtitle:    { fontSize:"0.88rem", fontWeight:700, color:"#78909C", textAlign:"center" },
-  errBox:      { background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"8px 14px", color:"#C62828", fontSize:"0.85rem", fontWeight:700 },
+  errBox:      { background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:12, padding:"10px 16px", color:"#C62828", fontSize:"0.85rem", fontWeight:700 },
   inputRow:    { display:"flex", gap:8 },
-  input:       { flex:1, padding:"11px 14px", border:"2px solid #E3F2FD", borderRadius:12, fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", outline:"none", color:"#1A237E" },
-  searchBtn:   { padding:"11px 18px", background:"linear-gradient(135deg,#1565C0,#1976D2)", color:"#fff", border:"none", borderRadius:12, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer", whiteSpace:"nowrap" },
+  input:       { flex:1, padding:"12px 16px", border:"2px solid #E3F2FD", borderRadius:14, fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", outline:"none", color:"#1A237E", transition:"border-color 0.2s, box-shadow 0.2s", boxShadow:"0 2px 8px rgba(21,101,192,0.04)" },
+  searchBtn:   { padding:"12px 20px", background:"linear-gradient(135deg,#1565C0,#42A5F5)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer", whiteSpace:"nowrap", boxShadow:"0 4px 14px rgba(21,101,192,0.3)", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)" },
   quickCities: { display:"flex", flexWrap:"wrap", gap:8, justifyContent:"center" },
-  cityChip:    { border:"1.5px solid #BBDEFB", background:"#E3F2FD", color:"#1565C0", borderRadius:99, padding:"5px 14px", fontWeight:800, fontSize:"0.82rem", cursor:"pointer", fontFamily:"'Nunito',sans-serif", transition:"all 0.15s" },
+  cityChip:    { border:"1.5px solid #BBDEFB", background:"linear-gradient(135deg,#E3F2FD,#EEF6FF)", color:"#1565C0", borderRadius:99, padding:"7px 16px", fontWeight:800, fontSize:"0.82rem", cursor:"pointer", fontFamily:"'Nunito',sans-serif", transition:"all 0.2s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(21,101,192,0.08)" },
   divider:     { display:"flex", alignItems:"center", gap:8 },
   dividerText: { fontSize:"0.8rem", color:"#B0BEC5", fontWeight:700, padding:"0 8px", background:"#F8FBFF" },
-  gpsBtn:      { width:"100%", padding:"12px", background:"linear-gradient(135deg,#FF7043,#FF8A65)", color:"#fff", border:"none", borderRadius:12, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer", boxShadow:"0 4px 14px rgba(255,112,67,0.3)", transition:"opacity 0.2s" },
+  gpsBtn:      { width:"100%", padding:"14px", background:"linear-gradient(135deg,#FF7043,#FF8A65)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(255,112,67,0.35)", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)" },
   cityLabel:   { fontSize:"0.88rem", fontWeight:700, color:"#546E7A", marginBottom:12, textAlign:"center" },
   list:        { display:"flex", flexDirection:"column", gap:10 },
-  card:        { background:"#fff", borderRadius:14, padding:"12px 16px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1.5px solid #E3F2FD", transition:"transform 0.2s, box-shadow 0.2s" },
+  card:        { background:"#fff", borderRadius:16, padding:"14px 18px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1.5px solid #E3F2FD", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 10px rgba(21,101,192,0.05)" },
   left:        { display:"flex", alignItems:"center", gap:12 },
-  name:        { fontWeight:800, color:"#1A237E", fontSize:"0.88rem" },
+  name:        { fontWeight:800, color:"#1A237E", fontSize:"0.9rem" },
   type:        { fontSize:"0.74rem", color:"#90A4AE", fontWeight:600, marginTop:2 },
-  openBtn:     { fontSize:"0.78rem", fontWeight:800, color:"#1565C0", textDecoration:"none", background:"#E3F2FD", padding:"6px 12px", borderRadius:99, whiteSpace:"nowrap" },
+  openBtn:     { fontSize:"0.78rem", fontWeight:800, color:"#1565C0", textDecoration:"none", background:"linear-gradient(135deg,#E3F2FD,#EEF6FF)", padding:"7px 14px", borderRadius:99, whiteSpace:"nowrap", boxShadow:"0 2px 8px rgba(21,101,192,0.12)", transition:"all 0.2s" },
 };
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
@@ -455,7 +470,7 @@ export default function TasksPage({ setPage, lang, dark }) {
       try {
         const token = localStorage.getItem("token");
         if (token) {
-          await fetch("http://localhost:8000/results/tasks", {
+          await fetch("https://karta-talantov-backend.onrender.com/results/tasks", {
             method:"POST",
             headers:{ "Content-Type":"application/json", Authorization:`Bearer ${token}` },
             body:JSON.stringify({ task_scores: newScores, lang }),
@@ -478,6 +493,7 @@ export default function TasksPage({ setPage, lang, dark }) {
 
   return (
     <div className="page-wrap">
+      <style>{TASK_CSS}</style>
       <Nav page="tasks" setPage={setPage} lang={lang} dark={dark} />
       <div className="progress-bar-wrap" style={{ marginTop:16 }}>
         <div className="progress-bar-fill" style={{ width:`${progress}%` }} />
@@ -509,18 +525,24 @@ export default function TasksPage({ setPage, lang, dark }) {
             return (
               <div key={task.id} className="task-card"
                 onClick={() => !done && setActiveGame(task.id)}
-                style={{ opacity:done?0.85:1, cursor:done?"default":"pointer" }}
+                style={{ opacity:done?0.9:1, cursor:done?"default":"pointer", transform:"translateY(0)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+                onMouseEnter={e => { if(!done){ e.currentTarget.style.transform="translateY(-8px) scale(1.03)"; e.currentTarget.style.boxShadow=`0 16px 40px ${task.color}33`; }}}
+                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0) scale(1)"; e.currentTarget.style.boxShadow=""; }}
+                onMouseDown={e => { if(!done) e.currentTarget.style.transform="scale(0.97)"; }}
               >
-                <div className="task-card-header" style={{ background:done?"#78909C":task.color }}>
+                <div className="task-card-header" style={{ background: done ? "linear-gradient(135deg,#78909C,#90A4AE)" : `linear-gradient(135deg,${task.color},${task.color}cc)`, letterSpacing:"0.05em" }}>
                   <span style={{ fontSize:"1.1rem" }}>{done?"✅":"⭐"}</span>
                   {LABELS[task.id]?.[lang]?.toUpperCase()}
                 </div>
-                <div className="task-card-body">
-                  <div className="task-card-emoji">{task.emoji}</div>
+                <div className="task-card-body" style={{ background: done ? `${task.color}08` : "#fff" }}>
+                  <div className="task-card-emoji" style={{ filter: done?"grayscale(0)":"none" }}>{task.emoji}</div>
                   {done
-                    ? <div style={{ fontWeight:900, color:task.color, fontSize:"1.4rem" }}>{score}%</div>
+                    ? <div style={{ fontWeight:900, color:task.color, fontSize:"1.5rem", fontFamily:"'Fredoka One',cursive" }}>{score}%</div>
                     : <div className="task-card-desc">{DESCS[task.id]?.[lang]}</div>
                   }
+                  {!done && <div style={{ marginTop:8, fontSize:"0.72rem", fontWeight:700, color:task.color, background:`${task.color}12`, padding:"3px 10px", borderRadius:99, display:"inline-block" }}>
+                    {lang==="ru"?"Играть →":lang==="uz"?"O'ynash →":"Play →"}
+                  </div>}
                 </div>
               </div>
             );

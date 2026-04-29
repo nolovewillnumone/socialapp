@@ -1,4 +1,24 @@
 import { useState, useEffect } from "react";
+
+const DEV_CSS = `
+  @keyframes tabIn { from{opacity:0;transform:translateY(10px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes cardSlide { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .talent-tab { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .talent-tab:hover { transform: translateY(-4px) scale(1.05) !important; }
+  .tip-item { transition: all 0.2s ease !important; border-radius: 10px; padding: 8px 10px; }
+  .tip-item:hover { background: rgba(21,101,192,0.05) !important; transform: translateX(6px) !important; }
+  .course-item { transition: all 0.2s ease !important; border-radius: 10px; padding: 8px 10px; cursor: pointer; }
+  .course-item:hover { background: rgba(255,112,67,0.06) !important; transform: translateX(6px) !important; }
+  .uni-chip { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; cursor: default; }
+  .uni-chip:hover { transform: translateY(-4px) scale(1.04) !important; }
+  .career-card { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; cursor: default; }
+  .career-card:hover { transform: translateY(-6px) !important; }
+  .dev-btn-home:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(21,101,192,0.4) !important; }
+  .dev-btn-tasks:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(255,112,67,0.4) !important; }
+  .develop-card { transition: box-shadow 0.2s ease !important; }
+  .develop-card:hover { box-shadow: 0 8px 32px rgba(21,101,192,0.12) !important; }
+`;
 import Nav from "../components/Nav";
 import Loader from "../components/Loader";
 import { quizAPI } from "../api/client";
@@ -235,13 +255,17 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
 
   return (
     <div className="page-wrap">
+      <style>{DEV_CSS}</style>
       <Nav page="develop" setPage={setPage} lang={lang} dark={dark} />
 
       <div className="develop-section">
         {/* Banner */}
-        <div className="develop-banner">
-          <div className="develop-banner-title">{L.banner}</div>
-          <span style={{ color:"#fff", fontSize:"0.9rem", fontWeight:700 }}>{L.personal}</span>
+        <div className="develop-banner" style={{ background:"linear-gradient(135deg,#FF7043,#FF8A65,#FFB300)", backgroundSize:"200% 200%", animation:"shimmer 4s ease infinite" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <span style={{ fontSize:"1.6rem" }}>🌟</span>
+            <div className="develop-banner-title">{L.banner}</div>
+          </div>
+          <span style={{ color:"rgba(255,255,255,0.9)", fontSize:"0.88rem", fontWeight:700, background:"rgba(255,255,255,0.15)", padding:"4px 12px", borderRadius:99, backdropFilter:"blur(4px)" }}>{L.personal}</span>
         </div>
 
         {/* No results state */}
@@ -267,11 +291,11 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                   const score = Math.round(data.scores[talent]);
                   const isActive = i === activeTab;
                   return (
-                    <button key={talent} onClick={() => setActiveTab(i)}
-                      style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px", borderRadius:50, border:`2px solid ${isActive ? td.color : "#E3F2FD"}`, background: isActive ? td.color : (dark?"#1A2A3A":"#fff"), color: isActive ? "#fff" : (dark?"#E3F2FD":"#1A237E"), fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"0.9rem", cursor:"pointer", transition:"all 0.2s", boxShadow: isActive ? `0 4px 16px ${td.color}44` : "none" }}>
-                      <span>{td.icon}</span>
+                    <button key={talent} className="talent-tab" onClick={() => setActiveTab(i)}
+                      style={{ display:"flex", alignItems:"center", gap:8, padding:"11px 20px", borderRadius:50, border:`2px solid ${isActive ? td.color : "#E3F2FD"}`, background: isActive ? `linear-gradient(135deg,${td.color},${td.color}cc)` : (dark?"#1A2A3A":"#fff"), color: isActive ? "#fff" : (dark?"#E3F2FD":"#1A237E"), fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"0.9rem", cursor:"pointer", boxShadow: isActive ? `0 6px 20px ${td.color}44` : "0 2px 8px rgba(21,101,192,0.06)", animation: isActive?"tabIn 0.3s ease both":"none" }}>
+                      <span style={{ fontSize:"1.1rem" }}>{td.icon}</span>
                       {TALENT_NAMES[talent]?.[lang]}
-                      <span style={{ background: isActive?"rgba(255,255,255,0.25)":"#E3F2FD", color: isActive?"#fff":td.color, borderRadius:99, padding:"2px 8px", fontSize:"0.78rem", fontWeight:900 }}>
+                      <span style={{ background: isActive?"rgba(255,255,255,0.25)":"#E3F2FD", color: isActive?"#fff":td.color, borderRadius:99, padding:"3px 10px", fontSize:"0.78rem", fontWeight:900 }}>
                         {score}%
                       </span>
                     </button>
@@ -291,8 +315,8 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                   </div>
                   <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
                     {talentData.tips[lang]?.map((tip, i) => (
-                      <li key={i} style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E3F2FD":"#37474F", display:"flex", gap:8, alignItems:"flex-start" }}>
-                        <span style={{ color:talentData.color, flexShrink:0 }}>✔</span> {tip}
+                      <li key={i} className="tip-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E3F2FD":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
+                        <span style={{ color:talentData.color, flexShrink:0, fontSize:"1rem" }}>✔</span> {tip}
                       </li>
                     ))}
                   </ul>
@@ -305,8 +329,8 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                   </div>
                   <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
                     {talentData.courses[lang]?.map((course, i) => (
-                      <li key={i} style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E3F2FD":"#37474F", display:"flex", gap:8, alignItems:"flex-start" }}>
-                        <span style={{ color:"#FF7043", flexShrink:0 }}>→</span> {course}
+                      <li key={i} className="course-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E3F2FD":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
+                        <span style={{ color:"#FF7043", flexShrink:0, fontSize:"1rem" }}>→</span> {course}
                       </li>
                     ))}
                   </ul>
@@ -322,9 +346,7 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                 </div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginTop:4 }}>
                   {talentData.universities[lang]?.map((uni, i) => (
-                    <div key={i} style={{ background: dark?"#0F1923":"#fff", border:`1.5px solid ${talentData.color}33`, borderRadius:12, padding:"8px 14px", fontSize:"0.82rem", fontWeight:800, color: dark?"#E3F2FD":"#1A237E", boxShadow:`0 2px 8px ${talentData.color}15`, transition:"transform 0.2s" }}
-                      onMouseEnter={e => e.currentTarget.style.transform="translateY(-2px)"}
-                      onMouseLeave={e => e.currentTarget.style.transform=""}>
+                    <div key={i} className="uni-chip" style={{ background: dark?"#0F1923":`linear-gradient(135deg,#fff,${talentData.color}08)`, border:`1.5px solid ${talentData.color}33`, borderRadius:14, padding:"9px 16px", fontSize:"0.82rem", fontWeight:800, color: dark?"#E3F2FD":"#1A237E", boxShadow:`0 2px 10px ${talentData.color}18`, animation:`cardSlide 0.3s ease ${i*0.06}s both` }}>
                       {uni}
                     </div>
                   ))}
@@ -341,8 +363,8 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                 <div className="develop-card-title">🚀 {L.careers}</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {careers.map((career, i) => (
-                    <div key={i} style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#0F1923":"#F8FBFF", border:"1.5px solid #E3F2FD", borderRadius:14, padding:"10px 16px", flex:1, minWidth:160 }}>
-                      <span style={{ fontSize:"1.6rem" }}>{career.icon}</span>
+                    <div key={i} className="career-card" style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#0F1923":`linear-gradient(135deg,#F8FBFF,#fff)`, border:"1.5px solid #E3F2FD", borderRadius:16, padding:"12px 16px", flex:1, minWidth:160, boxShadow:"0 4px 16px rgba(21,101,192,0.06)" }}>
+                      <span style={{ fontSize:"1.8rem", filter:"drop-shadow(0 2px 6px rgba(0,0,0,0.12))" }}>{career.icon}</span>
                       <div>
                         <div style={{ fontWeight:800, color: dark?"#E3F2FD":"#1A237E", fontSize:"0.9rem" }}>{career.name}</div>
                         {career.match_percent != null && (
@@ -365,11 +387,15 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
         )}
 
         {/* Buttons */}
-        <div style={{ display:"flex", gap:16, marginTop:8, justifyContent:"center", flexWrap:"wrap" }}>
-          <button className="quiz-next" style={{ background:"#1565C0" }} onClick={() => setPage("home")}>
+        <div style={{ display:"flex", gap:16, marginTop:24, justifyContent:"center", flexWrap:"wrap" }}>
+          <button className="quiz-next dev-btn-home"
+            style={{ background:"linear-gradient(135deg,#1565C0,#42A5F5)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(21,101,192,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+            onClick={() => setPage("home")}>
             {L.toHome}
           </button>
-          <button className="quiz-next" onClick={() => setPage("tasks")}>
+          <button className="quiz-next dev-btn-tasks"
+            style={{ background:"linear-gradient(135deg,#FF7043,#FF8A65)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(255,112,67,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+            onClick={() => setPage("tasks")}>
             {L.toTasks}
           </button>
         </div>
