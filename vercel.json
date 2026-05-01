@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd frontend/karta-talantov && npm install && npm run build",
-  "outputDirectory": "frontend/karta-talantov/dist",
-  "installCommand": "cd frontend/karta-talantov && npm install"
-}
