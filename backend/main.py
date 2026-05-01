@@ -21,7 +21,7 @@ import httpx
 import os
 import re
 import time
-import anthropic
+
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
