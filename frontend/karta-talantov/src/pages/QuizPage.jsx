@@ -246,9 +246,7 @@ const STORY = {
           {
             id:"q6", talent:"memory", type:"memorize_pattern",
             mission:"Yakuniy sinov — Korsi matritsasi",
-            memorize:"🔵⬜⬜
-⬜🔵⬜
-⬜⬜🔵",
+            memorize:"🔵⬜⬜|⬜🔵⬜|⬜⬜🔵",
             memorize_label:"Ko'k katakchalar joylashuvini yodlab oling! 5 soniya 👀",
             q:"Ko'k katakchalarning ketma-ketligi qanday edi (yuqoridan pastga, chapdan o'ngga)?",
             hint:"Corsi Block Tapping testi (1972) — ko'rish-fazoviy ishchi xotirani o'lchaydi. Butun dunyoda neyropsixologiyada qo'llaniladi",
@@ -350,9 +348,7 @@ const STORY = {
           {
             id:"q6", talent:"memory", type:"memorize_pattern",
             mission:"Final Trial — Corsi Matrix",
-            memorize:"🔵⬜⬜
-⬜🔵⬜
-⬜⬜🔵",
+            memorize:"🔵⬜⬜|⬜🔵⬜|⬜⬜🔵",
             memorize_label:"Memorise the blue cell positions! 5 seconds 👀",
             q:"What was the sequence of blue cells (top to bottom, left to right)?",
             hint:"Corsi Block Tapping test (1972) — measures visuospatial working memory. Used in neuropsychology worldwide",
