@@ -324,11 +324,12 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 # ── Rule-based AI Chatbot (no external API needed) ──────────────────────────
 from pydantic import BaseModel as PydanticBase
+from typing import Optional
 
 class ChatRequest(PydanticBase):
-    message: str  = ""
-    lang:    str  = "ru"
-    scores:  dict = {}
+    message: Optional[str] = ""
+    lang:    Optional[str] = "ru"
+    scores:  Optional[dict] = None
 
 # ── Response database ─────────────────────────────────────────────────────────
 RESPONSES = {
@@ -492,7 +493,7 @@ def find_response(message: str, lang: str, scores: dict) -> str:
     # Check for talent-related questions with scores context
     talent_keywords = ["my talent","мой талант","мои способ","qobilyat","iste'dod","my score","мои резуль","result","результ","natija"]
     if any(k in msg_lower for k in talent_keywords) and scores:
-        talent_resp = get_top_talent_response(scores, lang)
+        talent_resp = get_top_talent_response(scores or {}, lang)
         if talent_resp:
             return talent_resp
 
@@ -516,7 +517,7 @@ def chat(body: ChatRequest):
             greet_data = RESPONSES["greet"]
             return {"reply": random.choice(greet_data.get(body.lang, greet_data["en"]))}
 
-        reply = find_response(message, body.lang, body.scores)
+        reply = find_response(message, body.lang, body.scores or {})
         return {"reply": reply}
 
     except Exception as e:
