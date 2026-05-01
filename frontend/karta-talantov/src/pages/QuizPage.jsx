@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Nav from "../components/Nav";
 import Loader from "../components/Loader";
 import { quizAPI } from "../api/client";
@@ -223,9 +223,38 @@ const STORY = {
         color:"#7E57C2", bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",
         intro:"Xotira G'ori! Kembrij neyrobiologlari isbotladi: yaxshi xotira barcha akademik yutuqlarning asosi.",
         questions:[
-          { id:"q4", talent:"memory", mission:"Sinov #1 — Teskari raqamlar", q:"Bu raqamlarni TESKARI tartibda qaytaring: 8 — 3 — 7 — 1 — 9 — 4", hint:"Veksler shkalasi 'Digit Span Backward' testi — ishchi xotirani o'lchaydi", opts:["4-9-1-7-3-8","8-3-7-1-9-4","4-1-9-7-3-8","9-4-1-7-3-8"], score_map:[1.0,0.0,0.2,0.0] },
-          { id:"q5", talent:"memory", mission:"Sinov #2 — Xotira turlari", q:"Pianinochi sonata ijro etayotganda har bir notani o'ylamasdan chaladi. Stanford neyrobiologlari bu qaysi xotira ekanini aytadilar?", hint:"MIT/Harvard tadqiqoti: protsedural xotira miyachada va bazal gangliyalarda saqlanadi", opts:["Epizodik xotira (voqealar xotirasi)","Semantik xotira (faktlar va bilimlar)","Protsedural xotira (ko'nikmalar va avtomatizmlar)","Ishchi xotira (qisqa muddatli saqlash)"], score_map:[0.1,0.1,1.0,0.1] },
-          { id:"q6", talent:"memory", mission:"Yakuniy sinov — Lokuslar usuli", q:"Sitseron va Sherlock Xolms ishlatgan 'Xotira saroyi' usuli qaysi tamoyilga asoslangan?", hint:"UCL tadqiqoti (2011): lokuslar usuli xotirani 200-300% oshiradi, gippokampni faollashtiradi", opts:["Ko'p marta takrorlash","Ma'lumotni xayoliy tanish joylarga bog'lash","Hamma narsani daftarga yozish","Raqamlar bilan assotsiatsiya"], score_map:[0.1,1.0,0.0,0.2] },
+          {
+            id:"q4", talent:"memory", type:"memorize_digits",
+            mission:"Sinov #1 — Veksler testi (WISC-V)",
+            memorize:"8  3  7  1  9  4",
+            memorize_label:"Bu raqamlarni yodlab oling! 5 soniya bor 👀",
+            q:"Endi ularni TESKARI tartibda kiriting:",
+            hint:"Digit Span Backward testi (Wechsler, WISC-V) — ishchi xotirani o'lchashning oltin standarti. 12 yoshda norma: 4-5 ta raqam",
+            opts:["4-9-1-7-3-8","8-3-7-1-9-4","4-1-9-7-3-8","9-4-1-7-3-8"],
+            score_map:[1.0,0.0,0.2,0.0],
+          },
+          {
+            id:"q5", talent:"memory", type:"memorize_words",
+            mission:"Sinov #2 — Eshitish xotirasi testi",
+            memorize:"🦊 TULKI   🌊 OKEAN   🎸 GITARA   🏛️ SAROY   ⚡ CHAQMOQ",
+            memorize_label:"Bu 5 so'zni yodlab oling! 6 soniya bor 👀",
+            q:"Ro'yxatda QAYSI SO'Z YO'Q EDA?",
+            hint:"Rey Auditory Verbal Learning Test (RAVLT) — bolalar va kattalarda xotirani baholash uchun neyropsixologlar tomonidan ishlatiladi",
+            opts:["TULKI 🦊","PIRAMIDA 🔺","GITARA 🎸","CHAQMOQ ⚡"],
+            score_map:[0.0,1.0,0.0,0.0],
+          },
+          {
+            id:"q6", talent:"memory", type:"memorize_pattern",
+            mission:"Yakuniy sinov — Korsi matritsasi",
+            memorize:"🔵⬜⬜
+⬜🔵⬜
+⬜⬜🔵",
+            memorize_label:"Ko'k katakchalar joylashuvini yodlab oling! 5 soniya 👀",
+            q:"Ko'k katakchalarning ketma-ketligi qanday edi (yuqoridan pastga, chapdan o'ngga)?",
+            hint:"Corsi Block Tapping testi (1972) — ko'rish-fazoviy ishchi xotirani o'lchaydi. Butun dunyoda neyropsixologiyada qo'llaniladi",
+            opts:["Diagonal: yuqori-chap → markaz → quyi-o'ng","Diagonal: yuqori-o'ng → markaz → quyi-chap","Gorizontal: barcha markaziy qatorda","Vertikal: barcha o'ng ustunda"],
+            score_map:[1.0,0.0,0.0,0.0],
+          },
         ],
         complete:"G'or zabt etildi! 🎉 Sizning xotirangiz — haqiqiy bilimlar ombori!",
       },
@@ -298,9 +327,38 @@ const STORY = {
         color:"#7E57C2", bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",
         intro:"Memory Cave! Cambridge neuroscientists proved: strong memory is the foundation of all academic achievement.",
         questions:[
-          { id:"q4", talent:"memory", mission:"Trial #1 — Digit Span Backward", q:"Memorise these digits and repeat them in REVERSE order: 8 — 3 — 7 — 1 — 9 — 4", hint:"Wechsler Intelligence Scale 'Digit Span Backward' test — measures working memory. Average for age 12: 4-5 digits", opts:["4-9-1-7-3-8","8-3-7-1-9-4","4-1-9-7-3-8","9-4-1-7-3-8"], score_map:[1.0,0.0,0.2,0.0] },
-          { id:"q5", talent:"memory", mission:"Trial #2 — Types of Memory", q:"A pianist performs a sonata from memory without thinking about each note. A Stanford neuroscientist would say they are using:", hint:"MIT/Harvard research on patient HM (1953): procedural memory is stored in the cerebellum and basal ganglia, separate from conscious memory", opts:["Episodic memory (memory of events)","Semantic memory (facts and knowledge)","Procedural memory (skills and automatisms)","Working memory (short-term storage)"], score_map:[0.1,0.1,1.0,0.1] },
-          { id:"q6", talent:"memory", mission:"Final Trial — Method of Loci", q:"The 'Memory Palace' method (loci), used by Cicero and Sherlock Holmes, is based on the principle of:", hint:"UCL study (2011): Method of Loci increases memorisation by 200-300% by activating the hippocampus through spatial navigation", opts:["Repeating information many times","Linking information to familiar imagined locations","Writing everything in a notebook","Association with numbers"], score_map:[0.1,1.0,0.0,0.2] },
+          {
+            id:"q4", talent:"memory", type:"memorize_digits",
+            mission:"Trial #1 — Wechsler Test (WISC-V)",
+            memorize:"8  3  7  1  9  4",
+            memorize_label:"Memorise these digits! You have 5 seconds 👀",
+            q:"Now enter them in REVERSE order:",
+            hint:"Digit Span Backward test (Wechsler, WISC-V) — the gold standard for measuring working memory. Average for age 12: 4-5 digits backwards",
+            opts:["4-9-1-7-3-8","8-3-7-1-9-4","4-1-9-7-3-8","9-4-1-7-3-8"],
+            score_map:[1.0,0.0,0.2,0.0],
+          },
+          {
+            id:"q5", talent:"memory", type:"memorize_words",
+            mission:"Trial #2 — Auditory Memory Test",
+            memorize:"🦊 FOX   🌊 OCEAN   🎸 GUITAR   🏛️ PALACE   ⚡ LIGHTNING",
+            memorize_label:"Memorise these 5 words! You have 6 seconds 👀",
+            q:"Which word was NOT in the list?",
+            hint:"Rey Auditory Verbal Learning Test (RAVLT) — used by neuropsychologists worldwide to assess memory in children and adults",
+            opts:["FOX 🦊","PYRAMID 🔺","GUITAR 🎸","LIGHTNING ⚡"],
+            score_map:[0.0,1.0,0.0,0.0],
+          },
+          {
+            id:"q6", talent:"memory", type:"memorize_pattern",
+            mission:"Final Trial — Corsi Matrix",
+            memorize:"🔵⬜⬜
+⬜🔵⬜
+⬜⬜🔵",
+            memorize_label:"Memorise the blue cell positions! 5 seconds 👀",
+            q:"What was the sequence of blue cells (top to bottom, left to right)?",
+            hint:"Corsi Block Tapping test (1972) — measures visuospatial working memory. Used in neuropsychology worldwide",
+            opts:["Diagonal: top-left → centre → bottom-right","Diagonal: top-right → centre → bottom-left","Horizontal: all in the middle row","Vertical: all in the right column"],
+            score_map:[1.0,0.0,0.0,0.0],
+          },
         ],
         complete:"Cave conquered! 🎉 Your memory is a true knowledge vault!",
       },
@@ -368,6 +426,34 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState(null);
   const [showHint, setShowHint]     = useState(false);
+  const [memPhase, setMemPhase]     = useState("show"); // "show" | "answer"
+  const [countdown, setCountdown]   = useState(0);
+
+  const timerRef = useRef(null);
+
+  // When question changes and it's a memory type → start countdown
+  useEffect(() => {
+    if (phase !== "question" || !currentQ?.type?.startsWith("memorize_")) return;
+    setMemPhase("show");
+    const secs = currentQ.type === "memorize_words" ? 6 : 5;
+    setCountdown(secs);
+    let c = secs;
+    timerRef.current = setInterval(() => {
+      c--;
+      setCountdown(c);
+      if (c <= 0) {
+        clearInterval(timerRef.current);
+        setMemPhase("answer");
+      }
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [currentQ?.id, phase]);
+
+  // Reset memPhase when question changes
+  useEffect(() => {
+    setMemPhase("show");
+    setSelected(null);
+  }, [currentQ?.id]);
 
   const chapter   = chapters[chapterIdx];
   const chapterQ  = chapter?.questions || [];
@@ -536,25 +622,88 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
           </div>
         )}
 
-        <p className="quiz-q">{currentQ?.q}</p>
-
-        <div className="quiz-options">
-          {currentQ?.opts.map((opt, i) => (
-            <button key={i}
-              className={`quiz-option${selected===i?" selected":""}`}
-              style={selected===i ? { borderColor:chapter.color, background:`${chapter.color}15`, color:chapter.color } : {}}
-              onClick={() => setSelected(i)}>
-              <span style={{ fontSize:"0.8rem", fontWeight:900, color:selected===i?chapter.color:"#90A4AE", marginRight:8 }}>
-                {["A","B","C","D"][i]}.
-              </span>
-              {opt}
+        {/* ── Memory type: show memorize card first ── */}
+        {currentQ?.type?.startsWith("memorize_") && memPhase === "show" && (
+          <div style={{ textAlign:"center", marginBottom:20 }}>
+            <p style={{ fontSize:"0.85rem", fontWeight:800, color:chapter.color, marginBottom:12, textTransform:"uppercase", letterSpacing:"0.08em" }}>
+              {currentQ.memorize_label}
+            </p>
+            {/* Memorize display */}
+            <div style={{ background:`linear-gradient(135deg,${chapter.color}15,${chapter.color}08)`, border:`2px solid ${chapter.color}44`, borderRadius:20, padding:"24px 20px", margin:"0 auto", maxWidth:400, position:"relative" }}>
+              {currentQ.type === "memorize_digits" && (
+                <div style={{ fontFamily:"'Courier New',monospace", fontSize:"2.4rem", fontWeight:900, color:chapter.color, letterSpacing:"0.3em", textAlign:"center" }}>
+                  {currentQ.memorize}
+                </div>
+              )}
+              {currentQ.type === "memorize_words" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:10, alignItems:"center" }}>
+                  {currentQ.memorize.split("   ").map((word, i) => (
+                    <div key={i} style={{ fontSize:"1.1rem", fontWeight:800, color:chapter.color, background:"#fff", borderRadius:10, padding:"8px 20px", border:`1.5px solid ${chapter.color}33`, width:"100%", textAlign:"center", boxShadow:`0 2px 8px ${chapter.color}15` }}>
+                      {word}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {currentQ.type === "memorize_pattern" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"center" }}>
+                  {currentQ.memorize.split("
+").map((row, ri) => (
+                    <div key={ri} style={{ display:"flex", gap:8 }}>
+                      {row.split("").map((cell, ci) => (
+                        <div key={ci} style={{ width:60, height:60, borderRadius:12, background:cell==="🔵"?chapter.color:"#fff", border:`2px solid ${chapter.color}44`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.4rem", boxShadow:cell==="🔵"?`0 4px 16px ${chapter.color}44`:"none", transition:"all 0.3s" }}>
+                          {cell==="🔵" ? "🔵" : ""}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Countdown */}
+              <div style={{ marginTop:16, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                <div style={{ width:36, height:36, borderRadius:"50%", background:chapter.color, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", boxShadow:`0 4px 12px ${chapter.color}44` }}>
+                  {countdown}
+                </div>
+                <span style={{ fontSize:"0.78rem", fontWeight:700, color:"#90A4AE" }}>
+                  {lang==="ru"?"секунд...":lang==="uz"?"soniya...":"seconds..."}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => { clearInterval(timerRef.current); setMemPhase("answer"); }}
+              style={{ marginTop:14, border:"none", background:"transparent", color:chapter.color, fontWeight:800, fontSize:"0.82rem", cursor:"pointer", textDecoration:"underline" }}>
+              {lang==="ru"?"Я запомнил →":lang==="uz"?"Yodladim →":"I've memorised it →"}
             </button>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {/* Show question only after memorize phase */}
+        {(!currentQ?.type?.startsWith("memorize_") || memPhase === "answer") && (
+          <>
+            {currentQ?.type?.startsWith("memorize_") && (
+              <div style={{ background:"#FFF8E1", border:"1.5px solid #FFB300", borderRadius:10, padding:"8px 14px", marginBottom:14, fontSize:"0.82rem", fontWeight:800, color:"#E65100", textAlign:"center" }}>
+                🧠 {lang==="ru"?"Время вышло! Теперь ответь по памяти:":lang==="uz"?"Vaqt tugadi! Endi xotiradan javob bering:":"Time's up! Now answer from memory:"}
+              </div>
+            )}
+            <p className="quiz-q">{currentQ?.q}</p>
+            <div className="quiz-options">
+              {currentQ?.opts.map((opt, i) => (
+                <button key={i}
+                  className={`quiz-option${selected===i?" selected":""}`}
+                  style={selected===i ? { borderColor:chapter.color, background:`${chapter.color}15`, color:chapter.color } : {}}
+                  onClick={() => setSelected(i)}>
+                  <span style={{ fontSize:"0.8rem", fontWeight:900, color:selected===i?chapter.color:"#90A4AE", marginRight:8 }}>
+                    {["A","B","C","D"][i]}.
+                  </span>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         <button className="quiz-next"
-          style={{ background:selected===null?"#90A4AE":chapter.color, opacity:selected===null?0.6:1, transition:"all 0.2s" }}
-          onClick={handleAnswer} disabled={selected===null}>
+          style={{ background:(selected===null||memPhase==="show")?"#90A4AE":chapter.color, opacity:(selected===null||memPhase==="show")?0.5:1, transition:"all 0.2s" }}
+          onClick={handleAnswer} disabled={selected===null||memPhase==="show"}>
           {qInChapter < chapterQ.length-1
             ? (lang==="ru"?"Следующий вызов →":lang==="uz"?"Keyingi qiyinlik →":"Next Challenge →")
             : chapterIdx < chapters.length-1
