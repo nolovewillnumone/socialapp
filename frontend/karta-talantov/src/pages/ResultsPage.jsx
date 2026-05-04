@@ -63,12 +63,16 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
   const careers   = data.careers  || DEMO.careers;
   const strengths = data.strengths || DEMO.strengths;
 
-  const radarData = Object.entries(scores).map(([key, value]) => ({
+  // Ensure minimum 5% for all talents so radar chart looks good
+  const adjustedScores = Object.fromEntries(
+    Object.entries(scores).map(([k, v]) => [k, Math.max(5, Math.round(v))])
+  );
+  const radarData = Object.entries(adjustedScores).map(([key, value]) => ({
     label: t(lang, `talent.${key}`),
-    value: Math.round(value),
+    value,
   }));
 
-  const avgScore = Math.round(Object.values(scores).reduce((a,b)=>a+b,0) / Object.values(scores).length);
+  const avgScore = Math.round(Object.values(adjustedScores).reduce((a,b)=>a+b,0) / Object.values(adjustedScores).length);
 
   return (
     <div className="page-wrap">
@@ -100,23 +104,34 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
             </div>
           </div>
 
-          <div className="strengths-box">
+          <div className="strengths-box" style={{ background: dark?"#1A2A3A":"#F8FBFF", border: dark?"1.5px solid #2A4070":"1.5px solid #E3F2FD" }}>
             <div>
-              <p className="strengths-title">{t(lang,"results.strengths")}</p>
+              <p className="strengths-title" style={{ color: dark?"#90CAF9":"#1565C0" }}>{t(lang,"results.strengths")}</p>
               <ul className="strengths-list">
                 {strengths.length > 0
-                  ? strengths.map((s,i) => <li key={i}><span className="check">✔</span> {s}</li>)
-                  : <li><span className="check">✔</span> {t(lang,"results.allround")}</li>
+                  ? strengths.map((s,i) => (
+                      <li key={i} style={{ color: dark?"#E3F2FD":"#37474F" }}>
+                        <span className="check" style={{ color:"#1565C0" }}>✔</span> {s}
+                      </li>
+                    ))
+                  : <li style={{ color: dark?"#E3F2FD":"#37474F" }}>
+                      <span className="check" style={{ color:"#1565C0" }}>✔</span> {t(lang,"results.allround")}
+                    </li>
                 }
               </ul>
             </div>
             <div>
-              <p className="strengths-title">{t(lang,"results.careers")}</p>
+              <p className="strengths-title" style={{ color: dark?"#90CAF9":"#1565C0" }}>{t(lang,"results.careers")}</p>
               <ul className="prof-list">
                 {careers.map((c,i) => (
-                  <li key={i}>
-                    <span className="check">{c.icon}</span> {c.name}
-                    {c.match_percent != null && <span style={{ color:"#1565C0", fontWeight:700, marginLeft:6 }}>{Math.round(c.match_percent)}%</span>}
+                  <li key={i} style={{ color: dark?"#E3F2FD":"#37474F" }}>
+                    <span style={{ fontSize:"1.1rem" }}>{c.icon}</span>
+                    <span style={{ fontWeight:800 }}>{c.name}</span>
+                    {c.match_percent != null && (
+                      <span style={{ color:"#1565C0", fontWeight:800, marginLeft:6, background:"#E3F2FD", padding:"1px 8px", borderRadius:99, fontSize:"0.82rem" }}>
+                        {Math.round(c.match_percent)}%
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
