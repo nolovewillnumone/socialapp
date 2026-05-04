@@ -411,7 +411,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
           const res = await fetch("https://karta-talantov-ml.onrender.com/analyze", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ answers: finalAnswers, lang }),
+            body: JSON.stringify({ answers: finalAnswers, scores: localScores, lang }),
           });
           data = await res.json();
           if (!data.scores) data.scores = localScores;
