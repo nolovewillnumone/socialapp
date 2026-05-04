@@ -78,7 +78,7 @@ const STORY = {
       },
       {
         id:"ch3", zone:"Как ты думаешь?", emoji:"💭",
-        color:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)",
+        color:"#2196F3", bg:"linear-gradient(135deg,#E1F5EE,#9FE1CB)",
         intro:"Расскажи нам о том, как ты воспринимаешь мир вокруг себя. Что привлекает твоё внимание?",
         questions: [
           {
@@ -107,7 +107,7 @@ const STORY = {
       },
       {
         id:"ch4", zone:"Твоя мечта", emoji:"🚀",
-        color:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)",
+        color:"#FF9800", bg:"linear-gradient(135deg,#FAEEDA,#FAEEDA)",
         intro:"Поговорим о будущем! Что тебя вдохновляет и о чём ты мечтаешь?",
         questions: [
           {
@@ -204,7 +204,7 @@ const STORY = {
       },
       {
         id:"ch3", zone:"Qanday fikrlaysiz?", emoji:"💭",
-        color:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)",
+        color:"#2196F3", bg:"linear-gradient(135deg,#E1F5EE,#9FE1CB)",
         intro:"Atrofdagi dunyoni qanday qabul qilishingiz haqida gapiring. Nima e'tiboringizni tortadi?",
         questions:[
           { id:"q7", talent:"logic", mission:"Qiziqarli vazifalar", q:"Sizni eng ko'p nima qiziqtiradi?", opts:["Narsalar, mexanizmlar va texnologiyalar qanday ishlashi ⚙️","Odamlar nima uchun shunday harakat qilishlari 🧠","Chiroyli narsalar qanday yaratilishi — dizayn va san'at 🎨","Turli odamlar bilan muloqot qilish va tushunish 🤝"], score_map:{"logic":1.0,"leadership":0.9,"creativity":1.0,"languages":0.9} },
@@ -215,7 +215,7 @@ const STORY = {
       },
       {
         id:"ch4", zone:"Sizning orzuyingiz", emoji:"🚀",
-        color:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)",
+        color:"#FF9800", bg:"linear-gradient(135deg,#FAEEDA,#FAEEDA)",
         intro:"Kelajak haqida gaplashamiz! Sizni nima ilhomlantiradi va nima haqida orzu qilasiz?",
         questions:[
           { id:"q10", talent:"logic", mission:"Kim bo'lmoqchisiz?", q:"Kelajakdagi kasb haqida o'ylaganingizda, sizni ko'proq nima jalb qiladi:", opts:["Texnologiya, fan yoki matematika bilan ishlash 🔬","Yaratish — san'at, musiqa, kino yoki o'yinlar 🎮","Odamlarga yordam berish — shifokor, psixolog yoki pedagog 💙","Sayohat qilish, dunyo va turli madaniyatlarni o'rganish ✈️"], score_map:{"logic":1.0,"creativity":1.0,"leadership":1.0,"languages":1.0} },
@@ -276,7 +276,7 @@ const STORY = {
       },
       {
         id:"ch3", zone:"How You Think", emoji:"💭",
-        color:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)",
+        color:"#2196F3", bg:"linear-gradient(135deg,#E1F5EE,#9FE1CB)",
         intro:"Tell us about how you experience the world around you. What captures your attention?",
         questions:[
           { id:"q7", talent:"logic", mission:"What Interests You", q:"What interests and fascinates you the most?", opts:["How things, mechanisms and technology work ⚙️","Why people behave the way they do 🧠","How beautiful things are created — design and art 🎨","How to communicate and understand different people 🤝"], score_map:{"logic":1.0,"leadership":0.9,"creativity":1.0,"languages":0.9} },
@@ -287,7 +287,7 @@ const STORY = {
       },
       {
         id:"ch4", zone:"Your Dream", emoji:"🚀",
-        color:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)",
+        color:"#FF9800", bg:"linear-gradient(135deg,#FAEEDA,#FAEEDA)",
         intro:"Let's talk about the future! What inspires you and what do you dream of?",
         questions:[
           { id:"q10", talent:"logic", mission:"Who Do You Want to Be?", q:"When you think about a future career, you're most drawn to:", opts:["Working with technology, science or maths 🔬","Creating — art, music, film or games 🎮","Helping people — doctor, psychologist or teacher 💙","Travelling and exploring the world and different cultures ✈️"], score_map:{"logic":1.0,"creativity":1.0,"leadership":1.0,"languages":1.0} },
@@ -434,15 +434,15 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
       <div style={{ minHeight:"80vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", background:dark?"linear-gradient(135deg,#0F1923,#1A2A3A)":"linear-gradient(135deg,#FCE4EC,#E8F5E9)" }}>
         <div style={{ fontSize:"5rem", marginBottom:16 }}>{story.intro.mascot}</div>
-        <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:dark?"#E3F2FD":"#1A237E", marginBottom:14, maxWidth:500 }}>{story.intro.title}</h1>
-        <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#90CAF9":"#546E7A", maxWidth:460, lineHeight:1.8, marginBottom:20 }}>{story.intro.text}</p>
-        <div style={{ background:dark?"#1A2A3A":"#fff", border:"1.5px solid #E3F2FD", borderRadius:14, padding:"10px 20px", marginBottom:28, fontSize:"0.85rem", fontWeight:800, color:"#78909C" }}>
+        <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:dark?"#E1F5EE":"#04342C", marginBottom:14, maxWidth:500 }}>{story.intro.title}</h1>
+        <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#9FE1CB":"#546E7A", maxWidth:460, lineHeight:1.8, marginBottom:20 }}>{story.intro.text}</p>
+        <div style={{ background:dark?"#1A2A3A":"#fff", border:"1.5px solid #E1F5EE", borderRadius:14, padding:"10px 20px", marginBottom:28, fontSize:"0.85rem", fontWeight:800, color:"#78909C" }}>
           📋 {story.intro.note}
         </div>
         {/* Zone preview */}
         <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center", marginBottom:28, maxWidth:500 }}>
           {chapters.map((ch) => (
-            <div key={ch.id} style={{ background:dark?"#1A2A3A":"#fff", border:`2px solid ${ch.color}44`, borderRadius:12, padding:"6px 14px", display:"flex", alignItems:"center", gap:6, fontSize:"0.82rem", fontWeight:800, color:dark?"#E3F2FD":"#1A237E" }}>
+            <div key={ch.id} style={{ background:dark?"#1A2A3A":"#fff", border:`2px solid ${ch.color}44`, borderRadius:12, padding:"6px 14px", display:"flex", alignItems:"center", gap:6, fontSize:"0.82rem", fontWeight:800, color:dark?"#E1F5EE":"#04342C" }}>
               {ch.emoji} {ch.zone}
             </div>
           ))}
@@ -466,7 +466,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <div style={{ background:chapter.color, color:"#fff", borderRadius:99, padding:"5px 20px", fontSize:"0.85rem", fontWeight:800, marginBottom:16, letterSpacing:"0.08em" }}>
           {lang==="ru"?"ЗОНА":lang==="uz"?"ZONA":"ZONE"} {chapterIdx+1}/{chapters.length}
         </div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color:dark?"#E3F2FD":chapter.color, marginBottom:16 }}>{chapter.zone}</h2>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color:dark?"#E1F5EE":chapter.color, marginBottom:16 }}>{chapter.zone}</h2>
         <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#B0BEC5":"#546E7A", maxWidth:440, lineHeight:1.7, marginBottom:32 }}>{chapter.intro}</p>
         <button className="quiz-next" style={{ background:chapter.color, maxWidth:300 }} onClick={() => setPhase("question")}>
           {lang==="ru"?"Поехали! →":lang==="uz"?"Ketdik! →":"Let's go! →"}
@@ -481,10 +481,10 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
       <div style={{ minHeight:"80vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", background:dark?"#0F1923":chapter.bg }}>
         <div style={{ fontSize:"4rem", marginBottom:16 }}>✅</div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E3F2FD":chapter.color, marginBottom:16, maxWidth:420 }}>{chapter.complete}</h2>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E1F5EE":chapter.color, marginBottom:16, maxWidth:420 }}>{chapter.complete}</h2>
         <div style={{ display:"flex", gap:10, marginBottom:32 }}>
           {chapters.map((ch,i) => (
-            <div key={i} style={{ width:14, height:14, borderRadius:"50%", background:i<=chapterIdx?ch.color:(dark?"#2A4070":"#E3F2FD"), transition:"all 0.4s", boxShadow:i<=chapterIdx?`0 0 8px ${ch.color}66`:"none" }} />
+            <div key={i} style={{ width:14, height:14, borderRadius:"50%", background:i<=chapterIdx?ch.color:(dark?"#2A4070":"#E1F5EE"), transition:"all 0.4s", boxShadow:i<=chapterIdx?`0 0 8px ${ch.color}66`:"none" }} />
           ))}
         </div>
         {chapterIdx < chapters.length - 1 && (
@@ -502,8 +502,8 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
       <div style={{ textAlign:"center", padding:"60px 24px" }}>
         <div style={{ fontSize:"4rem", marginBottom:16 }}>{story.finale.mascot}</div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E3F2FD":"#1565C0", marginBottom:12 }}>{story.finale.title}</h2>
-        <p style={{ color:dark?"#90CAF9":"#78909C", fontWeight:600, marginBottom:32 }}>{story.finale.text}</p>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E1F5EE":"#0F6E56", marginBottom:12 }}>{story.finale.title}</h2>
+        <p style={{ color:dark?"#9FE1CB":"#78909C", fontWeight:600, marginBottom:32 }}>{story.finale.text}</p>
         <Loader message={lang==="ru"?"Составляем твою карту талантов... 🗺️":lang==="uz"?"Iste'dod xaritangiz tuzilmoqda... 🗺️":"Building your talent map... 🗺️"} />
       </div>
     </div>
@@ -526,7 +526,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
           <div style={{ fontSize:"0.7rem", fontWeight:800, color:chapter.color, textTransform:"uppercase", letterSpacing:"0.08em" }}>
             {lang==="ru"?"Зона":lang==="uz"?"Zona":"Zone"} {chapterIdx+1}/{chapters.length} — {chapter.zone}
           </div>
-          <div style={{ fontSize:"0.88rem", fontWeight:800, color:dark?"#E3F2FD":"#1A237E" }}>{currentQ?.mission}</div>
+          <div style={{ fontSize:"0.88rem", fontWeight:800, color:dark?"#E1F5EE":"#04342C" }}>{currentQ?.mission}</div>
         </div>
         <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#90A4AE" }}>{qInChapter+1}/{chapterQ.length}</span>
       </div>

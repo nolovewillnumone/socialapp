@@ -22,8 +22,8 @@ const TRACK = [...SLIDER_ITEMS, ...SLIDER_ITEMS];
 // ── Benefits ──────────────────────────────────────────────────────────────────
 const BENEFITS = [
   {
-    emoji: "🧠", accent: "#1565C0",
-    bg: "linear-gradient(135deg, #E3F2FD 0%, #EEF6FF 100%)",
+    emoji: "🧠", accent: "#0F6E56",
+    bg: "linear-gradient(135deg, #E1F5EE 0%, #E1F5EE 100%)",
     title: { ru: "Раскрой свой потенциал", uz: "Potentsialingizni oching", en: "Unlock your potential" },
     desc:  { ru: "Наш ML-движок анализирует ответы по 6 измерениям таланта и строит персональную карту способностей.", uz: "ML mexanizmi javoblaringizni 6 iste'dod o'lchovi bo'yicha tahlil qiladi.", en: "Our ML engine analyses your answers across 6 talent dimensions and builds a personal ability map." },
     stats: [
@@ -34,8 +34,8 @@ const BENEFITS = [
     visual: "radar",
   },
   {
-    emoji: "🎮", accent: "#FF7043",
-    bg: "linear-gradient(135deg, #FFF8E1 0%, #FFF3E0 100%)",
+    emoji: "🎮", accent: "#EF9F27",
+    bg: "linear-gradient(135deg, #FAEEDA 0%, #FAEEDA 100%)",
     title: { ru: "Учись играя",            uz: "O'ynab o'rgan",            en: "Learn by playing"         },
     desc:  { ru: "4 мини-игры на логику, память, творчество и лидерство. Каждый результат вливается в карту талантов.", uz: "4 mini-o'yin: mantiq, xotira, ijodkorlik va liderlik.", en: "4 mini-games covering logic, memory, creativity and leadership." },
     stats: [
@@ -115,7 +115,7 @@ function Visual({ type, accent }) {
       {[["💻","IT School","0.9km"],["🤖","Robotics Hub","1.2km"],["🏆","Chess Academy","2.8km"]].map(([em,name,dist],i) => (
         <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:12, background:accent+"12", border:`1px solid ${accent}33` }}>
           <span style={{ fontSize:"1.3rem" }}>{em}</span>
-          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#1A237E", flex:1 }}>{name}</span>
+          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#04342C", flex:1 }}>{name}</span>
           <span style={{ fontSize:"0.78rem", fontWeight:700, color:accent, background:accent+"18", padding:"2px 8px", borderRadius:99 }}>{dist}</span>
         </div>
       ))}
@@ -126,7 +126,7 @@ function Visual({ type, accent }) {
       {[["🇷🇺","Карта Талантов","Русский"],["🇺🇿","Iste'dod Xaritasi","O'zbek"],["🇬🇧","Talent Map","English"]].map(([f,n,l],i) => (
         <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:12, background:i===0?accent+"18":"transparent", border:`1.5px solid ${i===0?accent:accent+"33"}` }}>
           <span style={{ fontSize:"1.3rem" }}>{f}</span>
-          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#1A237E", flex:1 }}>{n}</span>
+          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#04342C", flex:1 }}>{n}</span>
           <span style={{ fontSize:"0.78rem", fontWeight:700, color:accent }}>{l}</span>
         </div>
       ))}
@@ -134,22 +134,22 @@ function Visual({ type, accent }) {
   );
   return null;
 }
-const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E3F2FD", padding:20, width:"100%", maxWidth:320, margin:"0 auto", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
+const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E1F5EE", padding:20, width:"100%", maxWidth:320, margin:"0 auto", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
 
 function BenefitSection({ benefit, index, lang, dark }) {
   const [ref, visible] = useInView(0.15);
   return (
-    <div ref={ref} style={{ padding:"64px 24px", borderBottom:"1px solid rgba(21,101,192,0.06)", background: dark ? "transparent" : benefit.bg, opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(48px)", transition:"opacity 0.7s ease, transform 0.7s ease", transitionDelay:`${index*0.05}s` }}>
+    <div ref={ref} style={{ padding:"64px 24px", borderBottom:"1px solid rgba(15,110,86,0.06)", background: dark ? "transparent" : benefit.bg, opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(48px)", transition:"opacity 0.7s ease, transform 0.7s ease", transitionDelay:`${index*0.05}s` }}>
       <div className="benefit-inner" style={{ maxWidth:900, margin:"0 auto", display:"flex", alignItems:"center", gap:48, flexWrap:"wrap", flexDirection:"column" }}>
         <div className="benefit-text" style={{ width:"100%" }}>
           <div style={{ fontSize:"1.6rem", marginBottom:10 }}>{benefit.emoji}</div>
-          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", lineHeight:1.2, marginBottom:12, color: dark?"#E3F2FD":"#1A237E" }}>{benefit.title[lang]||benefit.title.en}</h2>
+          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", lineHeight:1.2, marginBottom:12, color: dark?"#E1F5EE":"#04342C" }}>{benefit.title[lang]||benefit.title.en}</h2>
           <p style={{ fontSize:"0.98rem", fontWeight:600, lineHeight:1.7, marginBottom:20, color: dark?"#B0BEC5":"#546E7A" }}>{benefit.desc[lang]||benefit.desc.en}</p>
           <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
             {benefit.stats.map((stat,i) => (
               <div key={i} style={{ borderRadius:14, padding:"12px 18px", display:"flex", flexDirection:"column", gap:4, background: dark?"#1A2A3A":"#fff", border:`1.5px solid ${benefit.accent}33`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)", opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:`opacity 0.5s ease ${0.3+i*0.1}s, transform 0.5s ease ${0.3+i*0.1}s`, flex:1, minWidth:80 }}>
                 <span style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.6rem", color:benefit.accent }}>{stat.value}</span>
-                <span style={{ fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", color: dark?"#90CAF9":"#78909C" }}>{stat.label[lang]||stat.label.en}</span>
+                <span style={{ fontSize:"0.72rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", color: dark?"#9FE1CB":"#78909C" }}>{stat.label[lang]||stat.label.en}</span>
               </div>
             ))}
           </div>
@@ -187,7 +187,7 @@ const CODE_LINES = [
   { indent: 0, tokens: [{ t:"fn",      v:"print"               }, { t:"plain",   v:"(result["        }, { t:"str",   v:'"top_talent"'  }, { t:"plain", v:"])" }] },
 ];
 
-const TOKEN_COLORS = { keyword:"#FF7043", fn:"#42A5F5", str:"#66BB6A", comment:"#78909C", plain:"#E3F2FD" };
+const TOKEN_COLORS = { keyword:"#EF9F27", fn:"#5DCAA5", str:"#66BB6A", comment:"#78909C", plain:"#E1F5EE" };
 
 function AIDemoSection({ lang, dark }) {
   const [ref, visible] = useInView(0.1);
@@ -231,10 +231,10 @@ function AIDemoSection({ lang, dark }) {
     <div ref={ref} style={{ padding: typeof window!=="undefined" && window.innerWidth<=768 ? "40px 16px" : "72px 24px", background: dark ? "#0F1923" : "#0D1117", overflow:"hidden" }}>
       {/* Section header */}
       <div style={{ textAlign:"center", marginBottom:48, opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(30px)", transition:"opacity 0.6s ease, transform 0.6s ease" }}>
-        <div style={{ display:"inline-block", background:"rgba(66,165,245,0.15)", border:"1px solid rgba(66,165,245,0.3)", borderRadius:99, padding:"4px 16px", fontSize:"0.78rem", fontWeight:800, color:"#42A5F5", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:16 }}>
+        <div style={{ display:"inline-block", background:"rgba(66,165,245,0.15)", border:"1px solid rgba(66,165,245,0.3)", borderRadius:99, padding:"4px 16px", fontSize:"0.78rem", fontWeight:800, color:"#5DCAA5", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:16 }}>
           AI-POWERED
         </div>
-        <h2 className="ai-demo-title" style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:"#E3F2FD", marginBottom:12 }}>{label.title}</h2>
+        <h2 className="ai-demo-title" style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:"#E1F5EE", marginBottom:12 }}>{label.title}</h2>
         <p style={{ color:"#78909C", fontWeight:600, fontSize:"0.95rem" }}>{label.sub}</p>
       </div>
 
@@ -248,8 +248,8 @@ function AIDemoSection({ lang, dark }) {
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#28CA41" }} />
           <div style={{ flex:1, display:"flex", justifyContent:"center", gap:16 }}>
             {["talent_analyzer.py", "ml_service.py"].map((f, i) => (
-              <div key={f} style={{ background: i===0 ? "#0D1117" : "transparent", border: i===0 ? "1px solid rgba(255,255,255,0.1)" : "none", borderRadius:"6px 6px 0 0", padding:"4px 12px", fontSize:"0.75rem", fontWeight:700, color: i===0 ? "#E3F2FD" : "#78909C", display:"flex", alignItems:"center", gap:6 }}>
-                <span style={{ color:"#42A5F5" }}>■</span> {f}
+              <div key={f} style={{ background: i===0 ? "#0D1117" : "transparent", border: i===0 ? "1px solid rgba(255,255,255,0.1)" : "none", borderRadius:"6px 6px 0 0", padding:"4px 12px", fontSize:"0.75rem", fontWeight:700, color: i===0 ? "#E1F5EE" : "#78909C", display:"flex", alignItems:"center", gap:6 }}>
+                <span style={{ color:"#5DCAA5" }}>■</span> {f}
               </div>
             ))}
           </div>
@@ -266,19 +266,19 @@ function AIDemoSection({ lang, dark }) {
             <div ref={chatRef} style={{ flex:1, overflowY:"auto", padding:"14px", display:"flex", flexDirection:"column", gap:12, scrollBehavior:"smooth" }}>
               {shownMsgs.map((msg, i) => (
                 <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", animation:"listItemIn 0.3s ease both" }}>
-                  <div style={{ width:24, height:24, borderRadius:"50%", background: msg.role==="ai" ? "linear-gradient(135deg,#1565C0,#42A5F5)" : "#FF7043", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", flexShrink:0 }}>
+                  <div style={{ width:24, height:24, borderRadius:"50%", background: msg.role==="ai" ? "linear-gradient(135deg,#0F6E56,#5DCAA5)" : "#EF9F27", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", flexShrink:0 }}>
                     {msg.role === "ai" ? "🌟" : "👤"}
                   </div>
-                  <div style={{ background: msg.role==="ai" ? "rgba(66,165,245,0.1)" : "rgba(255,112,67,0.1)", border:`1px solid ${msg.role==="ai" ? "rgba(66,165,245,0.2)" : "rgba(255,112,67,0.2)"}`, borderRadius: msg.role==="ai" ? "4px 12px 12px 12px" : "12px 4px 12px 12px", padding:"8px 12px", fontSize:"0.8rem", color:"#E3F2FD", fontWeight:600, lineHeight:1.5, maxWidth:"82%" }}>
+                  <div style={{ background: msg.role==="ai" ? "rgba(66,165,245,0.1)" : "rgba(239,159,39,0.1)", border:`1px solid ${msg.role==="ai" ? "rgba(66,165,245,0.2)" : "rgba(239,159,39,0.2)"}`, borderRadius: msg.role==="ai" ? "4px 12px 12px 12px" : "12px 4px 12px 12px", padding:"8px 12px", fontSize:"0.8rem", color:"#E1F5EE", fontWeight:600, lineHeight:1.5, maxWidth:"82%" }}>
                     {msg.text[lang] || msg.text.en}
                   </div>
                 </div>
               ))}
               {shownMsgs.length < CHAT_MESSAGES.length && started && (
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                  <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#1565C0,#42A5F5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem" }}>🌟</div>
+                  <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem" }}>🌟</div>
                   <div style={{ display:"flex", gap:4, padding:"10px 14px", background:"rgba(66,165,245,0.1)", borderRadius:"4px 12px 12px 12px", border:"1px solid rgba(66,165,245,0.2)" }}>
-                    {[0,1,2].map((d) => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#42A5F5", animation:`pulse 1.2s ease-in-out ${d*0.2}s infinite` }} />)}
+                    {[0,1,2].map((d) => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#5DCAA5", animation:`pulse 1.2s ease-in-out ${d*0.2}s infinite` }} />)}
                   </div>
                 </div>
               )}
@@ -296,7 +296,7 @@ function AIDemoSection({ lang, dark }) {
                   <span style={{ color:"#30363D", fontWeight:700, fontSize:"0.7rem", minWidth:28, userSelect:"none" }}>{i + 77}</span>
                   <span style={{ paddingLeft: line.indent * 16 }}>
                     {line.tokens.map((tok, j) => (
-                      <span key={j} style={{ color: TOKEN_COLORS[tok.t] || "#E3F2FD" }}>{tok.v}</span>
+                      <span key={j} style={{ color: TOKEN_COLORS[tok.t] || "#E1F5EE" }}>{tok.v}</span>
                     ))}
                   </span>
                 </div>
@@ -304,7 +304,7 @@ function AIDemoSection({ lang, dark }) {
               {shownLines < CODE_LINES.length && started && (
                 <div style={{ padding:"1px 16px", lineHeight:1.7 }}>
                   <span style={{ color:"#30363D", minWidth:28, display:"inline-block", fontSize:"0.7rem" }}>{shownLines + 77}</span>
-                  <span style={{ display:"inline-block", width:8, height:14, background:"#42A5F5", verticalAlign:"middle", animation:"pulse 0.8s ease-in-out infinite" }} />
+                  <span style={{ display:"inline-block", width:8, height:14, background:"#5DCAA5", verticalAlign:"middle", animation:"pulse 0.8s ease-in-out infinite" }} />
                 </div>
               )}
             </div>
@@ -356,8 +356,8 @@ function StarMascot() {
       {/* Orbiting sparkles */}
       <div style={{ position:"absolute", top:"50%", left:"50%", width:0, height:0, zIndex:3 }}>
         <div style={{ position:"absolute", width:9, height:9, borderRadius:"50%", top:-4, left:-4, background:"#FFD740", boxShadow:"0 0 8px 2px #FFD740", animation:"orbitSpark  3.5s linear infinite" }} />
-        <div style={{ position:"absolute", width:7, height:7, borderRadius:"50%", top:-3, left:-3, background:"#42A5F5", boxShadow:"0 0 8px 2px #42A5F5", animation:"orbitSpark2 3.5s linear infinite" }} />
-        <div style={{ position:"absolute", width:5, height:5, borderRadius:"50%", top:-2, left:-2, background:"#FF7043", boxShadow:"0 0 6px 2px #FF7043", animation:"orbitSpark3 3.5s linear infinite" }} />
+        <div style={{ position:"absolute", width:7, height:7, borderRadius:"50%", top:-3, left:-3, background:"#5DCAA5", boxShadow:"0 0 8px 2px #5DCAA5", animation:"orbitSpark2 3.5s linear infinite" }} />
+        <div style={{ position:"absolute", width:5, height:5, borderRadius:"50%", top:-2, left:-2, background:"#EF9F27", boxShadow:"0 0 6px 2px #EF9F27", animation:"orbitSpark3 3.5s linear infinite" }} />
       </div>
 
       {/* Body floats up/down */}
@@ -376,7 +376,7 @@ function StarMascot() {
             </radialGradient>
             <radialGradient id="vG" cx="40%" cy="30%" r="65%">
               <stop offset="0%"   stopColor="#80D8FF" />
-              <stop offset="100%" stopColor="#1565C0" />
+              <stop offset="100%" stopColor="#0F6E56" />
             </radialGradient>
             <filter id="sG">
               <feGaussianBlur stdDeviation="3" result="b"/>
@@ -412,15 +412,15 @@ function StarMascot() {
             <rect x="60" y="53" width="10" height="8"  rx="4"  fill="url(#hG)" />
 
             {/* Left eye */}
-            <rect x="45" y="72" width="10" height="10" rx="3" fill="#1A237E"
+            <rect x="45" y="72" width="10" height="10" rx="3" fill="#04342C"
               style={{ transformOrigin:"50px 77px", animation:"eyeBlink 4s ease-in-out infinite" }} />
-            <rect x={47 + eyeOff.x} y={73 + eyeOff.y} width="6" height="6" rx="2" fill="#42A5F5" />
+            <rect x={47 + eyeOff.x} y={73 + eyeOff.y} width="6" height="6" rx="2" fill="#5DCAA5" />
             <rect x={48 + eyeOff.x} y={74 + eyeOff.y} width="2" height="2" rx="1" fill="rgba(255,255,255,0.85)" />
 
             {/* Right eye */}
-            <rect x="75" y="72" width="10" height="10" rx="3" fill="#1A237E"
+            <rect x="75" y="72" width="10" height="10" rx="3" fill="#04342C"
               style={{ transformOrigin:"80px 77px", animation:"eyeBlink 4s ease-in-out 0.15s infinite" }} />
-            <rect x={77 + eyeOff.x} y={73 + eyeOff.y} width="6" height="6" rx="2" fill="#42A5F5" />
+            <rect x={77 + eyeOff.x} y={73 + eyeOff.y} width="6" height="6" rx="2" fill="#5DCAA5" />
             <rect x={78 + eyeOff.x} y={74 + eyeOff.y} width="2" height="2" rx="1" fill="rgba(255,255,255,0.85)" />
 
             {/* Smile — wider when cursor is close */}
@@ -429,8 +429,8 @@ function StarMascot() {
               style={{ transition:"d 0.3s ease" }} />
 
             {/* Blush */}
-            <ellipse cx="43" cy="84" rx="7" ry="4" fill="rgba(255,112,67,0.35)" opacity={smile ? 0.8 : 0.35} />
-            <ellipse cx="87" cy="84" rx="7" ry="4" fill="rgba(255,112,67,0.35)" opacity={smile ? 0.8 : 0.35} />
+            <ellipse cx="43" cy="84" rx="7" ry="4" fill="rgba(239,159,39,0.35)" opacity={smile ? 0.8 : 0.35} />
+            <ellipse cx="87" cy="84" rx="7" ry="4" fill="rgba(239,159,39,0.35)" opacity={smile ? 0.8 : 0.35} />
           </g>
         </svg>
 
@@ -533,7 +533,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
 
         {/* Subtle radial glow behind mascot */}
         <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(92,53,204,0.18) 0%, transparent 70%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(21,101,192,0.10) 0%, transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(15,110,86,0.10) 0%, transparent 70%)", pointerEvents:"none" }} />
 
         {/* Mascot — centred */}
         <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both", marginBottom:8, transform: typeof window!=="undefined" && window.innerWidth<=768 ? "scale(0.9)" : "scale(1.3)" }}>
@@ -544,7 +544,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         <h1 style={{
           fontFamily:"'Fredoka One', cursive",
           fontSize: "clamp(2rem, 6vw, 3.6rem)",
-          color: "#E3F2FD",
+          color: "#E1F5EE",
           lineHeight: 1.15,
           maxWidth: 640,
           margin: "0 auto 16px",
@@ -580,7 +580,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
           </button>
           <button
             onClick={() => setPage("tasks")}
-            style={{ padding:"14px 32px", background:"transparent", color:"#E3F2FD", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", transition:"all 0.2s", backdropFilter:"blur(8px)" }}
+            style={{ padding:"14px 32px", background:"transparent", color:"#E1F5EE", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", transition:"all 0.2s", backdropFilter:"blur(8px)" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.5)"; e.currentTarget.style.background="rgba(255,255,255,0.05)"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.2)"; e.currentTarget.style.background="transparent"; }}
           >
@@ -600,18 +600,18 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
       </div>
 
       {/* Logo slider */}
-      <div style={{ padding:"28px 0 8px", overflow:"hidden", background: dark?"#0F1923":"#F0F7FF" }}>
+      <div style={{ padding:"28px 0 8px", overflow:"hidden", background: dark?"#0F1923":"#F1EFE8" }}>
         <p style={{ textAlign:"center", fontSize:"0.78rem", fontWeight:800, color: dark?"#484F58":"#B0BEC5", letterSpacing:"0.10em", textTransform:"uppercase", marginBottom:16 }}>
           {lang==="ru"?"Наши партнёры и платформы":lang==="uz"?"Bizning hamkorlar va platformalar":"Our partners & platforms"}
         </p>
         <div style={{ position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:0, bottom:0, left:0, width:80, zIndex:2, pointerEvents:"none", background: dark?"linear-gradient(to right,#0F1923,transparent)":"linear-gradient(to right,#F0F7FF,transparent)" }} />
-          <div style={{ position:"absolute", top:0, bottom:0, right:0, width:80, zIndex:2, pointerEvents:"none", background: dark?"linear-gradient(to left,#0F1923,transparent)":"linear-gradient(to left,#F0F7FF,transparent)" }} />
+          <div style={{ position:"absolute", top:0, bottom:0, left:0, width:80, zIndex:2, pointerEvents:"none", background: dark?"linear-gradient(to right,#0F1923,transparent)":"linear-gradient(to right,#F1EFE8,transparent)" }} />
+          <div style={{ position:"absolute", top:0, bottom:0, right:0, width:80, zIndex:2, pointerEvents:"none", background: dark?"linear-gradient(to left,#0F1923,transparent)":"linear-gradient(to left,#F1EFE8,transparent)" }} />
           <div style={{ display:"flex", gap:16, width:"max-content", animation:"infiniteScroll 28s linear infinite", padding:"8px 0" }}>
             {TRACK.map((item, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#1A2A3A":"#fff", borderRadius:16, padding:"12px 20px", border: dark?"1.5px solid #2A4070":"1.5px solid #E3F2FD", whiteSpace:"nowrap", userSelect:"none" }}>
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#1A2A3A":"#fff", borderRadius:16, padding:"12px 20px", border: dark?"1.5px solid #2A4070":"1.5px solid #E1F5EE", whiteSpace:"nowrap", userSelect:"none" }}>
                 <span style={{ fontSize:"1.4rem" }}>{item.emoji}</span>
-                <span style={{ fontSize:"0.88rem", fontWeight:800, color: dark?"#90CAF9":"#1A237E", fontFamily:"'Nunito',sans-serif" }}>{item.name}</span>
+                <span style={{ fontSize:"0.88rem", fontWeight:800, color: dark?"#9FE1CB":"#04342C", fontFamily:"'Nunito',sans-serif" }}>{item.name}</span>
               </div>
             ))}
           </div>
@@ -638,12 +638,12 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
       </div>
 
       {/* Final CTA */}
-      <div className="final-cta" style={{ textAlign:"center", padding:"60px 24px 80px", background: dark?"linear-gradient(135deg,#1A2A3A,#0F1923)":"linear-gradient(135deg,#E3F2FD,#FFF8E1)" }}>
+      <div className="final-cta" style={{ textAlign:"center", padding:"60px 24px 80px", background: dark?"linear-gradient(135deg,#1A2A3A,#0F1923)":"linear-gradient(135deg,#E1F5EE,#FAEEDA)" }}>
         <div style={{ fontSize:"2.8rem", marginBottom:16 }}>🌟</div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color: dark?"#E3F2FD":"#1565C0", marginBottom:12 }}>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color: dark?"#E1F5EE":"#0F6E56", marginBottom:12 }}>
           {lang==="ru"?"Готов узнать свои таланты?":lang==="uz"?"Iste'dodingizni bilishga tayyormisiz?":"Ready to discover your talents?"}
         </h2>
-        <p style={{ color: dark?"#90CAF9":"#78909C", fontWeight:600, marginBottom:28 }}>
+        <p style={{ color: dark?"#9FE1CB":"#78909C", fontWeight:600, marginBottom:28 }}>
           {lang==="ru"?"Пройди тест за 5 минут!":lang==="uz"?"5 daqiqada testni o'ting!":"Take the 5-minute quiz!"}
         </p>
         <button className="hero-cta" onClick={() => setPage("quiz")}>{t(lang,"home.cta")} →</button>

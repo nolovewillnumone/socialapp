@@ -16,8 +16,8 @@ export default function Nav({ page, setPage, lang = "ru", dark = false, user, on
   const label = (item) => item[lang] || item.ru;
 
   const navBg   = dark ? "#1A2A3A" : "rgba(255,255,255,0.95)";
-  const border  = dark ? "2px solid #2A4070" : "1.5px solid rgba(21,101,192,0.10)";
-  const textCol = dark ? "#90CAF9" : "#1565C0";
+  const border  = dark ? "2px solid #2A4070" : "1.5px solid rgba(15,110,86,0.10)";
+  const textCol = dark ? "#9FE1CB" : "#0F6E56";
   const mutedCol = dark ? "#607D8B" : "#90A4AE";
 
   return (
@@ -33,13 +33,13 @@ export default function Nav({ page, setPage, lang = "ru", dark = false, user, on
           {ITEMS.map((item) => (
             <button key={item.key}
               className={`nav-link${page === item.key ? " active" : ""}`}
-              style={{ color: page === item.key ? "#1565C0" : mutedCol }}
+              style={{ color: page === item.key ? "#0F6E56" : mutedCol }}
               onClick={() => go(item.key)}>
               {label(item)}
             </button>
           ))}
           {user && onLogout && (
-            <button className="nav-link" style={{ color: "#E64A19" }} onClick={onLogout}>
+            <button className="nav-link" style={{ color: "#993C1D" }} onClick={onLogout}>
               {lang === "uz" ? "Chiqish" : lang === "en" ? "Logout" : "Выйти"}
             </button>
           )}
@@ -59,13 +59,13 @@ export default function Nav({ page, setPage, lang = "ru", dark = false, user, on
         {ITEMS.map((item) => (
           <button key={item.key}
             className={`nav-mobile-link${page === item.key ? " active" : ""}`}
-            style={{ color: page === item.key ? "#1565C0" : mutedCol }}
+            style={{ color: page === item.key ? "#0F6E56" : mutedCol }}
             onClick={() => go(item.key)}>
             {label(item)}
           </button>
         ))}
         {user && onLogout && (
-          <button className="nav-mobile-link" style={{ color:"#E64A19", borderTop:"1.5px solid #E3F2FD" }}
+          <button className="nav-mobile-link" style={{ color:"#993C1D", borderTop:"1.5px solid #E1F5EE" }}
             onClick={() => { onLogout(); setOpen(false); }}>
             {lang === "uz" ? "Chiqish" : lang === "en" ? "Logout" : "Выйти"}
           </button>

@@ -10,7 +10,7 @@ const DEMO = {
   careers:  [{ name:"Программист", icon:"💻", match_percent:82 },{ name:"Инженер", icon:"⚙️", match_percent:74 },{ name:"Учёный", icon:"🔬", match_percent:68 }],
   strengths:["Отличная память","Сильная логика","Аналитическое мышление"],
 };
-const COLORS = ["#42A5F5","#26C6DA","#66BB6A","#7E57C2","#FF7043","#FFD740"];
+const COLORS = ["#5DCAA5","#26C6DA","#66BB6A","#7E57C2","#EF9F27","#FFD740"];
 
 export default function ResultsPage({ setPage, results, lang, dark }) {
   const [loading, setLoading] = useState(false);
@@ -44,10 +44,10 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
         <Nav page="results" setPage={setPage} lang={lang} dark={dark} />
         <div style={{ textAlign:"center", padding:"80px 24px" }}>
           <div style={{ fontSize:"3rem", marginBottom:16 }}>📊</div>
-          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color: dark?"#E3F2FD":"#1565C0", marginBottom:12 }}>
+          <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color: dark?"#E1F5EE":"#0F6E56", marginBottom:12 }}>
             {lang==="ru"?"Сначала пройди тест!":lang==="uz"?"Avval testni o'ting!":"Take the quiz first!"}
           </h2>
-          <p style={{ color: dark?"#90CAF9":"#78909C", fontWeight:600, marginBottom:28 }}>
+          <p style={{ color: dark?"#9FE1CB":"#78909C", fontWeight:600, marginBottom:28 }}>
             {lang==="ru"?"Чтобы увидеть свою карту талантов, нужно пройти тест.":lang==="uz"?"Iste'dod xaritangizni ko'rish uchun testni o'ting.":"You need to take the quiz to see your talent map."}
           </p>
           <button className="hero-cta" onClick={() => setPage("quiz")}>
@@ -104,31 +104,31 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
             </div>
           </div>
 
-          <div className="strengths-box" style={{ background: dark?"#1A2A3A":"#F8FBFF", border: dark?"1.5px solid #2A4070":"1.5px solid #E3F2FD" }}>
+          <div className="strengths-box" style={{ background: dark?"#1A2A3A":"#F8FBFF", border: dark?"1.5px solid #2A4070":"1.5px solid #E1F5EE" }}>
             <div>
-              <p className="strengths-title" style={{ color: dark?"#90CAF9":"#1565C0" }}>{t(lang,"results.strengths")}</p>
+              <p className="strengths-title" style={{ color: dark?"#9FE1CB":"#0F6E56" }}>{t(lang,"results.strengths")}</p>
               <ul className="strengths-list">
                 {strengths.length > 0
                   ? strengths.map((s,i) => (
-                      <li key={i} style={{ color: dark?"#E3F2FD":"#37474F" }}>
-                        <span className="check" style={{ color:"#1565C0" }}>✔</span> {s}
+                      <li key={i} style={{ color: dark?"#E1F5EE":"#37474F" }}>
+                        <span className="check" style={{ color:"#0F6E56" }}>✔</span> {s}
                       </li>
                     ))
-                  : <li style={{ color: dark?"#E3F2FD":"#37474F" }}>
-                      <span className="check" style={{ color:"#1565C0" }}>✔</span> {t(lang,"results.allround")}
+                  : <li style={{ color: dark?"#E1F5EE":"#37474F" }}>
+                      <span className="check" style={{ color:"#0F6E56" }}>✔</span> {t(lang,"results.allround")}
                     </li>
                 }
               </ul>
             </div>
             <div>
-              <p className="strengths-title" style={{ color: dark?"#90CAF9":"#1565C0" }}>{t(lang,"results.careers")}</p>
+              <p className="strengths-title" style={{ color: dark?"#9FE1CB":"#0F6E56" }}>{t(lang,"results.careers")}</p>
               <ul className="prof-list">
                 {careers.map((c,i) => (
-                  <li key={i} style={{ color: dark?"#E3F2FD":"#37474F" }}>
+                  <li key={i} style={{ color: dark?"#E1F5EE":"#37474F" }}>
                     <span style={{ fontSize:"1.1rem" }}>{c.icon}</span>
                     <span style={{ fontWeight:800 }}>{c.name}</span>
                     {c.match_percent != null && (
-                      <span style={{ color:"#1565C0", fontWeight:800, marginLeft:6, background:"#E3F2FD", padding:"1px 8px", borderRadius:99, fontSize:"0.82rem" }}>
+                      <span style={{ color:"#0F6E56", fontWeight:800, marginLeft:6, background:"#E1F5EE", padding:"1px 8px", borderRadius:99, fontSize:"0.82rem" }}>
                         {Math.round(c.match_percent)}%
                       </span>
                     )}
