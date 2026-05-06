@@ -756,10 +756,11 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
           {lang==="ru"?"Пройди тест за 5 минут!":lang==="uz"?"5 daqiqada testni o'ting!":"Take the 5-minute quiz!"}
         </p>
         <button className="hero-cta" onClick={() => setPage("quiz")}>{t(lang,"home.cta")} →</button>
+        <button onClick={() => setPage("admin")}>admin</button>
       </div>
     </div>
     
   );
   
-  <button onClick={() => setPage("admin")}>admin</button>
+  
 }
