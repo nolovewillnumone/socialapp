@@ -758,5 +758,8 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         <button className="hero-cta" onClick={() => setPage("quiz")}>{t(lang,"home.cta")} →</button>
       </div>
     </div>
+    
   );
+  
+  <button onClick={() => setPage("admin")}>admin</button>
 }
