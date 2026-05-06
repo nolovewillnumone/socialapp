@@ -189,157 +189,64 @@ const CODE_LINES = [
 
 const TOKEN_COLORS = { keyword:"#EF9F27", fn:"#5DCAA5", str:"#66BB6A", comment:"#78909C", plain:"#E1F5EE" };
 
-// ── Chat knowledge base ──────────────────────────────────────────────────────
-const CHAT_KB = {
-  ru: {
-    triggers: {
-      талант:    "Твой самый сильный талант определяется ответами на 30 вопросов о твоих интересах! Пройди тест — это займёт 7 минут 🌟",
-      профессия: "У нас 20+ профессий: программист 💻, дизайнер 🎨, музыкант 🎵, врач 🩺, спортсмен 🏆, биолог 🌿, юрист ⚖️ и многие другие!",
-      тест:      "Тест состоит из 30 вопросов по 5 зонам. Нет правильных ответов — просто отвечай честно о том, что тебе нравится! 📋",
-      логика:    "Логический интеллект — это способность решать задачи и мыслить системно. Идеально для IT, инженерии и науки! 🧠",
-      творчество:"Творческий интеллект — способность создавать новое. Дизайнер, художник, режиссёр, архитектор — всё это твоё! 🎨",
-      музыка:    "Музыкальный интеллект развивает мозг! Музыканты лучше учатся в школе благодаря нейронным связям. 🎵",
-      лидерство: "Лидерский интеллект — умение вдохновлять других. CEO, предприниматель, политик — это про тебя! 👑",
-      языки:     "Лингвистический интеллект открывает весь мир! Переводчик, дипломат, журналист — блестящие карьеры 🌍",
-      спорт:     "Спортивный интеллект — это не просто физика, это дисциплина, командная работа и стратегия! 🏃",
-      природа:   "Интеллект натуралиста — любовь к живому миру. Биолог, эколог, ветеринар — твои пути! 🌿",
-      привет:    "Привет! 👋 Я AI-советник Karta Talantov. Спроси меня о талантах, профессиях или тесте!",
-      помощь:    "Я могу ответить на вопросы о: талантах, профессиях, тесте, логике, творчестве, музыке, лидерстве, языках, спорте, природе!",
-    },
-    default: "Интересный вопрос! 🤔 Попробуй спросить о: талантах, профессиях, тесте или конкретном интеллекте (логика, музыка, спорт и т.д.)",
-    placeholder: "Спроси о талантах...",
-    title: "KARTA TALANTOV: AI CHAT",
-    send: "→",
-  },
-  uz: {
-    triggers: {
-      iste:      "Sizning eng kuchli iste'dodingiz 30 ta savol orqali aniqlanadi! Testni o'ting — atigi 7 daqiqa 🌟",
-      kasb:      "Bizda 20+ kasb bor: dasturchi 💻, dizayner 🎨, musiqachi 🎵, shifokor 🩺, sportchi 🏆, biolog 🌿, yurist ⚖️ va boshqalar!",
-      test:      "Test 30 savoldan iborat, 5 zona bo'yicha. To'g'ri yoki noto'g'ri javoblar yo'q — faqat sevganingiz haqida to'g'ri javob bering! 📋",
-      mantiq:    "Mantiqiy intellekt — muammolarni hal qilish qobiliyati. IT, muhandislik va fan uchun ideal! 🧠",
-      ijod:      "Ijodiy intellekt — yangi narsa yaratish qobiliyati. Dizayner, rassom, rejissyor — hammasi sizniki! 🎨",
-      musiqa:    "Musiqiy intellekt miyani rivojlantiradi! Musiqachilar neyron bog'lanishlar tufayli maktabda yaxshiroq o'qiydi. 🎵",
-      lider:     "Liderlik intellekti — boshqalarni ilhomlantirish qobiliyati. CEO, tadbirkor, siyosatchi — bu siz haqingizda! 👑",
-      til:       "Lingvistik intellekt butun dunyoni ochadi! Tarjimon, diplomat, jurnalist — ajoyib kasblar 🌍",
-      sport:     "Sport intellekti — bu nafaqat jismoniy, balki intizom, jamoa ishi va strategiya! 🏃",
-      tabiat:    "Naturalist intellekti — tirik dunyoga muhabbat. Biolog, ekolog, veterinar — sizning yo'lingiz! 🌿",
-      salom:     "Salom! 👋 Men Karta Talantov AI maslahatchimanman. Iste'dodlar, kasblar yoki test haqida so'rang!",
-      yordam:    "Men quyidagilar haqida javob bera olaman: iste'dodlar, kasblar, test, mantiq, ijod, musiqa, liderlik, tillar, sport, tabiat!",
-    },
-    default: "Qiziqarli savol! 🤔 So'raning: iste'dodlar, kasblar, test yoki aniq intellekt (mantiq, musiqa, sport va h.k.) haqida",
-    placeholder: "Iste'dodlar haqida so'rang...",
-    title: "KARTA TALANTOV: AI CHAT",
-    send: "→",
-  },
-  en: {
-    triggers: {
-      talent:   "Your strongest talent is determined by 30 questions about your interests! Take the quiz — it only takes 7 minutes 🌟",
-      career:   "We have 20+ careers: programmer 💻, designer 🎨, musician 🎵, doctor 🩺, athlete 🏆, biologist 🌿, lawyer ⚖️ and many more!",
-      quiz:     "The quiz has 30 questions across 5 zones. No right or wrong answers — just answer honestly about what you love! 📋",
-      logic:    "Logical intelligence is the ability to solve problems and think systematically. Perfect for IT, engineering and science! 🧠",
-      creativ:  "Creative intelligence is the ability to create something new. Designer, artist, director, architect — all yours! 🎨",
-      music:    "Musical intelligence develops the brain! Musicians do better in school thanks to neural connections. 🎵",
-      leader:   "Leadership intelligence is the ability to inspire others. CEO, entrepreneur, politician — that's you! 👑",
-      language: "Linguistic intelligence opens the whole world! Translator, diplomat, journalist — brilliant careers 🌍",
-      sport:    "Sports intelligence isn't just physical — it's discipline, teamwork and strategy! 🏃",
-      nature:   "Naturalist intelligence — love for the living world. Biologist, ecologist, vet — your paths! 🌿",
-      hello:    "Hello! 👋 I'm the Karta Talantov AI advisor. Ask me about talents, careers or the quiz!",
-      hi:       "Hi there! 👋 Ask me anything about your talents, careers or how the quiz works!",
-      help:     "I can answer questions about: talents, careers, quiz, logic, creativity, music, leadership, languages, sport, nature!",
-    },
-    default: "Interesting question! 🤔 Try asking about: talents, careers, quiz or a specific intelligence (logic, music, sport etc.)",
-    placeholder: "Ask about your talents...",
-    title: "KARTA TALANTOV: AI CHAT",
-    send: "→",
-  },
+// ── Auto chat messages (left panel - unchanged) ──────────────────────────────
+const CHAT_MESSAGES = [
+  { role:"ai",   delay:0,    text:{ ru:"Привет! Я анализирую твои ответы...", uz:"Salom! Men javoblaringizni tahlil qilaman...", en:"Hi! I'm analysing your answers..." } },
+  { role:"user", delay:1200, text:{ ru:"Какой у меня главный талант?", uz:"Mening asosiy iste'dodim nima?", en:"What is my main talent?" } },
+  { role:"ai",   delay:2600, text:{ ru:"Твой топ-талант — Логика (92%). Ты отлично решаешь задачи и думаешь системно.", uz:"Sizning asosiy iste'dodingiz — Mantiq (92%). Muammolarni yaxshi hal qilasiz.", en:"Your top talent is Logic (92%). You solve problems and think systematically." } },
+  { role:"user", delay:4200, text:{ ru:"Какую карьеру выбрать?", uz:"Qanday kasb tanlash kerak?", en:"What career should I choose?" } },
+  { role:"ai",   delay:5500, text:{ ru:"Рекомендую: Программист (89%), Инженер (81%), Учёный (76%) 🚀", uz:"Tavsiya: Dasturchi (89%), Muhandis (81%), Olim (76%) 🚀", en:"Recommended: Programmer (89%), Engineer (81%), Scientist (76%) 🚀" } },
+];
+
+// ── Two files for the code editor tabs ───────────────────────────────────────
+const CODE_FILES = {
+  "talent_analyzer.py": [
+    { indent:0, tokens:[{ t:"keyword", v:"def " },{ t:"fn", v:"analyze_talent" },{ t:"plain", v:"(answers):" }] },
+    { indent:1, tokens:[{ t:"comment", v:"# ML scoring engine" }] },
+    { indent:1, tokens:[{ t:"plain", v:"scores = " },{ t:"fn", v:"compute_scores" },{ t:"plain", v:"(answers)" }] },
+    { indent:1, tokens:[{ t:"keyword", v:"top " },{ t:"plain", v:"= " },{ t:"fn", v:"max" },{ t:"plain", v:"(scores, key=scores.get)" }] },
+    { indent:1, tokens:[{ t:"keyword", v:"return " },{ t:"plain", v:"{" }] },
+    { indent:2, tokens:[{ t:"str", v:'"top_talent"' },{ t:"plain", v:": top," }] },
+    { indent:2, tokens:[{ t:"str", v:'"score"' },{ t:"plain", v:": scores[top]," }] },
+    { indent:2, tokens:[{ t:"str", v:'"careers"' },{ t:"plain", v:": " },{ t:"fn", v:"match_careers" },{ t:"plain", v:"(scores)" }] },
+    { indent:1, tokens:[{ t:"plain", v:"}" }] },
+    { indent:0, tokens:[] },
+    { indent:0, tokens:[{ t:"comment", v:"# Run analysis" }] },
+    { indent:0, tokens:[{ t:"plain", v:"result = " },{ t:"fn", v:"analyze_talent" },{ t:"plain", v:"(user_answers)" }] },
+    { indent:0, tokens:[{ t:"fn", v:"print" },{ t:"plain", v:'(result[' },{ t:"str", v:'"top_talent"' },{ t:"plain", v:"])" }] },
+  ],
+  "ml_service.py": [
+    { indent:0, tokens:[{ t:"keyword", v:"from " },{ t:"plain", v:"fastapi " },{ t:"keyword", v:"import " },{ t:"fn", v:"FastAPI" }] },
+    { indent:0, tokens:[{ t:"keyword", v:"import " },{ t:"plain", v:"numpy " },{ t:"keyword", v:"as " },{ t:"plain", v:"np" }] },
+    { indent:0, tokens:[] },
+    { indent:0, tokens:[{ t:"plain", v:"app = " },{ t:"fn", v:"FastAPI" },{ t:"plain", v:"(title=" },{ t:"str", v:'"Talent ML"' },{ t:"plain", v:")" }] },
+    { indent:0, tokens:[] },
+    { indent:0, tokens:[{ t:"plain", v:"TALENTS = [" },{ t:"str", v:'"logic"' },{ t:"plain", v:", " },{ t:"str", v:'"creativity"' },{ t:"plain", v:", " },{ t:"str", v:'"music"' },{ t:"plain", v:",...]" }] },
+    { indent:0, tokens:[] },
+    { indent:0, tokens:[{ t:"comment", v:"# Career matching with dot product" }] },
+    { indent:0, tokens:[{ t:"keyword", v:"def " },{ t:"fn", v:"match_careers" },{ t:"plain", v:"(scores: dict):" }] },
+    { indent:1, tokens:[{ t:"plain", v:"vec = np." },{ t:"fn", v:"array" },{ t:"plain", v:"(list(scores.values()))" }] },
+    { indent:1, tokens:[{ t:"plain", v:"ranked = []" }] },
+    { indent:1, tokens:[{ t:"keyword", v:"for " },{ t:"plain", v:"career " },{ t:"keyword", v:"in " },{ t:"plain", v:"CAREER_MAP:" }] },
+    { indent:2, tokens:[{ t:"plain", v:"w = np." },{ t:"fn", v:"array" },{ t:"plain", v:"(career[" },{ t:"str", v:'"weights"' },{ t:"plain", v:"].values())" }] },
+    { indent:2, tokens:[{ t:"plain", v:"ranked." },{ t:"fn", v:"append" },{ t:"plain", v:"(np." },{ t:"fn", v:"dot" },{ t:"plain", v:"(vec, w))" }] },
+    { indent:1, tokens:[{ t:"keyword", v:"return " },{ t:"fn", v:"sorted" },{ t:"plain", v:"(ranked, reverse=" },{ t:"keyword", v:"True" },{ t:"plain", v:")" }] },
+  ],
 };
 
-function getReply(lang, msg) {
-  const kb = CHAT_KB[lang] || CHAT_KB.en;
-  const lower = msg.toLowerCase();
-  for (const [key, reply] of Object.entries(kb.triggers)) {
-    if (lower.includes(key)) return reply;
-  }
-  return kb.default;
-}
+const TOKEN_COLORS = { keyword:"#EF9F27", fn:"#5DCAA5", str:"#66BB6A", comment:"#78909C", plain:"#E1F5EE" };
 
-function InteractiveChatPanel({ lang }) {
-  const kb = CHAT_KB[lang] || CHAT_KB.en;
-  const INIT = [
-    { role:"ai", text: lang==="ru"?"Привет! Я AI-советник по талантам. Задай мне любой вопрос!":lang==="uz"?"Salom! Men iste'dod bo'yicha AI maslahatchimanman. Istalgan savol bering!":"Hi! I'm the AI talent advisor. Ask me anything!" },
-  ];
-  const [msgs, setMsgs]   = useState(INIT);
+// ── Interactive code editor (right panel) ─────────────────────────────────────
+function InteractiveCodeEditor({ visible, lang }) {
+  const FILES = Object.keys(CODE_FILES);
+  const [activeFile, setActiveFile] = useState(FILES[0]);
+  const [userLines, setUserLines] = useState({ "talent_analyzer.py":[], "ml_service.py":[] });
   const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-  const chatRef = useRef(null);
-
-  const scroll = () => setTimeout(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, 50);
-
-  const send = () => {
-    const q = input.trim();
-    if (!q || typing) return;
-    setInput("");
-    setMsgs(prev => [...prev, { role:"user", text:q }]);
-    setTyping(true);
-    scroll();
-    setTimeout(() => {
-      setMsgs(prev => [...prev, { role:"ai", text: getReply(lang, q) }]);
-      setTyping(false);
-      scroll();
-    }, 700 + Math.random() * 400);
-  };
-
-  const onKey = (e) => { if (e.key === "Enter") send(); };
-
-  return (
-    <div style={{ width:"42%", background:"#161B22", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column" }}>
-      <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", fontSize:"0.72rem", fontWeight:800, color:"#78909C", letterSpacing:"0.1em" }}>
-        {kb.title}
-      </div>
-      {/* Messages */}
-      <div ref={chatRef} style={{ flex:1, overflowY:"auto", padding:"14px", display:"flex", flexDirection:"column", gap:10, scrollBehavior:"smooth" }}>
-        {msgs.map((msg, i) => (
-          <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", flexDirection: msg.role==="ai"?"row":"row-reverse", animation:"fadeIn 0.25s ease both" }}>
-            <div style={{ width:24, height:24, borderRadius:"50%", background: msg.role==="ai" ? "linear-gradient(135deg,#0F6E56,#5DCAA5)" : "#EF9F27", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", flexShrink:0 }}>
-              {msg.role==="ai" ? "🌟" : "👤"}
-            </div>
-            <div style={{ background: msg.role==="ai" ? "rgba(93,202,165,0.1)" : "rgba(239,159,39,0.1)", border:`1px solid ${msg.role==="ai" ? "rgba(93,202,165,0.2)" : "rgba(239,159,39,0.2)"}`, borderRadius: msg.role==="ai" ? "4px 12px 12px 12px" : "12px 4px 12px 12px", padding:"8px 12px", fontSize:"0.8rem", color:"#E1F5EE", fontWeight:600, lineHeight:1.5, maxWidth:"82%" }}>
-              {msg.text}
-            </div>
-          </div>
-        ))}
-        {typing && (
-          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-            <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem" }}>🌟</div>
-            <div style={{ display:"flex", gap:4, padding:"10px 14px", background:"rgba(93,202,165,0.1)", borderRadius:"4px 12px 12px 12px", border:"1px solid rgba(93,202,165,0.2)" }}>
-              {[0,1,2].map(d => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#5DCAA5", animation:`pulse 1.2s ease-in-out ${d*0.2}s infinite` }} />)}
-            </div>
-          </div>
-        )}
-      </div>
-      {/* Input */}
-      <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"10px 12px", display:"flex", gap:8, background:"#0D1117" }}>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={onKey}
-          placeholder={kb.placeholder}
-          style={{ flex:1, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 12px", color:"#E1F5EE", fontSize:"0.8rem", fontFamily:"'Nunito',sans-serif", fontWeight:600, outline:"none", caretColor:"#5DCAA5" }}
-        />
-        <button onClick={send} disabled={!input.trim() || typing}
-          style={{ background: input.trim() && !typing ? "linear-gradient(135deg,#0F6E56,#5DCAA5)" : "rgba(255,255,255,0.05)", border:"none", borderRadius:8, padding:"7px 12px", color: input.trim() && !typing ? "#fff" : "#78909C", cursor: input.trim() && !typing ? "pointer":"default", fontWeight:900, fontSize:"1rem", transition:"all 0.2s" }}>
-          {kb.send}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function AIDemoSection({ lang, dark }) {
-  const [ref, visible] = useInView(0.1);
   const [shownLines, setShownLines] = useState(0);
   const [started, setStarted] = useState(false);
+  const editorRef = useRef(null);
 
+  // Auto-type existing code when visible
   useEffect(() => {
     if (!visible || started) return;
     setStarted(true);
@@ -347,15 +254,140 @@ function AIDemoSection({ lang, dark }) {
     const iv = setInterval(() => {
       line++;
       setShownLines(line);
-      if (line >= CODE_LINES.length) clearInterval(iv);
-    }, 120);
+      if (line >= CODE_FILES[FILES[0]].length) clearInterval(iv);
+    }, 110);
     return () => clearInterval(iv);
   }, [visible, started]);
 
+  // Reset shown lines when switching tabs
+  const switchFile = (f) => {
+    setActiveFile(f);
+    setShownLines(CODE_FILES[f].length); // show all instantly on switch
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!input.trim()) return;
+      setUserLines(prev => ({
+        ...prev,
+        [activeFile]: [...(prev[activeFile]||[]), input],
+      }));
+      setInput("");
+      setTimeout(() => {
+        if (editorRef.current) editorRef.current.scrollTop = editorRef.current.scrollHeight;
+      }, 50);
+    }
+  };
+
+  const codeLines = CODE_FILES[activeFile] || [];
+  const myLines   = userLines[activeFile] || [];
+  const startNum  = 77;
+  const linesToShow = activeFile === FILES[0] ? Math.min(shownLines, codeLines.length) : codeLines.length;
+
+  return (
+    <div style={{ flex:1, background:"#0D1117", display:"flex", flexDirection:"column", overflow:"hidden", fontFamily:"'Courier New',monospace", fontSize:"0.78rem" }}>
+
+      {/* Tab bar */}
+      <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", background:"#161B22" }}>
+        {FILES.map((f) => (
+          <button key={f} onClick={() => switchFile(f)}
+            style={{
+              padding:"8px 16px", border:"none", cursor:"pointer",
+              fontFamily:"'Courier New',monospace", fontSize:"0.73rem", fontWeight:700,
+              background: f===activeFile ? "#0D1117" : "transparent",
+              color: f===activeFile ? "#E1F5EE" : "#78909C",
+              borderTop: f===activeFile ? "1px solid #5DCAA5" : "1px solid transparent",
+              borderRight:"1px solid rgba(255,255,255,0.06)",
+              display:"flex", alignItems:"center", gap:6,
+              transition:"all 0.2s",
+            }}>
+            <span style={{ color: f===activeFile ? "#5DCAA5":"#78909C" }}>■</span> {f}
+            {f===activeFile && <span style={{ color:"#78909C", fontSize:"0.65rem" }}>●</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Code area */}
+      <div ref={editorRef} style={{ flex:1, overflowY:"auto", padding:"8px 0" }}>
+        {/* Pre-existing code */}
+        {codeLines.slice(0, linesToShow).map((line, i) => (
+          <div key={`pre-${i}`} style={{ display:"flex", padding:"1px 16px", lineHeight:1.7, animation:"fadeIn 0.12s ease both" }}>
+            <span style={{ color:"#30363D", fontWeight:700, fontSize:"0.7rem", minWidth:28, userSelect:"none", textAlign:"right", paddingRight:12 }}>{i+startNum}</span>
+            <span style={{ paddingLeft: line.indent*16 }}>
+              {line.tokens.map((tok,j) => (
+                <span key={j} style={{ color:TOKEN_COLORS[tok.t]||"#E1F5EE" }}>{tok.v}</span>
+              ))}
+            </span>
+          </div>
+        ))}
+
+        {/* Typing cursor if still animating */}
+        {activeFile===FILES[0] && linesToShow < codeLines.length && started && (
+          <div style={{ display:"flex", padding:"1px 16px", lineHeight:1.7 }}>
+            <span style={{ color:"#30363D", minWidth:28, paddingRight:12, textAlign:"right", fontSize:"0.7rem" }}>{linesToShow+startNum}</span>
+            <span style={{ display:"inline-block", width:8, height:14, background:"#5DCAA5", verticalAlign:"middle", animation:"pulse 0.8s ease-in-out infinite" }} />
+          </div>
+        )}
+
+        {/* User-typed lines */}
+        {myLines.map((line, i) => (
+          <div key={`user-${i}`} style={{ display:"flex", padding:"1px 16px", lineHeight:1.7, animation:"fadeIn 0.15s ease both" }}>
+            <span style={{ color:"#30363D", fontWeight:700, fontSize:"0.7rem", minWidth:28, userSelect:"none", textAlign:"right", paddingRight:12 }}>{codeLines.length+startNum+i}</span>
+            <span style={{ color:"#E1F5EE" }}>{line}</span>
+          </div>
+        ))}
+
+        {/* Active input line */}
+        <div style={{ display:"flex", padding:"1px 16px", lineHeight:1.7, alignItems:"center" }}>
+          <span style={{ color:"#30363D", fontWeight:700, fontSize:"0.7rem", minWidth:28, textAlign:"right", paddingRight:12, userSelect:"none" }}>
+            {codeLines.length+startNum+myLines.length}
+          </span>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder={lang==="ru"?"# напиши код здесь...":lang==="uz"?"# bu yerga kod yozing...":"# type your code here..."}
+            style={{ flex:1, background:"transparent", border:"none", outline:"none", color:"#E1F5EE", fontFamily:"'Courier New',monospace", fontSize:"0.78rem", caretColor:"#5DCAA5", padding:0 }}
+          />
+          <span style={{ width:7, height:13, background:"#5DCAA5", display:"inline-block", animation:"pulse 1s ease-in-out infinite", borderRadius:1, flexShrink:0 }} />
+        </div>
+      </div>
+
+      {/* Status bar */}
+      <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"3px 16px", background:"#0F6E56", display:"flex", gap:16, alignItems:"center" }}>
+        <span style={{ fontSize:"0.68rem", fontWeight:700, color:"rgba(255,255,255,0.85)" }}>Python</span>
+        <span style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.6)" }}>Ln {codeLines.length+myLines.length+startNum}</span>
+        <span style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.6)" }}>UTF-8</span>
+        <span style={{ marginLeft:"auto", fontSize:"0.68rem", color:"rgba(255,255,255,0.7)", fontWeight:700 }}>Karta Talantov ML</span>
+      </div>
+    </div>
+  );
+}
+
+function AIDemoSection({ lang, dark }) {
+  const [ref, visible] = useInView(0.1);
+  const [shownMsgs, setShownMsgs] = useState([]);
+  const [started, setStarted] = useState(false);
+  const chatRef = useRef(null);
+
+  useEffect(() => {
+    if (!visible || started) return;
+    setStarted(true);
+    CHAT_MESSAGES.forEach((msg) => {
+      setTimeout(() => {
+        setShownMsgs((prev) => [...prev, msg]);
+        setTimeout(() => {
+          if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }, 50);
+      }, msg.delay);
+    });
+  }, [visible, started]);
+
   const label = {
-    ru: { title: "Умный AI-анализ в реальном времени", sub: "Спроси нашего AI-советника о своих талантах прямо здесь!" },
-    uz: { title: "Real vaqtda aqlli AI tahlili",        sub: "AI maslahatchimizdан iste'dodlaringiz haqida so'rang!" },
-    en: { title: "Smart AI analysis in real time",      sub: "Ask our AI advisor about your talents right here!" },
+    ru: { title: "Умный AI-анализ в реальном времени", sub: "Наш ML видит закономерности, которые не видишь ты — попробуй написать код справа!" },
+    uz: { title: "Real vaqtda aqlli AI tahlili",        sub: "ML siz ko'ra olmaydigan naqshlarni ko'radi — o'ng tomonda kod yozing!" },
+    en: { title: "Smart AI analysis in real time",      sub: "Our ML sees patterns you might not notice — try writing code on the right!" },
   }[lang] || {};
 
   return (
@@ -368,7 +400,7 @@ function AIDemoSection({ lang, dark }) {
         <p style={{ color:"#78909C", fontWeight:600, fontSize:"0.95rem" }}>{label.sub}</p>
       </div>
 
-      {/* VS Code style window */}
+      {/* VS Code window */}
       <div className="ai-demo-window" style={{ maxWidth:900, margin:"0 auto", borderRadius:16, overflow:"hidden", boxShadow:"0 24px 80px rgba(0,0,0,0.5)", border:"1px solid rgba(255,255,255,0.08)", opacity:visible?1:0, transform:visible?"translateY(0) scale(1)":"translateY(40px) scale(0.97)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s" }}>
 
         {/* Window chrome */}
@@ -376,45 +408,43 @@ function AIDemoSection({ lang, dark }) {
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#FF5F57" }} />
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#FFBD2E" }} />
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#28CA41" }} />
-          <div style={{ flex:1, display:"flex", justifyContent:"center", gap:16 }}>
-            {["talent_analyzer.py", "ml_service.py"].map((f, i) => (
-              <div key={f} style={{ background: i===0 ? "#0D1117" : "transparent", border: i===0 ? "1px solid rgba(255,255,255,0.1)" : "none", borderRadius:"6px 6px 0 0", padding:"4px 12px", fontSize:"0.75rem", fontWeight:700, color: i===0 ? "#E1F5EE" : "#78909C", display:"flex", alignItems:"center", gap:6 }}>
-                <span style={{ color:"#5DCAA5" }}>■</span> {f}
-              </div>
-            ))}
+          <div style={{ flex:1, textAlign:"center", fontSize:"0.72rem", color:"#78909C", fontWeight:700, fontFamily:"'Courier New',monospace" }}>
+            karta-talantov — VSCode
           </div>
         </div>
 
         {/* Split pane */}
-        <div style={{ display:"flex", height:340 }}>
+        <div style={{ display:"flex", height:360 }}>
 
-          {/* LEFT: Interactive chat */}
-          <InteractiveChatPanel lang={lang} />
-
-          {/* RIGHT: Code editor — hidden on mobile */}
-          <div className="ai-demo-code" style={{ flex:1, background:"#0D1117", overflow:"hidden", fontFamily:"'Courier New', monospace", fontSize:"0.78rem" }}>
-            <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", gap:16 }}>
-              {["76","77","78"].map(n => <span key={n} style={{ fontSize:"0.72rem", color:"#30363D", fontWeight:700 }}>{n}</span>)}
+          {/* LEFT: Auto-animated chat — unchanged */}
+          <div className="ai-demo-chat" style={{ width:"42%", background:"#161B22", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column" }}>
+            <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", fontSize:"0.72rem", fontWeight:800, color:"#78909C", letterSpacing:"0.1em", textTransform:"uppercase" }}>
+              KARTA TALANTOV: AI CHAT
             </div>
-            <div style={{ padding:"8px 0", overflowY:"auto", height:"calc(100% - 40px)" }}>
-              {CODE_LINES.slice(0, shownLines).map((line, i) => (
-                <div key={i} style={{ display:"flex", padding:"1px 16px", lineHeight:1.7, animation:"fadeIn 0.15s ease both" }}>
-                  <span style={{ color:"#30363D", fontWeight:700, fontSize:"0.7rem", minWidth:28, userSelect:"none" }}>{i + 77}</span>
-                  <span style={{ paddingLeft: line.indent * 16 }}>
-                    {line.tokens.map((tok, j) => (
-                      <span key={j} style={{ color: TOKEN_COLORS[tok.t] || "#E1F5EE" }}>{tok.v}</span>
-                    ))}
-                  </span>
+            <div ref={chatRef} style={{ flex:1, overflowY:"auto", padding:"14px", display:"flex", flexDirection:"column", gap:12, scrollBehavior:"smooth" }}>
+              {shownMsgs.map((msg, i) => (
+                <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", animation:"listItemIn 0.3s ease both" }}>
+                  <div style={{ width:24, height:24, borderRadius:"50%", background: msg.role==="ai" ? "linear-gradient(135deg,#0F6E56,#5DCAA5)" : "#EF9F27", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", flexShrink:0 }}>
+                    {msg.role==="ai" ? "🌟" : "👤"}
+                  </div>
+                  <div style={{ background: msg.role==="ai" ? "rgba(93,202,165,0.1)" : "rgba(239,159,39,0.1)", border:`1px solid ${msg.role==="ai" ? "rgba(93,202,165,0.2)" : "rgba(239,159,39,0.2)"}`, borderRadius: msg.role==="ai" ? "4px 12px 12px 12px" : "12px 4px 12px 12px", padding:"8px 12px", fontSize:"0.8rem", color:"#E1F5EE", fontWeight:600, lineHeight:1.5, maxWidth:"82%" }}>
+                    {msg.text[lang] || msg.text.en}
+                  </div>
                 </div>
               ))}
-              {shownLines < CODE_LINES.length && started && (
-                <div style={{ padding:"1px 16px", lineHeight:1.7 }}>
-                  <span style={{ color:"#30363D", minWidth:28, display:"inline-block", fontSize:"0.7rem" }}>{shownLines + 77}</span>
-                  <span style={{ display:"inline-block", width:8, height:14, background:"#5DCAA5", verticalAlign:"middle", animation:"pulse 0.8s ease-in-out infinite" }} />
+              {shownMsgs.length < CHAT_MESSAGES.length && started && (
+                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                  <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem" }}>🌟</div>
+                  <div style={{ display:"flex", gap:4, padding:"10px 14px", background:"rgba(93,202,165,0.1)", borderRadius:"4px 12px 12px 12px", border:"1px solid rgba(93,202,165,0.2)" }}>
+                    {[0,1,2].map(d => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#5DCAA5", animation:`pulse 1.2s ease-in-out ${d*0.2}s infinite` }} />)}
+                  </div>
                 </div>
               )}
             </div>
           </div>
+
+          {/* RIGHT: Interactive code editor with tabs */}
+          <InteractiveCodeEditor visible={visible} lang={lang} />
         </div>
       </div>
     </div>
