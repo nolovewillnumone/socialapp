@@ -162,17 +162,6 @@ function BenefitSection({ benefit, index, lang, dark }) {
   );
 }
 
-// ── AI Demo Section (GitHub Copilot style) ────────────────────────────────────
-const CHAT_MESSAGES = [
-  { role: "ai",   delay: 0,    text: { ru: "Привет! Я анализирую твои ответы...", uz: "Salom! Men javoblaringizni tahlil qilaman...", en: "Hi! I'm analysing your answers..." } },
-  { role: "user", delay: 1200, text: { ru: "Какой у меня главный талант?", uz: "Mening asosiy iste'dodim nima?", en: "What is my main talent?" } },
-  { role: "ai",   delay: 2600, text: { ru: "Твой топ-талант — Логика (92%). Ты отлично решаешь задачи и думаешь системно.", uz: "Sizning asosiy iste'dodingiz — Mantiq (92%). Muammolarni yaxshi hal qilasiz.", en: "Your top talent is Logic (92%). You solve problems and think systematically." } },
-  { role: "user", delay: 4200, text: { ru: "Какую карьеру выбрать?", uz: "Qanday kasb tanlash kerak?", en: "What career should I choose?" } },
-  { role: "ai",   delay: 5500, text: { ru: "Рекомендую: Программист (89%), Инженер (81%), Учёный (76%) 🚀", uz: "Tavsiya: Dasturchi (89%), Muhandis (81%), Olim (76%) 🚀", en: "Recommended: Programmer (89%), Engineer (81%), Scientist (76%) 🚀" } },
-];
-
-
-
 // ── Auto chat messages (left panel - unchanged) ──────────────────────────────
 const CHAT_MESSAGES = [
   { role:"ai",   delay:0,    text:{ ru:"Привет! Я анализирую твои ответы...", uz:"Salom! Men javoblaringizni tahlil qilaman...", en:"Hi! I'm analysing your answers..." } },
