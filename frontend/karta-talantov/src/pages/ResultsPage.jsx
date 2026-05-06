@@ -121,12 +121,14 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
               <ul className="strengths-list">
                 {strengths.length > 0
                   ? strengths.map((s,i) => (
-                      <li key={i} style={{ color: dark?"#E1F5EE":"#37474F" }}>
-                        <span className="check" style={{ color:"#0F6E56" }}>✔</span> {s}
+                      <li key={i} style={{ color: dark?"#E1F5EE":"#2E4057", background: dark?"rgba(159,225,203,0.06)":"#fff", borderColor: dark?"#2A4070":"#E1F5EE" }}>
+                        <span style={{ color:"#0F6E56", fontWeight:900, fontSize:"1rem" }}>✔</span>
+                        <span style={{ fontWeight:700 }}>{s}</span>
                       </li>
                     ))
-                  : <li style={{ color: dark?"#E1F5EE":"#37474F" }}>
-                      <span className="check" style={{ color:"#0F6E56" }}>✔</span> {t(lang,"results.allround")}
+                  : <li style={{ color: dark?"#E1F5EE":"#2E4057", background: dark?"rgba(159,225,203,0.06)":"#fff" }}>
+                      <span style={{ color:"#0F6E56", fontWeight:900 }}>✔</span>
+                      <span style={{ fontWeight:700 }}>{t(lang,"results.allround")}</span>
                     </li>
                 }
               </ul>
@@ -135,11 +137,11 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
               <p className="strengths-title" style={{ color: dark?"#9FE1CB":"#0F6E56" }}>{t(lang,"results.careers")}</p>
               <ul className="prof-list">
                 {careers.map((c,i) => (
-                  <li key={i} style={{ color: dark?"#E1F5EE":"#37474F" }}>
-                    <span style={{ fontSize:"1.1rem" }}>{c.icon}</span>
-                    <span style={{ fontWeight:800 }}>{c.name}</span>
+                  <li key={i} style={{ color: dark?"#E1F5EE":"#2E4057", background: dark?"rgba(159,225,203,0.06)":"#fff", borderColor: dark?"#2A4070":"#E1F5EE" }}>
+                    <span style={{ fontSize:"1.2rem" }}>{c.icon}</span>
+                    <span style={{ fontWeight:800, flex:1 }}>{c.name}</span>
                     {c.match_percent != null && (
-                      <span style={{ color:"#0F6E56", fontWeight:800, marginLeft:6, background:"#E1F5EE", padding:"1px 8px", borderRadius:99, fontSize:"0.82rem" }}>
+                      <span style={{ color:"#0F6E56", fontWeight:900, background: dark?"rgba(15,110,86,0.2)":"#E1F5EE", padding:"2px 10px", borderRadius:99, fontSize:"0.82rem", flexShrink:0 }}>
                         {Math.round(c.match_percent)}%
                       </span>
                     )}
