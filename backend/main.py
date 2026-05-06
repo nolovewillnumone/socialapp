@@ -15,13 +15,13 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from pydantic import BaseModel as PydanticBase
 from collections import defaultdict
 from datetime import datetime, timedelta
 import httpx
 import os
 import re
 import time
-
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
