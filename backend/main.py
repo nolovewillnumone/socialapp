@@ -21,7 +21,7 @@ import httpx
 import os
 import re
 import time
-
+import anthropic
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
@@ -321,6 +321,149 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+
+# ── Anonymous result tracking ─────────────────────────────────────────────────
+class AnonResultCreate(PydanticBase):
+    session_id: Optional[str] = ""
+    lang:       Optional[str] = "ru"
+    age_range:  Optional[str] = ""
+    scores:     Optional[Dict[str, Any]] = None
+    top_talent: Optional[str] = ""
+    top_career: Optional[str] = ""
+
+@app.post("/results/anonymous", status_code=201)
+def save_anonymous_result(body: AnonResultCreate, db: Session = Depends(get_db)):
+    """Save quiz result for guests — for analytics only, no personal data."""
+    try:
+        scores = body.scores or {}
+        rec = models.AnonymousResult(
+            session_id   = sanitize(body.session_id or "", 64),
+            lang         = body.lang if body.lang in ["ru","uz","en"] else "ru",
+            age_range    = body.age_range or "",
+            score_logic      = float(scores.get("logic", 0)),
+            score_creativity = float(scores.get("creativity", 0)),
+            score_memory     = float(scores.get("memory", 0)),
+            score_leadership = float(scores.get("leadership", 0)),
+            score_languages  = float(scores.get("languages", 0)),
+            score_music      = float(scores.get("music", 0)),
+            score_sport      = float(scores.get("sport", 0)),
+            score_nature     = float(scores.get("nature", 0)),
+            score_social     = float(scores.get("social", 0)),
+            top_talent   = sanitize(body.top_talent or "", 50),
+            top_career   = sanitize(body.top_career or "", 100),
+        )
+        db.add(rec)
+        db.commit()
+        return {"saved": True}
+    except Exception as e:
+        db.rollback()
+        return {"saved": False, "error": str(e)}
+
+
+# ── Feedback endpoints ────────────────────────────────────────────────────────
+class FeedbackCreate(PydanticBase):
+    name:       Optional[str] = "Anonymous"
+    session_id: Optional[str] = ""
+    lang:       Optional[str] = "ru"
+    rating:     Optional[int] = 5
+    comment:    Optional[str] = ""
+    career:     Optional[str] = ""
+    helpful:    Optional[bool] = True
+
+class FeedbackOut(PydanticBase):
+    id:         int
+    name:       str
+    rating:     int
+    comment:    str
+    career:     str
+    lang:       str
+    helpful:    bool
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+@app.post("/feedback", status_code=201)
+def submit_feedback(body: FeedbackCreate, db: Session = Depends(get_db)):
+    """Submit feedback — works for both logged-in and guest users."""
+    try:
+        rating = max(1, min(5, body.rating or 5))
+        rec = models.Feedback(
+            name       = sanitize(body.name or "Anonymous", 100),
+            session_id = sanitize(body.session_id or "", 64),
+            lang       = body.lang if body.lang in ["ru","uz","en"] else "ru",
+            rating     = rating,
+            comment    = sanitize(body.comment or "", 1000),
+            career     = sanitize(body.career or "", 100),
+            helpful    = body.helpful if body.helpful is not None else True,
+        )
+        db.add(rec)
+        db.commit()
+        db.refresh(rec)
+        return {"saved": True, "id": rec.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Feedback error: {str(e)}")
+
+@app.get("/feedback/public")
+def get_public_feedback(db: Session = Depends(get_db), limit: int = 20):
+    """Get recent public feedback with rating >= 4 for display."""
+    items = (
+        db.query(models.Feedback)
+        .filter(models.Feedback.rating >= 4)
+        .filter(models.Feedback.comment != "")
+        .order_by(models.Feedback.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "id":      f.id,
+            "name":    f.name,
+            "rating":  f.rating,
+            "comment": f.comment,
+            "career":  f.career,
+            "lang":    f.lang,
+            "helpful": f.helpful,
+            "date":    f.created_at.strftime("%d.%m.%Y") if f.created_at else "",
+        }
+        for f in items
+    ]
+
+# ── Analytics summary ─────────────────────────────────────────────────────────
+@app.get("/analytics/summary")
+def analytics_summary(db: Session = Depends(get_db)):
+    """Public analytics — how many people used the platform."""
+    try:
+        users_count    = db.query(models.User).count()
+        results_count  = db.query(models.QuizResult).count()
+        anon_count     = db.query(models.AnonymousResult).count()
+        feedback_count = db.query(models.Feedback).count()
+        avg_rating_row = db.query(models.Feedback).all()
+        avg_rating     = round(sum(f.rating for f in avg_rating_row) / len(avg_rating_row), 1) if avg_rating_row else 5.0
+
+        # Top career distribution
+        from sqlalchemy import func as sqlfunc
+        top_careers = (
+            db.query(models.QuizResult.top_career, sqlfunc.count(models.QuizResult.id).label("cnt"))
+            .group_by(models.QuizResult.top_career)
+            .order_by(sqlfunc.count(models.QuizResult.id).desc())
+            .limit(5)
+            .all()
+        )
+
+        return {
+            "total_users":    users_count,
+            "total_quizzes":  results_count + anon_count,
+            "registered":     results_count,
+            "guests":         anon_count,
+            "feedbacks":      feedback_count,
+            "avg_rating":     avg_rating,
+            "top_careers":    [{"career": r[0], "count": r[1]} for r in top_careers],
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 # ── Rule-based AI Chatbot (no external API needed) ──────────────────────────
 from pydantic import BaseModel as PydanticBase

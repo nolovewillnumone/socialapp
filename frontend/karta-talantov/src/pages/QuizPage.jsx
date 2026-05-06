@@ -322,6 +322,24 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
       }
       setResults(data);
       setPage("results");
+
+      // Always save anonymous analytics (no personal data)
+      try {
+        const sid = localStorage.getItem("session_id") || Math.random().toString(36).slice(2);
+        localStorage.setItem("session_id", sid);
+        const scores = data.scores || localScores;
+        await fetch("https://karta-talantov-backend.onrender.com/results/anonymous", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({
+            session_id: sid, lang,
+            scores,
+            top_talent: data.top_talents?.[0] || "",
+            top_career: data.careers?.[0]?.name || "",
+          }),
+        });
+      } catch {}
+
     } catch {
       setError(lang==="ru"?"Ошибка. Попробуй ещё раз.":lang==="uz"?"Xato. Qaytadan urinib ko'ring.":"Error. Please try again.");
       setPhase("question");

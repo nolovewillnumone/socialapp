@@ -4,6 +4,7 @@ import RadarChart from "../components/RadarChart";
 import Loader from "../components/Loader";
 import { quizAPI } from "../api/client";
 import { t } from "../i18n";
+import { FeedbackForm } from "../components/FeedbackSection";
 
 const DEMO_SCORES = { logic:85, creativity:60, memory:90, leadership:45, languages:70, music:50, sport:30, nature:40, social:55 };
 const DEMO_CAREERS = {
@@ -159,6 +160,14 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
             <button className="hero-cta" style={{ marginTop:8, fontSize:"1rem", padding:"13px 32px" }} onClick={() => setPage("develop")}>
               {t(lang,"results.develop")}
             </button>
+
+            {/* Inline feedback after results */}
+            <div style={{ marginTop:20, paddingTop:16, borderTop:`1px solid ${dark?"#2A4070":"#E1F5EE"}` }}>
+              <p style={{ fontSize:"0.82rem", fontWeight:800, color:dark?"#9FE1CB":"#0F6E56", marginBottom:12, textAlign:"center" }}>
+                {lang==="ru"?"Помогли ли результаты?":lang==="uz"?"Natijalar foydali bo'ldimi?":"Were the results helpful?"}
+              </p>
+              <FeedbackForm lang={lang} dark={dark} career={careers?.[0]?.name || ""} />
+            </div>
           </div>
         </div>
       </div>
