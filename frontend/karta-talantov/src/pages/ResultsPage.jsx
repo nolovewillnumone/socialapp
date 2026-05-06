@@ -67,8 +67,19 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
   const adjustedScores = Object.fromEntries(
     Object.entries(scores).map(([k, v]) => [k, Math.max(5, Math.round(v))])
   );
+  const TALENT_LABELS = {
+    logic:      {ru:"Логика",      uz:"Mantiq",      en:"Logic"},
+    creativity: {ru:"Творчество",  uz:"Ijodkorlik",  en:"Creativity"},
+    memory:     {ru:"Память",      uz:"Xotira",      en:"Memory"},
+    leadership: {ru:"Лидерство",   uz:"Liderlik",    en:"Leadership"},
+    languages:  {ru:"Языки",       uz:"Tillar",      en:"Languages"},
+    music:      {ru:"Музыка",      uz:"Musiqa",      en:"Music"},
+    sport:      {ru:"Спорт",       uz:"Sport",       en:"Sport"},
+    nature:     {ru:"Природа",     uz:"Tabiat",      en:"Nature"},
+    social:     {ru:"Общение",     uz:"Muloqot",     en:"Social"},
+  };
   const radarData = Object.entries(adjustedScores).map(([key, value]) => ({
-    label: t(lang, `talent.${key}`),
+    label: TALENT_LABELS[key]?.[lang] || TALENT_LABELS[key]?.en || key,
     value,
   }));
 
