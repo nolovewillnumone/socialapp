@@ -5,11 +5,18 @@ import Loader from "../components/Loader";
 import { quizAPI } from "../api/client";
 import { t } from "../i18n";
 
-const DEMO = {
-  scores:   { logic:85, creativity:60, memory:90, leadership:45, languages:70, music:50 },
-  careers:  [{ name:"Программист", icon:"💻", match_percent:82 },{ name:"Инженер", icon:"⚙️", match_percent:74 },{ name:"Учёный", icon:"🔬", match_percent:68 }],
-  strengths:["Отличная память","Сильная логика","Аналитическое мышление"],
+const DEMO_SCORES = { logic:85, creativity:60, memory:90, leadership:45, languages:70, music:50, sport:30, nature:40, social:55 };
+const DEMO_CAREERS = {
+  ru:[{ name:"Программист", icon:"💻", match_percent:82 },{ name:"Врач", icon:"🩺", match_percent:74 },{ name:"Учёный", icon:"🔬", match_percent:68 },{ name:"Психолог", icon:"🧠", match_percent:61 },{ name:"Учитель", icon:"📚", match_percent:58 }],
+  uz:[{ name:"Dasturchi", icon:"💻", match_percent:82 },{ name:"Shifokor", icon:"🩺", match_percent:74 },{ name:"Olim", icon:"🔬", match_percent:68 },{ name:"Psixolog", icon:"🧠", match_percent:61 },{ name:"O'qituvchi", icon:"📚", match_percent:58 }],
+  en:[{ name:"Programmer", icon:"💻", match_percent:82 },{ name:"Doctor", icon:"🩺", match_percent:74 },{ name:"Scientist", icon:"🔬", match_percent:68 },{ name:"Psychologist", icon:"🧠", match_percent:61 },{ name:"Teacher", icon:"📚", match_percent:58 }],
 };
+const DEMO_STRENGTHS = {
+  ru:["Отличная память и внимание","Сильное логическое мышление","Аналитическое мышление"],
+  uz:["A'lo xotira va diqqat","Kuchli mantiqiy tafakkur","Tahliliy tafakkur"],
+  en:["Excellent memory and attention","Strong logical thinking","Analytical thinking"],
+};
+const DEMO = { scores: DEMO_SCORES, careers: [], strengths: [] };
 const COLORS = ["#5DCAA5","#26C6DA","#66BB6A","#7E57C2","#EF9F27","#FFD740"];
 
 export default function ResultsPage({ setPage, results, lang, dark }) {
@@ -59,9 +66,9 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
   }
 
   const data      = results || fetched || DEMO;
-  const scores    = data.scores   || DEMO.scores;
-  const careers   = data.careers  || DEMO.careers;
-  const strengths = data.strengths || DEMO.strengths;
+  const scores    = data.scores   || DEMO_SCORES;
+  const careers   = (data.careers?.length > 0 ? data.careers : DEMO_CAREERS[lang] || DEMO_CAREERS.en);
+  const strengths = (data.strengths?.length > 0 ? data.strengths : DEMO_STRENGTHS[lang] || DEMO_STRENGTHS.en);
 
   // Ensure minimum 5% for all talents so radar chart looks good
   const adjustedScores = Object.fromEntries(
@@ -121,13 +128,13 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
               <ul className="strengths-list">
                 {strengths.length > 0
                   ? strengths.map((s,i) => (
-                      <li key={i} style={{ color: dark?"#E1F5EE":"#2E4057", background: dark?"rgba(159,225,203,0.06)":"#fff", borderColor: dark?"#2A4070":"#E1F5EE" }}>
-                        <span style={{ color:"#0F6E56", fontWeight:900, fontSize:"1rem" }}>✔</span>
-                        <span style={{ fontWeight:700 }}>{s}</span>
+                      <li key={i} style={{ color: dark?"#E3F2FD":"#04342C", background: dark?"rgba(93,202,165,0.08)":"#fff", borderColor: dark?"#2A4070":"#E1F5EE", animation:`listItemIn 0.35s ease ${i*0.08}s both` }}>
+                        <span style={{ color:"#0F6E56", fontWeight:900, fontSize:"1rem", flexShrink:0 }}>✔</span>
+                        <span style={{ fontWeight:700, color: dark?"#E3F2FD":"#04342C" }}>{s}</span>
                       </li>
                     ))
-                  : <li style={{ color: dark?"#E1F5EE":"#2E4057", background: dark?"rgba(159,225,203,0.06)":"#fff" }}>
-                      <span style={{ color:"#0F6E56", fontWeight:900 }}>✔</span>
+                  : <li style={{ color: dark?"#E3F2FD":"#04342C", background: dark?"rgba(93,202,165,0.08)":"#fff" }}>
+                      <span style={{ color:"#0F6E56", fontWeight:900, flexShrink:0 }}>✔</span>
                       <span style={{ fontWeight:700 }}>{t(lang,"results.allround")}</span>
                     </li>
                 }
@@ -136,12 +143,12 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
             <div>
               <p className="strengths-title" style={{ color: dark?"#9FE1CB":"#0F6E56" }}>{t(lang,"results.careers")}</p>
               <ul className="prof-list">
-                {careers.map((c,i) => (
-                  <li key={i} style={{ color: dark?"#E1F5EE":"#2E4057", background: dark?"rgba(159,225,203,0.06)":"#fff", borderColor: dark?"#2A4070":"#E1F5EE" }}>
-                    <span style={{ fontSize:"1.2rem" }}>{c.icon}</span>
-                    <span style={{ fontWeight:800, flex:1 }}>{c.name}</span>
+                {careers.slice(0,5).map((c,i) => (
+                  <li key={i} style={{ color: dark?"#E3F2FD":"#1A237E", background: dark?"rgba(93,202,165,0.08)":"#fff", borderColor: dark?"#2A4070":"#E1F5EE", animation:`listItemIn 0.35s ease ${i*0.06}s both` }}>
+                    <span style={{ fontSize:"1.2rem", flexShrink:0 }}>{c.icon}</span>
+                    <span style={{ fontWeight:800, flex:1, color: dark?"#E3F2FD":"#04342C" }}>{c.name}</span>
                     {c.match_percent != null && (
-                      <span style={{ color:"#0F6E56", fontWeight:900, background: dark?"rgba(15,110,86,0.2)":"#E1F5EE", padding:"2px 10px", borderRadius:99, fontSize:"0.82rem", flexShrink:0 }}>
+                      <span style={{ color:"#fff", fontWeight:900, background:"linear-gradient(135deg,#0F6E56,#1D9E75)", padding:"2px 10px", borderRadius:99, fontSize:"0.82rem", flexShrink:0, boxShadow:"0 2px 8px rgba(15,110,86,0.3)" }}>
                         {Math.round(c.match_percent)}%
                       </span>
                     )}
