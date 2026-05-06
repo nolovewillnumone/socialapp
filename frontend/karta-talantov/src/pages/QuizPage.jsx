@@ -3,356 +3,265 @@ import Nav from "../components/Nav";
 import Loader from "../components/Loader";
 import { quizAPI } from "../api/client";
 
-// ── INTEREST-BASED QUIZ ───────────────────────────────────────────────────────
-// Based on Gardner's Multiple Intelligences self-assessment model
-// Questions ask about what kids LOVE to do, not what they can do
-// This is the correct approach used by schools worldwide
-
 const STORY = {
   ru: {
     intro: {
       title: "Узнай свои таланты! 🌟",
-      text: "Это не экзамен — здесь нет правильных или неправильных ответов! Просто отвечай честно о том, что тебе нравится делать. Мы найдём твои настоящие таланты!",
-      btn: "Начать →",
-      mascot: "🌟",
-      note: "15 вопросов · 5 минут · Честные ответы = точный результат",
+      text: "Нет правильных или неправильных ответов — просто отвечай честно! 30 вопросов, 7 минут, и ты узнаешь какая профессия тебе идеально подойдёт.",
+      btn: "Поехали →",
+      note: "30 вопросов · 7 минут · Более 20 профессий",
     },
     chapters: [
       {
-        id:"ch1", zone:"Что ты любишь?", emoji:"❤️",
-        color:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD9)",
-        intro:"Расскажи нам о своих любимых занятиях! Чем ты занимаешься, когда тебе скучно или у тебя есть свободное время?",
-        questions: [
-          {
-            id:"q1", talent:"logic",
-            mission:"Свободное время",
-            q:"Когда у тебя есть свободное время, ты чаще всего...",
-            opts:["Решаешь головоломки, играешь в шахматы или собираешь кубик Рубика 🧩","Рисуешь, лепишь или создаёшь что-то руками 🎨","Слушаешь музыку или играешь на инструменте 🎵","Общаешься с друзьями или организуешь игры 👥"],
-            score_map:{"logic":1.0,"creativity":0.8,"music":0.8,"leadership":0.8},
-          },
-          {
-            id:"q2", talent:"creativity",
-            mission:"Любимый предмет",
-            q:"Какой школьный предмет тебе нравится больше всего?",
-            opts:["Математика или информатика 💻","Рисование, музыка или технология 🎨","Литература или иностранные языки 📚","История или обществознание 🌍"],
-            score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":0.8},
-          },
-          {
-            id:"q3", talent:"leadership",
-            mission:"В группе друзей",
-            q:"Когда ты в группе друзей или одноклассников, ты обычно...",
-            opts:["Предлагаешь идеи и организуешь всех 👑","Придумываешь креативные сценарии для игр 🎭","Следишь за тем, чтобы всем было хорошо и комфортно 💙","Предпочитаешь слушать и поддерживать других 🤝"],
-            score_map:{"leadership":1.0,"creativity":0.8,"leadership":1.0,"memory":0.6},
-          },
+        id:"ch1", zone:"Свободное время", emoji:"⏰",
+        color:"#0F6E56", bg:"linear-gradient(135deg,#E1F5EE,#C8E6C9)",
+        intro:"Расскажи нам, что ты любишь делать! Когда нет уроков и домашних заданий — чем ты занимаешься?",
+        questions:[
+          { id:"q1", mission:"Любимое занятие", q:"Когда у тебя есть свободное время, ты чаще всего...", opts:["Решаю задачи, головоломки или программирую 🧩","Рисую, создаю или снимаю видео 🎨","Играю на инструменте или слушаю музыку 🎵","Общаюсь с друзьями или помогаю другим 👥"] },
+          { id:"q2", mission:"Любимый предмет", q:"Какой школьный предмет тебе нравится больше всего?", opts:["Математика, физика или информатика 💻","Рисование, музыка или технология 🎨","Литература, история или иностранные языки 📚","Биология, природоведение или химия 🌿"] },
+          { id:"q3", mission:"В группе", q:"Когда ты в группе одноклассников, ты обычно...", opts:["Предлагаю идеи и организую всех 👑","Придумываю что-то творческое и интересное 🎭","Слушаю и помогаю всем найти общий язык 💙","Наблюдаю за природой или погодой вокруг 🌱"] },
+          { id:"q16", mission:"На природе", q:"Как ты относишься к природе и животным?", opts:["Обожаю спорт и активный отдых на свежем воздухе 🏃","Люблю наблюдать за животными, растениями, природой 🦋","Люблю рисовать природу и пейзажи 🎨","Предпочитаю быть дома за компьютером 💻"] },
+          { id:"q17", mission:"С людьми", q:"Как тебе общение с разными людьми?", opts:["Легко нахожу общий язык, обожаю знакомиться 🗣️","Предпочитаю руководить и организовывать 👑","Люблю творческое общение — через искусство или музыку 🎨","Общаюсь только с близкими, остальных немного стесняюсь 🤔"] },
+          { id:"q18", mission:"Мир вокруг", q:"Что тебя больше всего восхищает в окружающем мире?", opts:["Как работает природа — животные, экосистемы, биология 🌿","Как работают машины, технологии и системы ⚙️","Красота искусства, архитектуры и дизайна 🏛️","Истории и культуры разных народов 🌍"] },
         ],
         complete:"Отлично! Мы узнали о твоих любимых занятиях! 🎉",
       },
       {
         id:"ch2", zone:"Твои увлечения", emoji:"🎯",
-        color:"#9C27B0", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)",
-        intro:"Теперь расскажи о своих увлечениях и хобби. Что заставляет тебя забыть о времени?",
-        questions: [
-          {
-            id:"q4", talent:"music",
-            mission:"Музыка в жизни",
-            q:"Как музыка присутствует в твоей жизни?",
-            opts:["Играю на инструменте или пою — это моя страсть! 🎹","Всегда слушаю музыку, замечаю мелодии везде 🎧","Музыка мне нравится, но это не главное увлечение 🎵","Предпочитаю тишину или другие занятия 📖"],
-            score_map:{"music":1.0,"music":0.8,"music":0.4,"logic":0.3},
-          },
-          {
-            id:"q5", talent:"creativity",
-            mission:"Творчество",
-            q:"Что из перечисленного приносит тебе наибольшее удовольствие?",
-            opts:["Рисовать, создавать дизайны или снимать видео 🎬","Писать рассказы, стихи или вести дневник ✍️","Конструировать, программировать или строить 🔧","Танцевать, выступать или играть в театре 🎭"],
-            score_map:{"creativity":1.0,"languages":1.0,"logic":1.0,"music":0.8},
-          },
-          {
-            id:"q6", talent:"languages",
-            mission:"Книги и языки",
-            q:"Как ты относишься к чтению и языкам?",
-            opts:["Обожаю читать — книги, статьи, всё подряд! 📚","Интересуюсь иностранными языками, учу новые слова 🌍","Читаю, только когда интересная тема 📖","Предпочитаю смотреть видео или слушать 🎬"],
-            score_map:{"languages":1.0,"languages":1.0,"memory":0.5,"music":0.4},
-          },
+        color:"#1D9E75", bg:"linear-gradient(135deg,#E1F5EE,#FAEEDA)",
+        intro:"Теперь поговорим о хобби и том, что тебя по-настоящему захватывает!",
+        questions:[
+          { id:"q4", mission:"Музыка", q:"Как музыка присутствует в твоей жизни?", opts:["Играю на инструменте или пою — это моя страсть 🎹","Всегда слушаю музыку, замечаю мелодии и ритмы 🎧","Мне нравится, но это не главное в жизни 🎵","Предпочитаю тишину или другие звуки 📖"] },
+          { id:"q5", mission:"Творчество", q:"Что из этого приносит тебе наибольшее удовольствие?", opts:["Рисовать, создавать дизайны или анимацию 🎬","Писать рассказы, стихи или вести блог ✍️","Конструировать, программировать или паять 🔧","Танцевать, играть в театре или петь 🎭"] },
+          { id:"q6", mission:"Чтение и языки", q:"Как ты относишься к чтению и иностранным языкам?", opts:["Обожаю читать книги на разные темы 📚","Учу иностранные языки — это мне легко даётся 🌍","Читаю только по необходимости 📖","Смотрю видео и слушаю подкасты вместо чтения 🎧"] },
+          { id:"q19", mission:"Спорт", q:"Какое место спорт занимает в твоей жизни?", opts:["Спорт — это моё всё! Тренируюсь постоянно 🏆","Играю в командные игры — футбол, баскетбол, волейбол 🏀","Занимаюсь для здоровья, но не на профессиональном уровне 🏃","Предпочитаю интеллектуальные игры, а не физические 🧩"] },
+          { id:"q20", mission:"Идеальный проект", q:"Если бы у тебя был любой школьный проект, ты выбрал бы:", opts:["Написать программу или создать сайт 💻","Снять фильм или создать арт-инсталляцию 🎬","Провести социальный проект — помочь людям 🤲","Исследовать экосистему или поставить научный эксперимент 🔬"] },
+          { id:"q21", mission:"Тип мышления", q:"Когда ты решаешь сложную задачу, ты чаще всего:", opts:["Ищешь нестандартные, необычные решения 🌈","Слушаешь музыку — она помогает думать 🎵","Анализируешь шаг за шагом, ищешь логику ⚙️","Обсуждаю с другими, ищу мнения команды 🤝"] },
         ],
-        complete:"Замечательно! Твои увлечения многое говорят о тебе! ✨",
+        complete:"Замечательно! Твои увлечения рассказали нам о тебе очень много! ✨",
       },
       {
-        id:"ch3", zone:"Как ты думаешь?", emoji:"💭",
-        color:"#2196F3", bg:"linear-gradient(135deg,#E1F5EE,#9FE1CB)",
-        intro:"Расскажи нам о том, как ты воспринимаешь мир вокруг себя. Что привлекает твоё внимание?",
-        questions: [
-          {
-            id:"q7", talent:"logic",
-            mission:"Интересные задачи",
-            q:"Что тебя больше всего интересует и увлекает?",
-            opts:["Как работают вещи, механизмы и технологии ⚙️","Почему люди ведут себя так или иначе 🧠","Как создаются красивые вещи — дизайн и искусство 🎨","Как общаться и понимать разных людей 🤝"],
-            score_map:{"logic":1.0,"leadership":0.9,"creativity":1.0,"languages":0.9},
-          },
-          {
-            id:"q8", talent:"leadership",
-            mission:"Лидерство",
-            q:"Если нужно организовать мероприятие в классе, ты...",
-            opts:["С удовольствием возьмёшь на себя роль организатора! 🌟","Предложишь несколько творческих идей для мероприятия 💡","Поможешь сделать красивое оформление и декор 🎨","Постараешься, чтобы всем было комфортно и весело 😊"],
-            score_map:{"leadership":1.0,"creativity":0.8,"creativity":1.0,"leadership":0.8},
-          },
-          {
-            id:"q9", talent:"creativity",
-            mission:"Твой идеальный проект",
-            q:"Если бы у тебя был школьный проект на любую тему, ты бы выбрал:",
-            opts:["Создать приложение или сайт 💻","Нарисовать комикс или снять короткометражку 🎬","Изучить другую культуру и её язык 🌏","Организовать благотворительное мероприятие 🤲"],
-            score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0},
-          },
+        id:"ch3", zone:"Ты и люди", emoji:"🤝",
+        color:"#EF9F27", bg:"linear-gradient(135deg,#FAEEDA,#E1F5EE)",
+        intro:"Расскажи, как ты взаимодействуешь с людьми и обществом вокруг тебя!",
+        questions:[
+          { id:"q7", mission:"Интересы", q:"Что тебя больше всего fascинирует и увлекает?", opts:["Как работают технологии, алгоритмы и системы ⚙️","Почему люди так себя ведут — психология и эмоции 🧠","Как создаётся красота — дизайн, живопись, музыка 🎨","Как устроены экосистемы и живые организмы 🌿"] },
+          { id:"q8", mission:"Лидерство", q:"Если нужно организовать мероприятие в классе, ты:", opts:["С удовольствием возьмёшь на себя роль организатора 🌟","Предложишь несколько творческих идей 💡","Создашь красивое оформление и декорации 🎨","Позаботишься о том, чтобы все чувствовали себя хорошо 😊"] },
+          { id:"q22", mission:"Помощь другим", q:"В каких ситуациях ты чувствуешь себя наиболее полезным?", opts:["Когда помогаю разобраться в сложной теме или задаче 💡","Когда выслушиваю и поддерживаю тех, кто расстроен 💙","Когда создаю что-то, что радует людей 🎨","Когда организую команду для достижения цели 🏆"] },
+          { id:"q23", mission:"Природа и экология", q:"Как ты относишься к охране природы?", opts:["Это очень важно! Хотел бы работать в этой сфере 🌿","Занимаюсь спортом на природе — это мотивирует заботиться о ней 🏃","Интересно изучать природные явления и живых существ 🦋","Поддерживаю экологию, но это не моё главное призвание 🌍"] },
+          { id:"q24", mission:"Авторитет", q:"Кого из известных людей ты больше всего уважаешь?", opts:["Предпринимателей и лидеров — Маск, Цукерберг 👑","Учёных и изобретателей — Эйнштейн, Кюри 🔬","Артистов и творцов — Да Винчи, Моцарт 🎨","Спортсменов и чемпионов — мотивируют своей силой 🏆"] },
+          { id:"q25", mission:"Будущее", q:"Когда ты думаешь о своём будущем, тебе важнее всего:", opts:["Решать сложные задачи и создавать инновации 🧠","Выражать себя творчески и создавать искусство 🌈","Помогать людям и делать мир лучше 💙","Жить в гармонии с природой и путешествовать 🌿"] },
         ],
-        complete:"Прекрасно! Мы всё лучше понимаем твой уникальный характер! 🌈",
+        complete:"Прекрасно! Мы понимаем, как ты взаимодействуешь с миром! 🌈",
       },
       {
         id:"ch4", zone:"Твоя мечта", emoji:"🚀",
-        color:"#FF9800", bg:"linear-gradient(135deg,#FAEEDA,#FAEEDA)",
-        intro:"Поговорим о будущем! Что тебя вдохновляет и о чём ты мечтаешь?",
-        questions: [
-          {
-            id:"q10", talent:"logic",
-            mission:"Кем ты хочешь стать?",
-            q:"Когда ты думаешь о будущей профессии, тебя больше привлекает:",
-            opts:["Работать с технологиями, наукой или математикой 🔬","Создавать — искусство, музыку, кино или игры 🎮","Помогать людям — врач, психолог или педагог 💙","Путешествовать, изучать мир и разные культуры ✈️"],
-            score_map:{"logic":1.0,"creativity":1.0,"leadership":1.0,"languages":1.0},
-          },
-          {
-            id:"q11", talent:"music",
-            mission:"Музыкальная душа",
-            q:"Что ты думаешь о музыке?",
-            opts:["Музыка — это моя жизнь! Я не могу без неё 🎼","Люблю музыку и хотел бы научиться играть 🎸","Музыка мне нравится, слушаю в фоне 🎵","Другие занятия интереснее, чем музыка 📚"],
-            score_map:{"music":1.0,"music":0.85,"music":0.5,"logic":0.4},
-          },
-          {
-            id:"q12", talent:"leadership",
-            mission:"Твоя суперсила",
-            q:"Если бы у тебя была одна суперсила, ты бы выбрал:",
-            opts:["Решать любые сложные задачи мгновенно 🧠","Создавать шедевры — рисовать, писать, сочинять 🎨","Понимать и говорить на всех языках мира 🌍","Вдохновлять людей и вести их за собой 👑"],
-            score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0},
-          },
+        color:"#BA7517", bg:"linear-gradient(135deg,#FAEEDA,#FAC775)",
+        intro:"Поговорим о твоих мечтах и о том, каким ты видишь своё будущее!",
+        questions:[
+          { id:"q9", mission:"Профессия мечты", q:"Если бы ты мог выбрать любую профессию без ограничений:", opts:["Создавал бы технологии, которые изменят мир 💻","Создавал бы искусство, кино или музыку 🎭","Путешествовал бы и изучал другие языки и культуры ✈️","Организовывал бы важные события и вёл за собой людей 👑"] },
+          { id:"q10", mission:"Карьера", q:"Что привлекает тебя в будущей работе больше всего?", opts:["Решать сложные технические задачи 🔬","Создавать что-то красивое и вдохновлять людей 🎨","Помогать людям, лечить или обучать 💙","Зарабатывать много денег и стать успешным 💰"] },
+          { id:"q26", mission:"Музыкальные мечты", q:"Если говорить о музыке и выступлениях:", opts:["Мечтаю выступать на сцене — петь или играть 🎤","Хочу создавать музыку — писать песни или сочинять 🎼","Люблю музыку, но мечтаю о другом 🎵","Мне нравится за кулисами — звук, свет, режиссура 🎬"] },
+          { id:"q27", mission:"Спортивные мечты", q:"Если говорить о спорте и физической активности:", opts:["Хочу стать профессиональным спортсменом или тренером 🏆","Спорт — часть жизни, но не карьера 🏃","Интересует спортивная медицина или психология 🩺","Предпочитаю интеллектуальные соревнования ♟️"] },
+          { id:"q28", mission:"Языки и путешествия", q:"Как ты относишься к разным языкам и культурам?", opts:["Хочу знать 5+ языков и работать на международном уровне 🌍","Путешествия и новые культуры меня вдохновляют ✈️","Один-два языка — вполне достаточно 📖","Мне интереснее погружаться в одну культуру глубоко 🏛️"] },
+          { id:"q29", mission:"Природа и наука", q:"Что из научных направлений тебя привлекает больше?", opts:["Биология, экология, зоология — живые организмы 🌿","Физика, астрономия, космос — законы вселенной 🌌","Химия, медицина — состав и реакции веществ 🧪","Психология, социология — поведение людей 🧠"] },
         ],
-        complete:"Потрясающе! Твои мечты показывают твой настоящий потенциал! 🌟",
+        complete:"Твои мечты помогают нам понять твоё предназначение! 🌟",
       },
       {
-        id:"ch5", zone:"Ты в деле", emoji:"⚡",
-        color:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)",
-        intro:"Последние вопросы! Расскажи нам о том, как ты действуешь в реальных ситуациях.",
-        questions: [
-          {
-            id:"q13", talent:"creativity",
-            mission:"Выходные",
-            q:"Идеальные выходные для тебя — это:",
-            opts:["Создать что-то новое: нарисовать, написать, сделать 🖌️","Изучить новый язык, посмотреть документальный фильм 🎬","Поиграть в логические игры или программировать 💻","Сходить с друзьями куда-нибудь и пообщаться 🎪"],
-            score_map:{"creativity":1.0,"languages":0.9,"logic":1.0,"leadership":0.8},
-          },
-          {
-            id:"q14", talent:"languages",
-            mission:"Общение",
-            q:"Когда ты общаешься с новыми людьми, ты...",
-            opts:["Быстро находишь общий язык и много разговариваешь 🗣️","Слушаешь и наблюдаешь, прежде чем говорить 👁️","Предлагаешь интересные темы или игры для разговора 💡","Чаще предпочитаешь быть наедине с собой 📚"],
-            score_map:{"languages":1.0,"memory":0.8,"leadership":0.9,"logic":0.5},
-          },
-          {
-            id:"q15", talent:"logic",
-            mission:"Финальный вопрос",
-            q:"Что тебя больше всего описывает?",
-            opts:["Я люблю понимать, КАК и ПОЧЕМУ работают вещи 🔍","Я выражаю себя через творчество и создание 🌈","Я нахожу удовольствие в словах, языках и историях 📖","Я чувствую себя живым, когда помогаю и вдохновляю других 💫"],
-            score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0},
-          },
+        id:"ch5", zone:"Ты в действии", emoji:"⚡",
+        color:"#5DCAA5", bg:"linear-gradient(135deg,#E1F5EE,#F1EFE8)",
+        intro:"Последние вопросы! Расскажи, как ты ведёшь себя в реальных ситуациях.",
+        questions:[
+          { id:"q11", mission:"Музыка в жизни", q:"Что ты думаешь о музыке в целом?", opts:["Музыка — это моя жизнь, не могу без неё 🎼","Люблю музыку и хочу научиться играть 🎸","Слушаю в фоне, нравится, но не главное 🎵","Другие занятия интереснее музыки 📚"] },
+          { id:"q12", mission:"Суперсила", q:"Если бы у тебя была одна суперсила, ты выбрал бы:", opts:["Решать любые задачи мгновенно 🧠","Создавать шедевры — рисовать, писать, сочинять 🎨","Говорить на всех языках мира 🌍","Вдохновлять людей и быть их лидером 👑"] },
+          { id:"q13", mission:"Выходные", q:"Идеальные выходные для тебя:", opts:["Создать что-то новое — нарисовать, написать 🖌️","Изучить новый язык или посмотреть документальный фильм 🎬","Поиграть в логические игры или попрограммировать 💻","Пойти на спортивную тренировку или в поход 🏃"] },
+          { id:"q14", mission:"Общение", q:"Когда ты знакомишься с новыми людьми, ты...", opts:["Быстро находишь общий язык и говоришь о многом 🗣️","Слушаешь и наблюдаешь, прежде чем открываться 👁️","Предлагаешь сыграть в игру или устроить активность 🎯","Рассказываешь о своих увлечениях и интересах 💡"] },
+          { id:"q30", mission:"Финальный вопрос", q:"Если бы тебя попросили описать себя одним словом:", opts:["Изобретатель 🔧","Художник 🎨","Музыкант 🎵","Лидер 👑"] },
+          { id:"q15", mission:"О себе", q:"Что тебя лучше всего описывает?", opts:["Я люблю понимать КАК и ПОЧЕМУ работают вещи 🔍","Я выражаю себя через творчество и создание 🌈","Я нахожу радость в словах, языках и историях 📖","Я чувствую себя живым, когда помогаю и вдохновляю 💫"] },
         ],
-        complete:"Ты прошёл все зоны! Наш AI анализирует твои ответы... 🚀",
+        complete:"Экспедиция завершена! Анализируем твои таланты... 🚀",
       },
     ],
-    finale:{
-      title:"Анализируем твои таланты! 🌟",
-      text:"Секунду... Наш ML-алгоритм изучает твои ответы и составляет персональную карту талантов!",
-      mascot:"🏆",
-    },
+    finale:{title:"Анализируем! 🌟",text:"Наш ML-алгоритм составляет твою карту талантов и подбирает профессии...",mascot:"🏆"},
   },
 
   uz: {
     intro:{
       title:"Iste'dodlaringizni bilib oling! 🌟",
-      text:"Bu imtihon emas — bu yerda to'g'ri yoki noto'g'ri javoblar yo'q! Faqat sevgan narsalaringiz haqida to'g'ridan-to'g'ri javob bering. Biz sizning haqiqiy iste'dodlaringizni topamiz!",
-      btn:"Boshlash →",
-      mascot:"🌟",
-      note:"15 savol · 5 daqiqa · Halol javoblar = aniq natija",
+      text:"To'g'ri yoki noto'g'ri javoblar yo'q — faqat to'g'ridan-to'g'ri javob bering! 30 savol, 7 daqiqa va siz qaysi kasb sizga to'g'ri kelishini bilib olasiz.",
+      btn:"Ketdik →",
+      note:"30 savol · 7 daqiqa · 20+ kasb",
     },
     chapters:[
-      {
-        id:"ch1", zone:"Nima yaxshi ko'rasiz?", emoji:"❤️",
-        color:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD9)",
-        intro:"Sevimli mashg'ulotlaringiz haqida gapiring! Bo'sh vaqtingizda nima qilasiz?",
+      { id:"ch1", zone:"Bo'sh vaqt", emoji:"⏰", color:"#0F6E56", bg:"linear-gradient(135deg,#E1F5EE,#C8E6C9)", intro:"Sevimli mashg'ulotlaringiz haqida gapiring!",
         questions:[
-          { id:"q1", talent:"logic", mission:"Bo'sh vaqt", q:"Bo'sh vaqtingizda ko'pincha nima qilasiz?", opts:["Boshqotirmalar, shaxmat yoki Rubik kubini yechasiz 🧩","Chizasiz, yasaysiz yoki biror narsa yaratasiz 🎨","Musiqa tinglaysiz yoki cholg'u asbobi chalasiz 🎵","Do'stlar bilan muloqot qilasiz yoki o'yinlar tashkil qilasiz 👥"], score_map:{"logic":1.0,"creativity":0.8,"music":0.8,"leadership":0.8} },
-          { id:"q2", talent:"creativity", mission:"Sevimli fan", q:"Qaysi maktab fani sizga ko'proq yoqadi?", opts:["Matematika yoki informatika 💻","Rasm, musiqa yoki texnologiya 🎨","Adabiyot yoki xorijiy tillar 📚","Tarix yoki ijtimoiyot 🌍"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":0.8} },
-          { id:"q3", talent:"leadership", mission:"Do'stlar guruhida", q:"Do'stlar yoki sinfdoshlar guruhida qanday bo'lasiz?", opts:["G'oyalar taklif qilasiz va hammasini tashkil qilasiz 👑","O'yinlar uchun ijodiy stsenariylar o'ylaysiz 🎭","Hammaga yaxshi va qulay bo'lishini kuzatasiz 💙","Tinglashni va boshqalarni qo'llashni afzal ko'rasiz 🤝"], score_map:{"leadership":1.0,"creativity":0.8,"leadership":1.0,"memory":0.6} },
-        ],
-        complete:"Ajoyib! Sevimli mashg'ulotlaringiz haqida bildik! 🎉",
-      },
-      {
-        id:"ch2", zone:"Qiziqishlaringiz", emoji:"🎯",
-        color:"#9C27B0", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)",
-        intro:"Endi qiziqishlaringiz va hobbingiz haqida gapiring. Vaqtni unuttiradigan narsa nima?",
+          { id:"q1", mission:"Sevimli mashg'ulot", q:"Bo'sh vaqtingizda ko'pincha nima qilasiz?", opts:["Masalalar yechaman, boshqotirmalar yoki dasturlash 🧩","Chizaman, yarataman yoki video suratga olaman 🎨","Cholg'u asbobi chalaman yoki musiqa tinglaymanlar 🎵","Do'stlar bilan muloqot qilaman yoki yordam beraman 👥"] },
+          { id:"q2", mission:"Sevimli fan", q:"Qaysi maktab fani sizga ko'proq yoqadi?", opts:["Matematika, fizika yoki informatika 💻","Rasm, musiqa yoki texnologiya 🎨","Adabiyot, tarix yoki xorijiy tillar 📚","Biologiya, tabiat yoki kimyo 🌿"] },
+          { id:"q3", mission:"Guruhda", q:"Sinfdoshlar guruhida qanday bo'lasiz?", opts:["G'oyalar taklif qilaman va hammasini tashkil qilaman 👑","Ijodiy va qiziqarli narsalar o'ylaymanlar 🎭","Tinglaymanlar va hammasiga yordam beraman 💙","Atrofdagi tabiatni kuzataman 🌱"] },
+          { id:"q16", mission:"Tabiatda", q:"Tabiat va hayvonlarga qanday munosabatdasiz?", opts:["Sport va faol dam olishni yaxshi ko'raman 🏃","Hayvonlar, o'simliklar va tabiatni kuzatishni yaxshi ko'raman 🦋","Tabiat manzaralarini chizishni yaxshi ko'raman 🎨","Uyda kompyuter oldida bo'lishni afzal ko'raman 💻"] },
+          { id:"q17", mission:"Odamlar bilan", q:"Turli odamlar bilan muloqot qanday?", opts:["Tez til topaman, tanishishni yaxshi ko'raman 🗣️","Boshqarish va tashkil qilishni afzal ko'raman 👑","Ijodiy muloqot — san'at yoki musiqa orqali 🎨","Faqat yaqinlar bilan muloqot qilaman 🤔"] },
+          { id:"q18", mission:"Atrofdagi dunyo", q:"Atrofdagi dunyoda sizni eng ko'p nima hayratlantiradi?", opts:["Tabiat qanday ishlashi — hayvonlar, ekotizimlar 🌿","Texnologiyalar va mashinalar qanday ishlashi ⚙️","San'at, arxitektura va dizayn go'zalligi 🏛️","Turli xalqlar tarixi va madaniyati 🌍"] },
+        ], complete:"Ajoyib! Sevimli mashg'ulotlaringiz haqida bildik! 🎉" },
+      { id:"ch2", zone:"Qiziqishlar", emoji:"🎯", color:"#1D9E75", bg:"linear-gradient(135deg,#E1F5EE,#FAEEDA)", intro:"Hobbi va qiziqishlaringiz haqida gapirishng!",
         questions:[
-          { id:"q4", talent:"music", mission:"Musiqadagi o'rin", q:"Musiqa hayotingizda qanday o'rin tutadi?", opts:["Cholg'u asbobi chalaman yoki qo'shiq aytaman — bu mening ehtirosim! 🎹","Har doim musiqa tinglaymanlar va melodiyalarni hamma yerda sezaman 🎧","Musiqa yaxshi, lekin asosiy qiziqishim emas 🎵","Jimlikni yoki boshqa mashg'ulotlarni afzal ko'raman 📖"], score_map:{"music":1.0,"music":0.8,"music":0.4,"logic":0.3} },
-          { id:"q5", talent:"creativity", mission:"Ijodkorlik", q:"Quyidagilardan qaysi biri sizga eng ko'p zavq beradi?", opts:["Chizish, dizayn yaratish yoki video tushirish 🎬","Hikoya, she'r yozish yoki kundalik yuritish ✍️","Konstruksiya qilish, dasturlash yoki qurilish 🔧","Raqs, sahna chiqishi yoki teatr 🎭"], score_map:{"creativity":1.0,"languages":1.0,"logic":1.0,"music":0.8} },
-          { id:"q6", talent:"languages", mission:"Kitob va tillar", q:"O'qish va tillarga qanday munosabatdasiz?", opts:["Kitob o'qishni yaxshi ko'raman — kitoblar, maqolalar, hammasi! 📚","Xorijiy tillarga qiziqaman, yangi so'zlar o'rganaman 🌍","Faqat qiziqarli mavzu bo'lsa o'qiyman 📖","Video tomosha qilish yoki tinglashni afzal ko'raman 🎬"], score_map:{"languages":1.0,"languages":1.0,"memory":0.5,"music":0.4} },
-        ],
-        complete:"Ajoyib! Qiziqishlaringiz siz haqingizda ko'p narsani aytadi! ✨",
-      },
-      {
-        id:"ch3", zone:"Qanday fikrlaysiz?", emoji:"💭",
-        color:"#2196F3", bg:"linear-gradient(135deg,#E1F5EE,#9FE1CB)",
-        intro:"Atrofdagi dunyoni qanday qabul qilishingiz haqida gapiring. Nima e'tiboringizni tortadi?",
+          { id:"q4", mission:"Musiqa", q:"Musiqa hayotingizda qanday o'rin tutadi?", opts:["Cholg'u asbobini chalaman yoki qo'shiq aytaman 🎹","Musiqa tinglaymanlar, melodiya va ritmlarni sezaman 🎧","Yoqadi, lekin hayotimning asosiy qismi emas 🎵","Jimlikni yoki boshqa ovozlarni afzal ko'raman 📖"] },
+          { id:"q5", mission:"Ijodkorlik", q:"Quyidagilardan qaysi biri sizga eng zavq beradi?", opts:["Chizish, dizayn yaratish yoki animatsiya 🎬","Hikoya, she'r yozish yoki blog yuritish ✍️","Konstruksiya qilish, dasturlash yoki lehimlash 🔧","Raqs, teatr yoki qo'shiq aytish 🎭"] },
+          { id:"q6", mission:"O'qish va tillar", q:"O'qish va xorijiy tillarga qanday munosabatdasiz?", opts:["Turli mavzularda kitob o'qishni yaxshi ko'raman 📚","Xorijiy tillarni o'rganaman — menga oson beriladi 🌍","Faqat kerak bo'lganda o'qiyman 📖","Video va podkastlarni o'qishdan afzal ko'raman 🎧"] },
+          { id:"q19", mission:"Sport", q:"Sport hayotingizda qanday o'rin egallaydi?", opts:["Sport — bu mening hammasim! Doim mashg'ul bo'laman 🏆","Jamoa o'yinlarini — futbol, basketbol o'ynayman 🏀","Sog'liq uchun shug'ullanaman, professional emas 🏃","Jismoniy emas, intellektual o'yinlarni afzal ko'raman 🧩"] },
+          { id:"q20", mission:"Ideal loyiha", q:"Istalgan maktab loyihasini tanlasangiz:", opts:["Dastur yoki veb-sayt yarataman 💻","Film suratga olaman yoki art-installyatsiya yarataman 🎬","Odamlarga yordam beruvchi ijtimoiy loyiha 🤲","Ekotizimni tadqiq qilaman yoki ilmiy tajriba o'tkazaman 🔬"] },
+          { id:"q21", mission:"Tafakkur turi", q:"Murakkab masalani yechishda ko'pincha:", opts:["Noodatiy, g'ayrioddiy yechimlar qidiraman 🌈","Musiqa yoqaman — u fikrlashga yordam beradi 🎵","Qadam-baqadam tahlil qilaman, mantiqni qidiraman ⚙️","Jamoa bilan muhokama qilaman 🤝"] },
+        ], complete:"Ajoyib! Qiziqishlaringiz siz haqingizda ko'p narsani aytdi! ✨" },
+      { id:"ch3", zone:"Siz va odamlar", emoji:"🤝", color:"#EF9F27", bg:"linear-gradient(135deg,#FAEEDA,#E1F5EE)", intro:"Odamlar va jamiyat bilan munosabatingiz haqida gapirishng!",
         questions:[
-          { id:"q7", talent:"logic", mission:"Qiziqarli vazifalar", q:"Sizni eng ko'p nima qiziqtiradi?", opts:["Narsalar, mexanizmlar va texnologiyalar qanday ishlashi ⚙️","Odamlar nima uchun shunday harakat qilishlari 🧠","Chiroyli narsalar qanday yaratilishi — dizayn va san'at 🎨","Turli odamlar bilan muloqot qilish va tushunish 🤝"], score_map:{"logic":1.0,"leadership":0.9,"creativity":1.0,"languages":0.9} },
-          { id:"q8", talent:"leadership", mission:"Liderlik", q:"Sinfda tadbir tashkil qilish kerak bo'lsa, siz...", opts:["Mamnuniyat bilan tashkilotchi rolini o'z zimmangizga olasiz! 🌟","Tadbir uchun bir nechta ijodiy g'oyalar taklif qilasiz 💡","Chiroyli bezatish va dekoratsiya qilishga yordam berasiz 🎨","Hammaga qulay va qiziqarli bo'lishiga harakat qilasiz 😊"], score_map:{"leadership":1.0,"creativity":0.8,"creativity":1.0,"leadership":0.8} },
-          { id:"q9", talent:"creativity", mission:"Ideal loyiha", q:"Istalgan mavzuda maktab loyihangiz bo'lsa, tanlagan bo'lardingiz:", opts:["Ilova yoki veb-sayt yaratish 💻","Komiks chizish yoki qisqa metraj film tushirish 🎬","Boshqa madaniyat va tilni o'rganish 🌏","Xayriya tadbirini tashkil qilish 🤲"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0} },
-        ],
-        complete:"Zo'r! Sizning noyob xarakteringizni tobora yaxshiroq tushunyapmiz! 🌈",
-      },
-      {
-        id:"ch4", zone:"Sizning orzuyingiz", emoji:"🚀",
-        color:"#FF9800", bg:"linear-gradient(135deg,#FAEEDA,#FAEEDA)",
-        intro:"Kelajak haqida gaplashamiz! Sizni nima ilhomlantiradi va nima haqida orzu qilasiz?",
+          { id:"q7", mission:"Qiziqishlar", q:"Sizni eng ko'p nima qiziqtiradi?", opts:["Texnologiyalar, algoritmlar va tizimlar qanday ishlashi ⚙️","Odamlar nima uchun shunday harakat qiladi — psixologiya 🧠","Go'zallik qanday yaratiladi — dizayn, rasm, musiqa 🎨","Ekotizimlar va tirik organizmlar qanday tuzilgan 🌿"] },
+          { id:"q8", mission:"Liderlik", q:"Sinfda tadbir tashkil qilish kerak bo'lsa:", opts:["Mamnuniyat bilan tashkilotchi rolini o'z zimmangizga olasiz 🌟","Bir nechta ijodiy g'oyalar taklif qilasiz 💡","Chiroyli bezatish va dekoratsiya qilasiz 🎨","Hammaga qulay va yaxshi his qilishiga g'amxo'rlik qilasiz 😊"] },
+          { id:"q22", mission:"Boshqalarga yordam", q:"Qaysi vaziyatlarda o'zingizni eng foydali his qilasiz?", opts:["Murakkab mavzu yoki masalani tushuntirganda 💡","Xafa bo'lgan kishini eshitib, qo'llab-quvvatlaganda 💙","Odamlarni xursand qiladigan narsa yaratganda 🎨","Maqsadga erishish uchun jamoani tashkil qilganda 🏆"] },
+          { id:"q23", mission:"Tabiat va ekologiya", q:"Tabiatni muhofaza qilishga qanday munosabatdasiz?", opts:["Bu juda muhim! Shu sohadagi kasbda ishlashni xohlayman 🌿","Tabiatda sport bilan shug'ullanaman — bu uni muhofaza qilishga undaydi 🏃","Tabiiy hodisalar va tirik mavjudotlarni o'rganish qiziq 🦋","Ekologiyani qo'llab-quvvatlayman, lekin bu mening asosiy maqsadim emas 🌍"] },
+          { id:"q24", mission:"Siz hurmat qilgan shaxs", q:"Mashhur odamlardan kimni ko'proq hurmat qilasiz?", opts:["Tadbirkor va liderlar — Mask, Zuckerberg 👑","Olimlar va ixtirochilar — Eynshteyn, Kyuri 🔬","San'atkorlar va ijodkorlar — Da Vinchi, Motsart 🎨","Sportchilar va chempionlar — o'z kuchi bilan rag'batlantirguchi 🏆"] },
+          { id:"q25", mission:"Kelajak", q:"Kelajak haqida o'ylaganingizda, eng muhimi:", opts:["Murakkab masalalar yechish va innovatsiyalar yaratish 🧠","O'zingizni ijodiy ifodalash va san'at yaratish 🌈","Odamlarga yordam berish va dunyoni yaxshilash 💙","Tabiat bilan uyg'unlikda yashash va sayohat qilish 🌿"] },
+        ], complete:"Zo'r! Siz odamlar bilan qanday o'zaro munosabatda bo'lishingizni tushundik! 🌈" },
+      { id:"ch4", zone:"Sizning orzuyingiz", emoji:"🚀", color:"#BA7517", bg:"linear-gradient(135deg,#FAEEDA,#FAC775)", intro:"Kelajakdagi orzu va maqsadlaringiz haqida gapirishng!",
         questions:[
-          { id:"q10", talent:"logic", mission:"Kim bo'lmoqchisiz?", q:"Kelajakdagi kasb haqida o'ylaganingizda, sizni ko'proq nima jalb qiladi:", opts:["Texnologiya, fan yoki matematika bilan ishlash 🔬","Yaratish — san'at, musiqa, kino yoki o'yinlar 🎮","Odamlarga yordam berish — shifokor, psixolog yoki pedagog 💙","Sayohat qilish, dunyo va turli madaniyatlarni o'rganish ✈️"], score_map:{"logic":1.0,"creativity":1.0,"leadership":1.0,"languages":1.0} },
-          { id:"q11", talent:"music", mission:"Musiqiy ruh", q:"Musiqa haqida nima deb o'ylaysiz?", opts:["Musiqa — bu mening hayotim! Men usiz yasha olmayman 🎼","Musiqani yaxshi ko'raman va chalishni o'rganmoqchiman 🎸","Musiqa yaxshi, fonda tinglaymanlar 🎵","Musiqadan ko'ra boshqa mashg'ulotlar qiziqroq 📚"], score_map:{"music":1.0,"music":0.85,"music":0.5,"logic":0.4} },
-          { id:"q12", talent:"leadership", mission:"Sizning superkuchingiz", q:"Bitta superkuch bo'lganida, tanlagan bo'lardingiz:", opts:["Istalgan murakkab masalani bir zumda hal qilish 🧠","Shoh asarlar yaratish — chizish, yozish, bastakorlik 🎨","Dunyodagi barcha tillarda gapirish va tushunish 🌍","Odamlarni ilhomlantirib, ularni ergashtirib borish 👑"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0} },
-        ],
-        complete:"Hayratlanarli! Orzularingiz haqiqiy potentsialingizni ko'rsatadi! 🌟",
-      },
-      {
-        id:"ch5", zone:"Siz harakatda", emoji:"⚡",
-        color:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)",
-        intro:"Oxirgi savollar! Haqiqiy vaziyatlarda qanday harakat qilishingiz haqida gapiring.",
+          { id:"q9", mission:"Orzu kasbi", q:"Cheklovlarsiz istalgan kasbni tanlasangiz:", opts:["Dunyoni o'zgartiradigan texnologiyalar yaratardim 💻","San'at, kino yoki musiqa yaratardim 🎭","Sayohat qilib, turli tillar va madaniyatlarni o'rganardim ✈️","Muhim tadbirlar tashkil qilardim va odamlarni boshqarardim 👑"] },
+          { id:"q10", mission:"Karyera", q:"Kelajakdagi ishingizda eng ko'p nima jalb qiladi?", opts:["Murakkab texnik masalalar yechish 🔬","Chiroyli narsa yaratish va odamlarni ilhomlantirish 🎨","Odamlarga yordam berish, davolash yoki o'qitish 💙","Ko'p pul ishlash va muvaffaqiyatli bo'lish 💰"] },
+          { id:"q26", mission:"Musiqa orzulari", q:"Musiqa va sahnada chiqish haqida:", opts:["Sahnada chiqishni orzu qilaman — qo'shiq yoki cholg'u 🎤","Musiqa yaratishni xohlayman — qo'shiq yoki besto yozish 🎼","Musiqani yaxshi ko'raman, lekin boshqa orzularim bor 🎵","Sahna ortida — ovoz, yorug'lik, rejissura qiziqroq 🎬"] },
+          { id:"q27", mission:"Sport orzulari", q:"Sport va jismoniy faollik haqida:", opts:["Professional sportchi yoki murabbiy bo'lmoqchiman 🏆","Sport — hayot qismim, lekin kasb emas 🏃","Sport tibbiyoti yoki psixologiyasi qiziqtiradi 🩺","Intellektual musobaqalarni afzal ko'raman ♟️"] },
+          { id:"q28", mission:"Tillar va sayohat", q:"Turli tillar va madaniyatlarga qanday munosabatdasiz?", opts:["5+ til bilmoqchiman va xalqaro darajada ishlashni xohlayman 🌍","Sayohat va yangi madaniyatlar meni ilhomlantiradi ✈️","Bir-ikki til yetarli 📖","Bitta madaniyatni chuqur o'rganishni afzal ko'raman 🏛️"] },
+          { id:"q29", mission:"Tabiat va fan", q:"Qaysi ilmiy yo'nalish sizni ko'proq jalb qiladi?", opts:["Biologiya, ekologiya, zoologiya — tirik organizmlar 🌿","Fizika, astronomiya, kosmos — koinot qonunlari 🌌","Kimyo, tibbiyot — moddalar tarkibi va reaksiyalari 🧪","Psixologiya, sotsiologiya — odamlar xulq-atvori 🧠"] },
+        ], complete:"Orzularingiz maqsadingizni tushunishga yordam beradi! 🌟" },
+      { id:"ch5", zone:"Siz harakatda", emoji:"⚡", color:"#5DCAA5", bg:"linear-gradient(135deg,#E1F5EE,#F1EFE8)", intro:"Oxirgi savollar! Haqiqiy vaziyatlarda qanday harakat qilishingiz haqida!",
         questions:[
-          { id:"q13", talent:"creativity", mission:"Dam olish kunlari", q:"Ideal dam olish kunlari siz uchun:", opts:["Yangi narsa yaratish: chizish, yozish, qilish 🖌️","Yangi til o'rganish, hujjatli film ko'rish 🎬","Mantiqiy o'yinlar o'ynash yoki dasturlash 💻","Do'stlar bilan bir joyga borish va muloqot qilish 🎪"], score_map:{"creativity":1.0,"languages":0.9,"logic":1.0,"leadership":0.8} },
-          { id:"q14", talent:"languages", mission:"Muloqot", q:"Yangi odamlar bilan muloqotda, siz...", opts:["Tez til topasiz va ko'p gaplashasiz 🗣️","Gapirmadan oldin tinglaysiz va kuzatasiz 👁️","Suhbat uchun qiziqarli mavzular yoki o'yinlar taklif qilasiz 💡","Yolg'iz bo'lishni afzal ko'rasiz 📚"], score_map:{"languages":1.0,"memory":0.8,"leadership":0.9,"logic":0.5} },
-          { id:"q15", talent:"logic", mission:"Yakuniy savol", q:"Sizni eng yaxshi tavsiflaydigan narsa:", opts:["Men narsalar QANDAY va NIMA UCHUN ishlashini tushunishni yaxshi ko'raman 🔍","Men ijodkorlik va yaratish orqali o'zimni ifodalaymanlar 🌈","Men so'zlar, tillar va hikoyalarda zavq topaman 📖","Men boshqalarga yordam berganimda va ilhomlantirganimda o'zimni tirikdek his qilaman 💫"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0} },
-        ],
-        complete:"Siz barcha zonalarni zabt etdingiz! AI javoblaringizni tahlil qilmoqda... 🚀",
-      },
+          { id:"q11", mission:"Musiqa", q:"Musiqa haqida umuman nima deb o'ylaysiz?", opts:["Musiqa — mening hayotim, usiz yasha olmayman 🎼","Musiqani yaxshi ko'raman va chalishni o'rganmoqchiman 🎸","Fonda tinglaymanlar, yoqadi lekin asosiy emas 🎵","Boshqa mashg'ulotlar musiqadan qiziqroq 📚"] },
+          { id:"q12", mission:"Superkuch", q:"Bitta superkuch bo'lganida tanlagan bo'lardingiz:", opts:["Istalgan masalani bir zumda hal qilish 🧠","Shoh asarlar yaratish — chizish, yozish, bastakorlik 🎨","Dunyodagi barcha tillarda gapirish 🌍","Odamlarni ilhomlantirib, rahbarlik qilish 👑"] },
+          { id:"q13", mission:"Dam olish kunlari", q:"Ideal dam olish kunlari:", opts:["Yangi narsa yaratish — chizish, yozish 🖌️","Yangi til o'rganish yoki hujjatli film ko'rish 🎬","Mantiqiy o'yinlar yoki dasturlash 💻","Sport mashg'uloti yoki yurish 🏃"] },
+          { id:"q14", mission:"Muloqot", q:"Yangi odamlar bilan tanishganingizda:", opts:["Tez til topasiz va ko'p gaplashasiz 🗣️","Ochilishdan oldin tinglaysiz va kuzatasiz 👁️","O'yin yoki faoliyat taklif qilasiz 🎯","Qiziqishlaringiz va hobbingiz haqida gapirasiz 💡"] },
+          { id:"q30", mission:"Yakuniy savol", q:"Agar bir so'z bilan tavsiflamoqchi bo'lsangiz:", opts:["Ixtirochi 🔧","Rassom 🎨","Musiqachi 🎵","Lider 👑"] },
+          { id:"q15", mission:"O'zingiz haqida", q:"Sizni eng yaxshi tavsiflovchi narsa:", opts:["Narsalar QANDAY va NIMA UCHUN ishlashini tushunishni yaxshi ko'raman 🔍","O'zimni ijodkorlik va yaratish orqali ifodalaymanlar 🌈","So'zlar, tillar va hikoyalarda quvonch topaman 📖","Boshqalarga yordam berganimda va ilhomlantirganimda tirikman 💫"] },
+        ], complete:"Barcha zonalar zabt etildi! Iste'dodlaringiz tahlil qilinmoqda... 🚀" },
     ],
-    finale:{
-      title:"Iste'dodlaringiz tahlil qilinmoqda! 🌟",
-      text:"Bir lahza... ML-algoritmimiz javoblaringizni o'rganib, shaxsiy iste'dod xaritasini tuzmoqda!",
-      mascot:"🏆",
-    },
+    finale:{title:"Tahlil qilinmoqda! 🌟",text:"ML-algoritmimiz iste'dod xaritangizni va kasblarni tanlayapti...",mascot:"🏆"},
   },
 
   en: {
     intro:{
       title:"Discover Your Talents! 🌟",
-      text:"This is NOT an exam — there are no right or wrong answers here! Just answer honestly about what you love to do. We'll find your real talents!",
-      btn:"Start →",
-      mascot:"🌟",
-      note:"15 questions · 5 minutes · Honest answers = accurate results",
+      text:"No right or wrong answers — just answer honestly! 30 questions, 7 minutes, and you'll find out which profession suits you perfectly.",
+      btn:"Let's go →",
+      note:"30 questions · 7 minutes · 20+ professions",
     },
     chapters:[
-      {
-        id:"ch1", zone:"What Do You Love?", emoji:"❤️",
-        color:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD9)",
-        intro:"Tell us about your favourite activities! What do you do when you're bored or have free time?",
+      { id:"ch1", zone:"Free Time", emoji:"⏰", color:"#0F6E56", bg:"linear-gradient(135deg,#E1F5EE,#C8E6C9)", intro:"Tell us what you love doing when you have free time!",
         questions:[
-          { id:"q1", talent:"logic", mission:"Free Time", q:"When you have free time, you usually...", opts:["Solve puzzles, play chess or do a Rubik's cube 🧩","Draw, sculpt or create something with your hands 🎨","Listen to music or play an instrument 🎵","Hang out with friends or organise games 👥"], score_map:{"logic":1.0,"creativity":0.8,"music":0.8,"leadership":0.8} },
-          { id:"q2", talent:"creativity", mission:"Favourite Subject", q:"Which school subject do you enjoy the most?", opts:["Maths or computer science 💻","Art, music or technology 🎨","Literature or foreign languages 📚","History or social studies 🌍"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":0.8} },
-          { id:"q3", talent:"leadership", mission:"In a Group", q:"When you're in a group of friends or classmates, you usually...", opts:["Suggest ideas and organise everyone 👑","Come up with creative scenarios for games 🎭","Make sure everyone feels comfortable and happy 💙","Prefer to listen and support others 🤝"], score_map:{"leadership":1.0,"creativity":0.8,"leadership":1.0,"memory":0.6} },
-        ],
-        complete:"Great! We've learned about your favourite activities! 🎉",
-      },
-      {
-        id:"ch2", zone:"Your Hobbies", emoji:"🎯",
-        color:"#9C27B0", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)",
-        intro:"Now tell us about your hobbies and interests. What makes you lose track of time?",
+          { id:"q1", mission:"Favourite Activity", q:"When you have free time, you usually...", opts:["Solve puzzles, problems or code 🧩","Draw, create or make videos 🎨","Play an instrument or listen to music 🎵","Talk with friends or help others 👥"] },
+          { id:"q2", mission:"Favourite Subject", q:"Which school subject do you enjoy most?", opts:["Maths, physics or computer science 💻","Art, music or technology 🎨","Literature, history or foreign languages 📚","Biology, nature studies or chemistry 🌿"] },
+          { id:"q3", mission:"In a Group", q:"When you're in a group of classmates, you usually...", opts:["Suggest ideas and organise everyone 👑","Think of something creative and interesting 🎭","Listen and help everyone get along 💙","Observe the nature or weather around you 🌱"] },
+          { id:"q16", mission:"Nature", q:"How do you feel about nature and animals?", opts:["I love sports and active outdoor activities 🏃","I love observing animals, plants and nature 🦋","I love drawing landscapes and nature scenes 🎨","I prefer being at home on the computer 💻"] },
+          { id:"q17", mission:"With People", q:"How do you feel about meeting different people?", opts:["I easily connect with people and love meeting them 🗣️","I prefer to lead and organise 👑","I like creative connection — through art or music 🎨","I mainly talk with close friends, feel shy with others 🤔"] },
+          { id:"q18", mission:"The World Around You", q:"What amazes you most about the world?", opts:["How nature works — animals, ecosystems, biology 🌿","How machines, technology and systems work ⚙️","The beauty of art, architecture and design 🏛️","The stories and cultures of different peoples 🌍"] },
+        ], complete:"Great! We've learned about your favourite activities! 🎉" },
+      { id:"ch2", zone:"Your Hobbies", emoji:"🎯", color:"#1D9E75", bg:"linear-gradient(135deg,#E1F5EE,#FAEEDA)", intro:"Now let's talk about your hobbies and what truly captivates you!",
         questions:[
-          { id:"q4", talent:"music", mission:"Music in Your Life", q:"How does music feature in your life?", opts:["I play an instrument or sing — it's my passion! 🎹","I always listen to music and notice melodies everywhere 🎧","I enjoy music but it's not my main hobby 🎵","I prefer silence or other activities 📖"], score_map:{"music":1.0,"music":0.8,"music":0.4,"logic":0.3} },
-          { id:"q5", talent:"creativity", mission:"Creativity", q:"Which of these brings you the most enjoyment?", opts:["Drawing, creating designs or making videos 🎬","Writing stories, poems or keeping a diary ✍️","Building, coding or constructing things 🔧","Dancing, performing or acting in theatre 🎭"], score_map:{"creativity":1.0,"languages":1.0,"logic":1.0,"music":0.8} },
-          { id:"q6", talent:"languages", mission:"Books and Languages", q:"How do you feel about reading and languages?", opts:["I love reading — books, articles, everything! 📚","I'm interested in foreign languages and learn new words 🌍","I read only when the topic is interesting 📖","I prefer watching videos or listening 🎬"], score_map:{"languages":1.0,"languages":1.0,"memory":0.5,"music":0.4} },
-        ],
-        complete:"Wonderful! Your hobbies tell us a lot about you! ✨",
-      },
-      {
-        id:"ch3", zone:"How You Think", emoji:"💭",
-        color:"#2196F3", bg:"linear-gradient(135deg,#E1F5EE,#9FE1CB)",
-        intro:"Tell us about how you experience the world around you. What captures your attention?",
+          { id:"q4", mission:"Music", q:"How does music feature in your life?", opts:["I play an instrument or sing — it's my passion 🎹","I always listen to music and notice melodies and rhythms 🎧","I enjoy it but it's not the main thing in my life 🎵","I prefer silence or other sounds 📖"] },
+          { id:"q5", mission:"Creativity", q:"Which of these brings you the most enjoyment?", opts:["Drawing, creating designs or animation 🎬","Writing stories, poems or keeping a blog ✍️","Building, coding or soldering 🔧","Dancing, acting in theatre or singing 🎭"] },
+          { id:"q6", mission:"Reading & Languages", q:"How do you feel about reading and foreign languages?", opts:["I love reading books on all kinds of topics 📚","I learn foreign languages — it comes easily to me 🌍","I only read when necessary 📖","I prefer videos and podcasts over reading 🎧"] },
+          { id:"q19", mission:"Sport", q:"What place does sport have in your life?", opts:["Sport is everything to me! I train constantly 🏆","I play team sports — football, basketball, volleyball 🏀","I exercise for health, not at a professional level 🏃","I prefer intellectual games over physical ones 🧩"] },
+          { id:"q20", mission:"Dream Project", q:"If you could do any school project, you'd choose:", opts:["Write a program or create a website 💻","Shoot a film or create an art installation 🎬","Run a social project — helping people 🤲","Research an ecosystem or conduct a science experiment 🔬"] },
+          { id:"q21", mission:"Type of Thinking", q:"When you're solving a hard problem, you usually:", opts:["Look for unusual, non-standard solutions 🌈","Put on music — it helps you think 🎵","Analyse step by step, looking for the logic ⚙️","Discuss it with others and gather opinions 🤝"] },
+        ], complete:"Wonderful! Your hobbies told us a great deal about you! ✨" },
+      { id:"ch3", zone:"You & People", emoji:"🤝", color:"#EF9F27", bg:"linear-gradient(135deg,#FAEEDA,#E1F5EE)", intro:"Tell us how you interact with people and society around you!",
         questions:[
-          { id:"q7", talent:"logic", mission:"What Interests You", q:"What interests and fascinates you the most?", opts:["How things, mechanisms and technology work ⚙️","Why people behave the way they do 🧠","How beautiful things are created — design and art 🎨","How to communicate and understand different people 🤝"], score_map:{"logic":1.0,"leadership":0.9,"creativity":1.0,"languages":0.9} },
-          { id:"q8", talent:"leadership", mission:"Leadership", q:"If your class needs to organise an event, you...", opts:["Happily take on the role of organiser! 🌟","Suggest several creative ideas for the event 💡","Help make beautiful decorations 🎨","Make sure everyone feels comfortable and has fun 😊"], score_map:{"leadership":1.0,"creativity":0.8,"creativity":1.0,"leadership":0.8} },
-          { id:"q9", talent:"creativity", mission:"Your Dream Project", q:"If you had a school project on any topic, you'd choose:", opts:["Create an app or website 💻","Draw a comic or shoot a short film 🎬","Study another culture and its language 🌏","Organise a charity event 🤲"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0} },
-        ],
-        complete:"Wonderful! We understand your unique character better and better! 🌈",
-      },
-      {
-        id:"ch4", zone:"Your Dream", emoji:"🚀",
-        color:"#FF9800", bg:"linear-gradient(135deg,#FAEEDA,#FAEEDA)",
-        intro:"Let's talk about the future! What inspires you and what do you dream of?",
+          { id:"q7", mission:"Interests", q:"What fascinates and captivates you most?", opts:["How technology, algorithms and systems work ⚙️","Why people behave the way they do — psychology 🧠","How beauty is created — design, painting, music 🎨","How ecosystems and living organisms are structured 🌿"] },
+          { id:"q8", mission:"Leadership", q:"If your class needs to organise an event, you:", opts:["Happily take on the organiser role 🌟","Suggest several creative ideas 💡","Create beautiful decorations 🎨","Make sure everyone feels comfortable 😊"] },
+          { id:"q22", mission:"Helping Others", q:"In which situations do you feel most useful?", opts:["When I help someone understand a complex topic 💡","When I listen to and support someone who is upset 💙","When I create something that brings people joy 🎨","When I organise a team to achieve a goal 🏆"] },
+          { id:"q23", mission:"Nature & Ecology", q:"How do you feel about protecting nature?", opts:["It's very important! I'd love to work in this field 🌿","I do sport in nature — it motivates me to protect it 🏃","I find it interesting to study natural phenomena 🦋","I support ecology but it's not my main calling 🌍"] },
+          { id:"q24", mission:"Who You Respect", q:"Which famous person do you respect most?", opts:["Entrepreneurs and leaders — Musk, Zuckerberg 👑","Scientists and inventors — Einstein, Curie 🔬","Artists and creators — Da Vinci, Mozart 🎨","Athletes and champions — motivated by their strength 🏆"] },
+          { id:"q25", mission:"The Future", q:"When you think about your future, what matters most?", opts:["Solving complex problems and creating innovations 🧠","Expressing yourself creatively and making art 🌈","Helping people and making the world better 💙","Living in harmony with nature and travelling 🌿"] },
+        ], complete:"Wonderful! We understand how you interact with the world! 🌈" },
+      { id:"ch4", zone:"Your Dream", emoji:"🚀", color:"#BA7517", bg:"linear-gradient(135deg,#FAEEDA,#FAC775)", intro:"Let's talk about your dreams and how you see your future!",
         questions:[
-          { id:"q10", talent:"logic", mission:"Who Do You Want to Be?", q:"When you think about a future career, you're most drawn to:", opts:["Working with technology, science or maths 🔬","Creating — art, music, film or games 🎮","Helping people — doctor, psychologist or teacher 💙","Travelling and exploring the world and different cultures ✈️"], score_map:{"logic":1.0,"creativity":1.0,"leadership":1.0,"languages":1.0} },
-          { id:"q11", talent:"music", mission:"Musical Soul", q:"What do you think about music?", opts:["Music is my life! I can't live without it 🎼","I love music and want to learn to play 🎸","I enjoy music and listen to it in the background 🎵","Other activities are more interesting than music 📚"], score_map:{"music":1.0,"music":0.85,"music":0.5,"logic":0.4} },
-          { id:"q12", talent:"leadership", mission:"Your Superpower", q:"If you had one superpower, you'd choose:", opts:["Solving any complex problem instantly 🧠","Creating masterpieces — drawing, writing, composing 🎨","Speaking and understanding all world languages 🌍","Inspiring people and leading them 👑"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0} },
-        ],
-        complete:"Amazing! Your dreams show your true potential! 🌟",
-      },
-      {
-        id:"ch5", zone:"You In Action", emoji:"⚡",
-        color:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)",
-        intro:"Last questions! Tell us how you act in real situations.",
+          { id:"q9", mission:"Dream Profession", q:"If you could choose any profession without limits:", opts:["I'd create technologies that change the world 💻","I'd create art, film or music 🎭","I'd travel and learn different languages and cultures ✈️","I'd organise important events and lead people 👑"] },
+          { id:"q10", mission:"Career", q:"What attracts you most about a future job?", opts:["Solving complex technical problems 🔬","Creating something beautiful and inspiring people 🎨","Helping people, healing or educating 💙","Earning good money and becoming successful 💰"] },
+          { id:"q26", mission:"Music Dreams", q:"When it comes to music and performing:", opts:["I dream of performing on stage — singing or playing 🎤","I want to create music — write songs or compose 🎼","I love music but dream of something else 🎵","I'm more interested in backstage — sound, lighting, directing 🎬"] },
+          { id:"q27", mission:"Sport Dreams", q:"When it comes to sport and physical activity:", opts:["I want to become a professional athlete or coach 🏆","Sport is part of life but not a career 🏃","Sports medicine or psychology interests me 🩺","I prefer intellectual competitions ♟️"] },
+          { id:"q28", mission:"Languages & Travel", q:"How do you feel about different languages and cultures?", opts:["I want to know 5+ languages and work internationally 🌍","Travel and new cultures inspire me ✈️","One or two languages is quite enough 📖","I prefer diving deep into one culture 🏛️"] },
+          { id:"q29", mission:"Nature & Science", q:"Which scientific field attracts you more?", opts:["Biology, ecology, zoology — living organisms 🌿","Physics, astronomy, space — laws of the universe 🌌","Chemistry, medicine — substances and reactions 🧪","Psychology, sociology — human behaviour 🧠"] },
+        ], complete:"Your dreams help us understand your purpose! 🌟" },
+      { id:"ch5", zone:"You In Action", emoji:"⚡", color:"#5DCAA5", bg:"linear-gradient(135deg,#E1F5EE,#F1EFE8)", intro:"Last questions! Tell us how you act in real situations.",
         questions:[
-          { id:"q13", talent:"creativity", mission:"Weekend", q:"Your ideal weekend is:", opts:["Creating something new: drawing, writing, making 🖌️","Learning a new language or watching a documentary 🎬","Playing logic games or coding 💻","Going out with friends and socialising 🎪"], score_map:{"creativity":1.0,"languages":0.9,"logic":1.0,"leadership":0.8} },
-          { id:"q14", talent:"languages", mission:"Communication", q:"When meeting new people, you...", opts:["Quickly connect and talk a lot 🗣️","Listen and observe before speaking 👁️","Suggest interesting topics or games to talk about 💡","Prefer to be on your own 📚"], score_map:{"languages":1.0,"memory":0.8,"leadership":0.9,"logic":0.5} },
-          { id:"q15", talent:"logic", mission:"Final Question", q:"Which best describes you?", opts:["I love understanding HOW and WHY things work 🔍","I express myself through creativity and making things 🌈","I find joy in words, languages and stories 📖","I feel most alive when helping and inspiring others 💫"], score_map:{"logic":1.0,"creativity":1.0,"languages":1.0,"leadership":1.0} },
-        ],
-        complete:"You've conquered all zones! Our AI is analysing your answers... 🚀",
-      },
+          { id:"q11", mission:"Music", q:"What do you think about music in general?", opts:["Music is my life, I can't live without it 🎼","I love music and want to learn to play 🎸","I listen in the background — I like it but it's not everything 🎵","Other activities are more interesting than music 📚"] },
+          { id:"q12", mission:"Superpower", q:"If you had one superpower, you'd choose:", opts:["Solving any problem instantly 🧠","Creating masterpieces — drawing, writing, composing 🎨","Speaking all world languages 🌍","Inspiring people and leading them 👑"] },
+          { id:"q13", mission:"Weekend", q:"Your ideal weekend:", opts:["Creating something new — drawing, writing 🖌️","Learning a language or watching a documentary 🎬","Logic games or coding 💻","Sports training or going on a hike 🏃"] },
+          { id:"q14", mission:"Communication", q:"When you meet new people, you...", opts:["Quickly connect and talk about many things 🗣️","Listen and observe before opening up 👁️","Suggest a game or activity 🎯","Talk about your interests and hobbies 💡"] },
+          { id:"q30", mission:"Final Question", q:"If you had to describe yourself in one word:", opts:["Inventor 🔧","Artist 🎨","Musician 🎵","Leader 👑"] },
+          { id:"q15", mission:"About You", q:"What describes you best?", opts:["I love understanding HOW and WHY things work 🔍","I express myself through creativity and making 🌈","I find joy in words, languages and stories 📖","I feel most alive when helping and inspiring others 💫"] },
+        ], complete:"All zones conquered! Analysing your talents... 🚀" },
     ],
-    finale:{
-      title:"Analysing Your Talents! 🌟",
-      text:"One moment... Our ML algorithm is studying your answers and building your personal talent map!",
-      mascot:"🏆",
-    },
+    finale:{title:"Analysing! 🌟",text:"Our ML algorithm is building your talent map and selecting professions...",mascot:"🏆"},
   },
 };
 
-// ── Score calculator ──────────────────────────────────────────────────────────
-function calculateScores(answers, story) {
-  const totals = { logic:0, creativity:0, memory:0, leadership:0, languages:0, music:0 };
-  const counts = { logic:0, creativity:0, memory:0, leadership:0, languages:0, music:0 };
+// ── Score calculator ───────────────────────────────────────────────────────────
+const INTEREST_MAP = {
+  "q1":[{"logic":1.0},{"creativity":0.9},{"music":0.9},{"social":0.8}],
+  "q2":[{"logic":1.0},{"creativity":1.0},{"languages":1.0},{"nature":0.9}],
+  "q3":[{"leadership":1.0},{"creativity":0.8},{"social":0.9},{"nature":0.6}],
+  "q4":[{"music":1.0},{"music":0.8},{"music":0.4},{"logic":0.3}],
+  "q5":[{"creativity":1.0},{"languages":1.0},{"logic":1.0},{"music":0.9}],
+  "q6":[{"languages":1.0},{"languages":1.0},{"memory":0.5},{"music":0.4}],
+  "q7":[{"logic":1.0},{"social":0.9},{"creativity":1.0},{"nature":0.9}],
+  "q8":[{"leadership":1.0},{"creativity":0.8},{"creativity":1.0},{"social":0.9}],
+  "q9":[{"logic":1.0},{"creativity":1.0},{"languages":1.0},{"leadership":1.0}],
+  "q10":[{"logic":1.0},{"creativity":1.0},{"social":1.0},{"leadership":0.9}],
+  "q11":[{"music":1.0},{"music":0.85},{"music":0.5},{"logic":0.4}],
+  "q12":[{"logic":1.0},{"creativity":1.0},{"languages":1.0},{"leadership":1.0}],
+  "q13":[{"creativity":1.0},{"languages":0.9},{"logic":1.0},{"sport":0.9}],
+  "q14":[{"languages":1.0},{"memory":0.8},{"sport":0.7},{"creativity":0.7}],
+  "q15":[{"logic":1.0},{"creativity":1.0},{"languages":1.0},{"leadership":1.0}],
+  "q16":[{"sport":1.0},{"nature":1.0},{"creativity":0.8},{"logic":0.7}],
+  "q17":[{"social":1.0},{"leadership":0.9},{"creativity":0.8},{"memory":0.6}],
+  "q18":[{"nature":1.0},{"logic":0.9},{"creativity":0.8},{"languages":0.7}],
+  "q19":[{"sport":1.0},{"sport":0.9},{"social":0.7},{"logic":0.6}],
+  "q20":[{"logic":1.0},{"creativity":1.0},{"social":1.0},{"nature":0.9}],
+  "q21":[{"creativity":1.0},{"music":0.9},{"logic":0.8},{"social":0.7}],
+  "q22":[{"social":1.0},{"social":0.9},{"creativity":0.8},{"leadership":0.9}],
+  "q23":[{"nature":1.0},{"sport":0.8},{"nature":0.9},{"social":0.6}],
+  "q24":[{"leadership":1.0},{"logic":0.9},{"creativity":0.9},{"sport":0.9}],
+  "q25":[{"logic":1.0},{"creativity":0.9},{"social":1.0},{"nature":0.9}],
+  "q26":[{"music":1.0},{"music":0.9},{"music":0.5},{"creativity":0.8}],
+  "q27":[{"sport":1.0},{"sport":0.7},{"social":0.8},{"logic":0.7}],
+  "q28":[{"languages":1.0},{"languages":0.9},{"languages":0.5},{"memory":0.6}],
+  "q29":[{"nature":1.0},{"logic":0.9},{"nature":0.8},{"social":0.8}],
+  "q30":[{"logic":0.8},{"creativity":1.0},{"music":1.0},{"leadership":1.0}],
+};
 
-  story.chapters.forEach(ch => {
-    ch.questions.forEach(q => {
-      const ansIdx = answers[q.id];
-      if (ansIdx === undefined) return;
-      const scoreMap = q.score_map;
-      const talents = Object.keys(scoreMap);
-      if (ansIdx < talents.length) {
-        const talent = talents[ansIdx];
-        const score  = scoreMap[talent];
-        totals[talent] = (totals[talent] || 0) + score;
-        counts[talent] = (counts[talent] || 0) + 1;
-      }
-    });
-  });
+const MAX_SCORES = {logic:7,creativity:8,memory:2,leadership:6,languages:6,music:5,sport:4,nature:5,social:6};
 
-  // Normalize to 0-100
-  const maxPossible = { logic:5, creativity:5, memory:2, leadership:5, languages:4, music:3 };
+function calculateScores(answers) {
+  const raw = {};
+  for (const [qid, idx] of Object.entries(answers)) {
+    const opts = INTEREST_MAP[qid];
+    if (!opts || idx < 0 || idx >= opts.length) continue;
+    for (const [t, v] of Object.entries(opts[idx])) {
+      raw[t] = (raw[t] || 0) + v;
+    }
+  }
   const result = {};
-  Object.keys(totals).forEach(t => {
-    result[t] = Math.min(100, Math.round((totals[t] / (maxPossible[t] || 1)) * 100));
-  });
+  for (const [t, mx] of Object.entries(MAX_SCORES)) {
+    const pct = ((raw[t] || 0) / mx) * 100;
+    result[t] = Math.min(100, Math.max(5, Math.round(pct)));
+  }
   return result;
 }
 
-function getAllQuestions(story) {
+function getAllQ(story) {
   return story.chapters.flatMap(ch => ch.questions.map(q => ({ ...q, chapterId: ch.id })));
 }
 
 export default function QuizPage({ setPage, setResults, lang, dark }) {
   const story    = STORY[lang] || STORY.en;
   const chapters = story.chapters;
-  const allQ     = getAllQuestions(story);
+  const allQ     = getAllQ(story);
 
   const [phase, setPhase]           = useState("intro");
   const [chapterIdx, setChapterIdx] = useState(0);
@@ -365,7 +274,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
   const chapter  = chapters[chapterIdx];
   const chapterQ = chapter?.questions || [];
   const currentQ = chapterQ[qInChapter];
-  const totalDone = chapters.slice(0, chapterIdx).reduce((acc, ch) => acc + ch.questions.length, 0) + qInChapter;
+  const totalDone = chapters.slice(0, chapterIdx).reduce((a, ch) => a + ch.questions.length, 0) + qInChapter;
   const totalQ   = allQ.length;
   const progress = Math.round((totalDone / totalQ) * 100);
 
@@ -375,30 +284,23 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
     setAnswers(newAnswers);
     setSelected(null);
 
-    const isLastInChapter = qInChapter === chapterQ.length - 1;
-    const isLastChapter   = chapterIdx === chapters.length - 1;
+    const lastInChapter = qInChapter === chapterQ.length - 1;
+    const lastChapter   = chapterIdx === chapters.length - 1;
 
-    if (isLastInChapter && isLastChapter) {
-      await submitAnswers(newAnswers);
-    } else if (isLastInChapter) {
+    if (lastInChapter && lastChapter) {
+      await submit(newAnswers);
+    } else if (lastInChapter) {
       setPhase("chapter-complete");
     } else {
       setQInChapter(qInChapter + 1);
     }
   };
 
-  const nextChapter = () => {
-    setChapterIdx(chapterIdx + 1);
-    setQInChapter(0);
-    setPhase("chapter-intro");
-  };
+  const nextChapter = () => { setChapterIdx(chapterIdx + 1); setQInChapter(0); setPhase("chapter-intro"); };
 
-  const submitAnswers = async (finalAnswers) => {
+  const submit = async (finalAnswers) => {
     setPhase("submitting");
-
-    // Calculate scores locally first
-    const localScores = calculateScores(finalAnswers, story);
-
+    const localScores = calculateScores(finalAnswers);
     try {
       const token = localStorage.getItem("token");
       let data;
@@ -409,140 +311,130 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
       } else {
         try {
           const res = await fetch("https://karta-talantov-ml.onrender.com/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ answers: finalAnswers, scores: localScores, lang }),
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ answers:finalAnswers, scores:localScores, lang }),
           });
           data = await res.json();
           if (!data.scores) data.scores = localScores;
         } catch {
-          // If ML is down, use local scores
-          data = { scores: localScores, careers: [], strengths: [], top_talents: Object.entries(localScores).sort((a,b) => b[1]-a[1]).slice(0,3).map(([k]) => k) };
+          data = { scores:localScores, careers:[], strengths:[], top_talents:Object.entries(localScores).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k) };
         }
       }
       setResults(data);
       setPage("results");
     } catch {
-      setError(lang==="ru"?"Ошибка соединения. Попробуй ещё раз.":lang==="uz"?"Ulanish xatosi. Qaytadan urinib ko'ring.":"Connection error. Please try again.");
+      setError(lang==="ru"?"Ошибка. Попробуй ещё раз.":lang==="uz"?"Xato. Qaytadan urinib ko'ring.":"Error. Please try again.");
       setPhase("question");
     }
   };
 
-  // ── INTRO ─────────────────────────────────────────────────────────────────
+  // ── INTRO ──────────────────────────────────────────────────────────────────
   if (phase === "intro") return (
     <div className="page-wrap">
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
-      <div style={{ minHeight:"80vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", background:dark?"linear-gradient(135deg,#0F1923,#1A2A3A)":"linear-gradient(135deg,#FCE4EC,#E8F5E9)" }}>
-        <div style={{ fontSize:"5rem", marginBottom:16 }}>{story.intro.mascot}</div>
-        <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:dark?"#E1F5EE":"#04342C", marginBottom:14, maxWidth:500 }}>{story.intro.title}</h1>
-        <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#9FE1CB":"#546E7A", maxWidth:460, lineHeight:1.8, marginBottom:20 }}>{story.intro.text}</p>
-        <div style={{ background:dark?"#1A2A3A":"#fff", border:"1.5px solid #E1F5EE", borderRadius:14, padding:"10px 20px", marginBottom:28, fontSize:"0.85rem", fontWeight:800, color:"#78909C" }}>
+      <div style={{ minHeight:"80vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", background:dark?"linear-gradient(135deg,#0F1923,#1A2A3A)":"linear-gradient(135deg,#E1F5EE,#FAEEDA)" }}>
+        <div style={{ fontSize:"5rem", marginBottom:16 }}>🌟</div>
+        <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:dark?"#E3F2FD":"#04342C", marginBottom:14, maxWidth:500 }}>{story.intro.title}</h1>
+        <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#9FE1CB":"#0F6E56", maxWidth:460, lineHeight:1.8, marginBottom:18 }}>{story.intro.text}</p>
+        <div style={{ background:dark?"#1A2A3A":"#fff", border:"1.5px solid #9FE1CB", borderRadius:14, padding:"10px 20px", marginBottom:24, fontSize:"0.85rem", fontWeight:800, color:"#0F6E56" }}>
           📋 {story.intro.note}
         </div>
-        {/* Zone preview */}
-        <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center", marginBottom:28, maxWidth:500 }}>
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center", marginBottom:28, maxWidth:520 }}>
           {chapters.map((ch) => (
-            <div key={ch.id} style={{ background:dark?"#1A2A3A":"#fff", border:`2px solid ${ch.color}44`, borderRadius:12, padding:"6px 14px", display:"flex", alignItems:"center", gap:6, fontSize:"0.82rem", fontWeight:800, color:dark?"#E1F5EE":"#04342C" }}>
+            <div key={ch.id} style={{ background:dark?"#1A2A3A":"#fff", border:`2px solid ${ch.color}55`, borderRadius:12, padding:"6px 14px", display:"flex", alignItems:"center", gap:6, fontSize:"0.82rem", fontWeight:800, color:dark?"#E3F2FD":ch.color }}>
               {ch.emoji} {ch.zone}
             </div>
           ))}
         </div>
-        <button className="hero-cta" style={{ fontSize:"1.1rem", padding:"14px 40px", background:"linear-gradient(135deg,#E91E63,#9C27B0)" }} onClick={() => setPhase("chapter-intro")}>
+        <button className="hero-cta" style={{ fontSize:"1.1rem", padding:"14px 40px", background:`linear-gradient(135deg,#0F6E56,#1D9E75)` }} onClick={() => setPhase("chapter-intro")}>
           {story.intro.btn}
         </button>
-        <p style={{ fontSize:"0.72rem", color:"#90A4AE", fontWeight:700, marginTop:16 }}>
-          🎓 {lang==="ru"?"Основано на теории множественного интеллекта Гарднера (Гарвард)":lang==="uz"?"Gardner ko'p intellektlar nazariyasiga asoslangan (Harvard)":"Based on Gardner's Multiple Intelligences Theory (Harvard)"}
-        </p>
       </div>
     </div>
   );
 
-  // ── CHAPTER INTRO ─────────────────────────────────────────────────────────
+  // ── CHAPTER INTRO ──────────────────────────────────────────────────────────
   if (phase === "chapter-intro") return (
     <div className="page-wrap">
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
       <div style={{ minHeight:"80vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", background:dark?"#0F1923":chapter.bg }}>
         <div style={{ fontSize:"4rem", marginBottom:16 }}>{chapter.emoji}</div>
-        <div style={{ background:chapter.color, color:"#fff", borderRadius:99, padding:"5px 20px", fontSize:"0.85rem", fontWeight:800, marginBottom:16, letterSpacing:"0.08em" }}>
+        <div style={{ background:chapter.color, color:"#fff", borderRadius:99, padding:"5px 20px", fontSize:"0.85rem", fontWeight:800, marginBottom:16 }}>
           {lang==="ru"?"ЗОНА":lang==="uz"?"ZONA":"ZONE"} {chapterIdx+1}/{chapters.length}
         </div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color:dark?"#E1F5EE":chapter.color, marginBottom:16 }}>{chapter.zone}</h2>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color:dark?"#E3F2FD":chapter.color, marginBottom:16 }}>{chapter.zone}</h2>
         <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#B0BEC5":"#546E7A", maxWidth:440, lineHeight:1.7, marginBottom:32 }}>{chapter.intro}</p>
-        <button className="quiz-next" style={{ background:chapter.color, maxWidth:300 }} onClick={() => setPhase("question")}>
+        <button className="quiz-next" style={{ background:chapter.color, maxWidth:280 }} onClick={() => setPhase("question")}>
           {lang==="ru"?"Поехали! →":lang==="uz"?"Ketdik! →":"Let's go! →"}
         </button>
       </div>
     </div>
   );
 
-  // ── CHAPTER COMPLETE ──────────────────────────────────────────────────────
+  // ── CHAPTER COMPLETE ───────────────────────────────────────────────────────
   if (phase === "chapter-complete") return (
     <div className="page-wrap">
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
       <div style={{ minHeight:"80vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", background:dark?"#0F1923":chapter.bg }}>
         <div style={{ fontSize:"4rem", marginBottom:16 }}>✅</div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E1F5EE":chapter.color, marginBottom:16, maxWidth:420 }}>{chapter.complete}</h2>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E3F2FD":chapter.color, marginBottom:16, maxWidth:420 }}>{chapter.complete}</h2>
         <div style={{ display:"flex", gap:10, marginBottom:32 }}>
           {chapters.map((ch,i) => (
-            <div key={i} style={{ width:14, height:14, borderRadius:"50%", background:i<=chapterIdx?ch.color:(dark?"#2A4070":"#E1F5EE"), transition:"all 0.4s", boxShadow:i<=chapterIdx?`0 0 8px ${ch.color}66`:"none" }} />
+            <div key={i} style={{ width:14, height:14, borderRadius:"50%", background:i<=chapterIdx?ch.color:(dark?"#2A4070":"#E1F5EE"), transition:"all 0.4s" }} />
           ))}
         </div>
-        {chapterIdx < chapters.length - 1 && (
+        {chapterIdx < chapters.length-1 && (
           <button className="quiz-next" style={{ background:chapters[chapterIdx+1]?.color||chapter.color, maxWidth:320 }} onClick={nextChapter}>
-            {lang==="ru"?`${chapters[chapterIdx+1]?.emoji} ${chapters[chapterIdx+1]?.zone} →`:lang==="uz"?`${chapters[chapterIdx+1]?.emoji} ${chapters[chapterIdx+1]?.zone} →`:`${chapters[chapterIdx+1]?.emoji} ${chapters[chapterIdx+1]?.zone} →`}
+            {chapters[chapterIdx+1]?.emoji} {chapters[chapterIdx+1]?.zone} →
           </button>
         )}
       </div>
     </div>
   );
 
-  // ── SUBMITTING ────────────────────────────────────────────────────────────
+  // ── SUBMITTING ─────────────────────────────────────────────────────────────
   if (phase === "submitting") return (
     <div className="page-wrap">
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
       <div style={{ textAlign:"center", padding:"60px 24px" }}>
         <div style={{ fontSize:"4rem", marginBottom:16 }}>{story.finale.mascot}</div>
-        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E1F5EE":"#0F6E56", marginBottom:12 }}>{story.finale.title}</h2>
-        <p style={{ color:dark?"#9FE1CB":"#78909C", fontWeight:600, marginBottom:32 }}>{story.finale.text}</p>
-        <Loader message={lang==="ru"?"Составляем твою карту талантов... 🗺️":lang==="uz"?"Iste'dod xaritangiz tuzilmoqda... 🗺️":"Building your talent map... 🗺️"} />
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:dark?"#E3F2FD":"#0F6E56", marginBottom:12 }}>{story.finale.title}</h2>
+        <p style={{ color:dark?"#9FE1CB":"#1D9E75", fontWeight:600, marginBottom:32 }}>{story.finale.text}</p>
+        <Loader message={lang==="ru"?"Строим твою карту талантов... 🗺️":lang==="uz"?"Iste'dod xaritangiz tuzilmoqda... 🗺️":"Building your talent map... 🗺️"} />
       </div>
     </div>
   );
 
-  // ── QUESTION ──────────────────────────────────────────────────────────────
+  // ── QUESTION ───────────────────────────────────────────────────────────────
   return (
     <div className="page-wrap">
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
-
-      {/* Progress */}
       <div className="progress-bar-wrap" style={{ marginTop:16 }}>
         <div className="progress-bar-fill" style={{ width:`${progress}%` }} />
       </div>
-
-      {/* Chapter badge */}
       <div style={{ background:dark?"#1A2A3A":chapter.bg, padding:"10px 24px", display:"flex", alignItems:"center", gap:12, borderBottom:`2px solid ${chapter.color}33` }}>
         <span style={{ fontSize:"1.4rem" }}>{chapter.emoji}</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:"0.7rem", fontWeight:800, color:chapter.color, textTransform:"uppercase", letterSpacing:"0.08em" }}>
             {lang==="ru"?"Зона":lang==="uz"?"Zona":"Zone"} {chapterIdx+1}/{chapters.length} — {chapter.zone}
           </div>
-          <div style={{ fontSize:"0.88rem", fontWeight:800, color:dark?"#E1F5EE":"#04342C" }}>{currentQ?.mission}</div>
+          <div style={{ fontSize:"0.88rem", fontWeight:800, color:dark?"#E3F2FD":"#04342C" }}>{currentQ?.mission}</div>
         </div>
-        <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#90A4AE" }}>{qInChapter+1}/{chapterQ.length}</span>
+        <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#9FE1CB" }}>{qInChapter+1}/{chapterQ.length}</span>
       </div>
 
       <div className="quiz-section">
-        {error && <div style={{ background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"10px 14px", color:"#C62828", fontWeight:700, marginBottom:14, fontSize:"0.88rem" }}>❌ {error}</div>}
+        {error && <div style={{ background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"10px 14px", color:"#C62828", fontWeight:700, marginBottom:14 }}>❌ {error}</div>}
 
-        <p className="quiz-q" style={{ fontSize:"1.2rem", lineHeight:1.5 }}>{currentQ?.q}</p>
+        <p className="quiz-q" style={{ fontSize:"1.2rem", lineHeight:1.5, color:dark?"#E3F2FD":"#04342C" }}>{currentQ?.q}</p>
 
         <div className="quiz-options">
           {currentQ?.opts.map((opt, i) => (
             <button key={i}
               className={`quiz-option${selected===i?" selected":""}`}
-              style={{ ...(selected===i ? { borderColor:chapter.color, background:`${chapter.color}12`, color:chapter.color } : {}), padding:"14px 18px", fontSize:"0.95rem", lineHeight:1.4 }}
+              style={selected===i ? { borderColor:chapter.color, background:`${chapter.color}15`, color:chapter.color } : { color:dark?"#E3F2FD":"#37474F" }}
               onClick={() => setSelected(i)}>
-              <span style={{ fontSize:"0.85rem", fontWeight:900, color:selected===i?chapter.color:"#90A4AE", marginRight:10, flexShrink:0 }}>
+              <span style={{ fontSize:"0.85rem", fontWeight:900, color:selected===i?chapter.color:"#9FE1CB", marginRight:10 }}>
                 {["A","B","C","D"][i]}.
               </span>
               {opt}
@@ -551,17 +443,17 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         </div>
 
         <button className="quiz-next"
-          style={{ background:selected===null?"#B0BEC5":chapter.color, opacity:selected===null?0.6:1, transition:"all 0.2s", fontSize:"1.05rem", padding:"15px" }}
+          style={{ background:selected===null?"#9FE1CB":chapter.color, opacity:selected===null?0.6:1, fontSize:"1.05rem", padding:"15px" }}
           onClick={handleAnswer} disabled={selected===null}>
           {qInChapter < chapterQ.length-1
-            ? (lang==="ru"?"Следующий вопрос →":lang==="uz"?"Keyingi savol →":"Next question →")
+            ? (lang==="ru"?"Следующий →":lang==="uz"?"Keyingi →":"Next →")
             : chapterIdx < chapters.length-1
-            ? (lang==="ru"?`Следующая зона ${chapters[chapterIdx+1]?.emoji} →`:lang==="uz"?`Keyingi zona ${chapters[chapterIdx+1]?.emoji} →`:`Next zone ${chapters[chapterIdx+1]?.emoji} →`)
+            ? `${chapters[chapterIdx+1]?.emoji} ${lang==="ru"?"Следующая зона":lang==="uz"?"Keyingi zona":"Next zone"} →`
             : (lang==="ru"?"Узнать мои таланты! 🌟":lang==="uz"?"Iste'dodlarimni bilish! 🌟":"Discover my talents! 🌟")
           }
         </button>
 
-        <p style={{ textAlign:"center", fontSize:"0.75rem", color:"#90A4AE", fontWeight:700, marginTop:12 }}>
+        <p style={{ textAlign:"center", fontSize:"0.75rem", color:"#9FE1CB", fontWeight:700, marginTop:12 }}>
           {lang==="ru"?`Вопрос ${totalDone+1} из ${totalQ}`:lang==="uz"?`Savol ${totalDone+1} / ${totalQ}`:`Question ${totalDone+1} of ${totalQ}`}
         </p>
       </div>
