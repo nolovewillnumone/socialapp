@@ -2,18 +2,66 @@ import { useState, useEffect, useRef } from "react";
 import Nav from "../components/Nav";
 
 const TASK_CSS = `
-  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-  @keyframes cardPop { from{opacity:0;transform:scale(0.9) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  .game-opt:hover { transform: translateX(8px) !important; border-color: #90CAF9 !important; background: linear-gradient(135deg,#EEF6FF,#E3F2FD) !important; box-shadow: 0 6px 20px rgba(21,101,192,0.14) !important; }
-  .emoji-btn:hover { transform: scale(1.25) rotate(8deg) !important; box-shadow: 0 6px 20px rgba(21,101,192,0.2) !important; border-color: #90CAF9 !important; }
-  .fin-btn:hover { transform: translateY(-4px) scale(1.04) !important; box-shadow: 0 12px 32px rgba(21,101,192,0.45) !important; }
-  .city-chip:hover { transform: translateY(-3px) scale(1.06) !important; box-shadow: 0 6px 16px rgba(21,101,192,0.2) !important; background: linear-gradient(135deg,#BBDEFB,#E3F2FD) !important; }
-  .search-btn:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 20px rgba(21,101,192,0.4) !important; }
-  .gps-btn:hover { transform: translateY(-3px) scale(1.02) !important; box-shadow: 0 10px 28px rgba(255,112,67,0.45) !important; }
-  .map-card:hover { transform: translateX(6px) !important; box-shadow: 0 8px 24px rgba(21,101,192,0.12) !important; border-color: #90CAF9 !important; }
-  .map-open-btn:hover { background: linear-gradient(135deg,#1565C0,#42A5F5) !important; color: #fff !important; box-shadow: 0 4px 14px rgba(21,101,192,0.35) !important; }
-  .change-btn:hover { transform: scale(1.05) !important; box-shadow: 0 4px 12px rgba(230,74,19,0.25) !important; }
+  @keyframes shake    { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  @keyframes cardPop  { from{opacity:0;transform:scale(0.88) translateY(24px) rotateX(6deg)} to{opacity:1;transform:scale(1) translateY(0) rotateX(0)} }
+  @keyframes float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+  @keyframes pulse    { 0%,100%{box-shadow:0 0 0 0 rgba(15,110,86,0.4)} 70%{box-shadow:0 0 0 12px rgba(15,110,86,0)} }
+  @keyframes shimmer  { 0%{background-position:200% center} 100%{background-position:-200% center} }
+  @keyframes listIn   { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes scoreIn  { from{opacity:0;transform:scale(0.5) rotate(-10deg)} to{opacity:1;transform:scale(1) rotate(0)} }
+  @keyframes glow     { 0%,100%{opacity:0.6} 50%{opacity:1} }
+  @keyframes slideDown{ from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin     { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  .game-opt {
+    position:relative; overflow:hidden;
+    transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+  }
+  .game-opt::before {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+    transform:translateX(-100%); transition:transform 0.4s ease;
+  }
+  .game-opt:hover { transform:translateX(10px) !important; border-color:#5DCAA5 !important; background:linear-gradient(135deg,#E1F5EE,#F1FFF8) !important; box-shadow:0 8px 24px rgba(15,110,86,0.16) !important; }
+  .game-opt:hover::before { transform:translateX(100%); }
+  .game-opt:active { transform:scale(0.97) !important; }
+
+  .emoji-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .emoji-btn:hover { transform:scale(1.3) rotate(10deg) !important; box-shadow:0 8px 24px rgba(15,110,86,0.25) !important; border-color:#5DCAA5 !important; }
+  .emoji-btn:active { transform:scale(0.9) !important; }
+
+  .fin-btn {
+    background:linear-gradient(90deg,#0F6E56,#1D9E75,#5DCAA5,#1D9E75,#0F6E56) !important;
+    background-size:300% 100% !important;
+    animation:shimmer 3s linear infinite !important;
+    transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
+  }
+  .fin-btn:hover { transform:translateY(-4px) scale(1.04) !important; box-shadow:0 14px 36px rgba(15,110,86,0.5) !important; }
+  .fin-btn:active { transform:scale(0.97) !important; }
+
+  .city-chip { transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .city-chip:hover { transform:translateY(-4px) scale(1.08) !important; box-shadow:0 8px 20px rgba(15,110,86,0.25) !important; background:linear-gradient(135deg,#5DCAA5,#E1F5EE) !important; color:#fff !important; }
+
+  .search-btn { transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .search-btn:hover { transform:translateY(-3px) scale(1.04) !important; box-shadow:0 10px 28px rgba(15,110,86,0.45) !important; }
+
+  .gps-btn { transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .gps-btn:hover { transform:translateY(-3px) scale(1.02) !important; box-shadow:0 12px 32px rgba(239,159,39,0.5) !important; }
+
+  .map-card { transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .map-card:hover { transform:translateX(8px) scale(1.01) !important; box-shadow:0 10px 28px rgba(15,110,86,0.14) !important; border-color:#5DCAA5 !important; }
+
+  .map-open-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .map-open-btn:hover { background:linear-gradient(135deg,#0F6E56,#5DCAA5) !important; color:#fff !important; transform:scale(1.06) !important; box-shadow:0 4px 16px rgba(15,110,86,0.4) !important; }
+
+  .change-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .change-btn:hover { transform:scale(1.08) translateY(-1px) !important; box-shadow:0 6px 16px rgba(239,159,39,0.3) !important; }
+
+  .task-card-inner { transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .task-card-inner:hover { transform:translateY(-10px) scale(1.04) !important; }
+
+  .close-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; }
+  .close-btn:hover { transform:scale(1.1) rotate(90deg) !important; background:#EF5350 !important; color:#fff !important; }
 `;
 import Loader from "../components/Loader";
 import { t } from "../i18n";
@@ -47,7 +95,7 @@ function LogicGame({ onFinish, lang }) {
   return (
     <div style={G.wrap}>
       <div style={G.badge}>🧠 {idx + 1}/{PUZZLES.length}</div>
-      <p style={G.question}>{p.seq.join(" → ")} → <span style={{ color: "#FF7043", fontWeight: 900 }}>?</span></p>
+      <p style={G.question}>{p.seq.join(" → ")} → <span style={{ color: "#EF9F27", fontWeight: 900 }}>?</span></p>
       <div style={G.opts}>
         {p.opts.map((opt) => (
           <button key={opt} className="game-opt" style={{ ...G.opt, ...(selected === opt ? (opt === p.answer ? G.optRight : G.optWrong) : {}) }} onClick={() => pick(opt)}>
@@ -142,21 +190,21 @@ function CreativityGame({ onFinish, lang }) {
   }
 
   const pct = (timer / 30) * 100;
-  const barC = timer > 15 ? "#66BB6A" : timer > 8 ? "#FFD740" : "#FF7043";
+  const barC = timer > 15 ? "#66BB6A" : timer > 8 ? "#FFD740" : "#EF9F27";
   const prompt = lang === "ru" ? "применений для старой газеты" : lang === "uz" ? "eski gazeta uchun foydalanishlar" : "uses for an old newspaper";
 
   return (
     <div style={G.wrap}>
       <div style={G.badge}>🎨 {lang === "ru" ? "Творчество" : lang === "uz" ? "Ijodkorlik" : "Creativity"}</div>
       <p style={G.question}>{lang === "ru" ? "Придумай как можно больше" : lang === "uz" ? "Imkon qadar ko'proq toping:" : "Think of as many"} <b>{prompt}</b>!</p>
-      <div style={{ width:"100%", height:8, background:"#E3F2FD", borderRadius:99, overflow:"hidden" }}>
+      <div style={{ width:"100%", height:8, background:"#E1F5EE", borderRadius:99, overflow:"hidden" }}>
         <div style={{ height:"100%", width:`${pct}%`, background:barC, borderRadius:99, transition:"width 1s linear, background 0.5s" }} />
       </div>
       <p style={{ fontWeight:800, color:barC }}>{timer}s</p>
       <textarea style={G.textarea} placeholder={lang === "ru" ? "Каждая идея на новой строке..." : lang === "uz" ? "Har bir g'oya yangi qatorda..." : "One idea per line..."}
         value={ideas} onChange={(e) => setIdeas(e.target.value)} autoFocus />
       <p style={{ fontSize:"0.8rem", color:"#90A4AE" }}>
-        {lang === "ru" ? "Идей:" : lang === "uz" ? "G'oyalar:" : "Ideas:"} <b style={{ color:"#1565C0" }}>{ideas.split("\n").filter((l)=>l.trim()).length}</b>
+        {lang === "ru" ? "Идей:" : lang === "uz" ? "G'oyalar:" : "Ideas:"} <b style={{ color:"#0F6E56" }}>{ideas.split("\n").filter((l)=>l.trim()).length}</b>
       </p>
     </div>
   );
@@ -224,7 +272,7 @@ function LeadershipGame({ onFinish, lang }) {
       <p style={G.question}>{q[lang] || q.ru}</p>
       <div style={G.opts}>
         {q.opts.map((opt, i) => (
-          <button key={i} style={{ ...G.opt, ...(picked===opt ? { background:"#E3F2FD", borderColor:"#1565C0", color:"#1565C0" } : {}) }}
+          <button key={i} style={{ ...G.opt, ...(picked===opt ? { background:"#E1F5EE", borderColor:"#0F6E56", color:"#0F6E56" } : {}) }}
             onClick={() => pick(opt)}>
             {opt[lang] || opt.ru}
           </button>
@@ -237,7 +285,7 @@ function LeadershipGame({ onFinish, lang }) {
 // ── Game Result ───────────────────────────────────────────────────────────────
 function GameResult({ score, talent, onFinish, lang }) {
   const emoji = score >= 80 ? "🏆" : score >= 50 ? "⭐" : "💪";
-  const color = score >= 80 ? "#66BB6A" : score >= 50 ? "#FFD740" : "#FF7043";
+  const color = score >= 80 ? "#66BB6A" : score >= 50 ? "#FFD740" : "#EF9F27";
   const msg   = { ru: score>=80?"Отлично!":score>=50?"Хорошо!":"Тренируйся!", uz: score>=80?"Ajoyib!":score>=50?"Yaxshi!":"Mashq qil!", en: score>=80?"Excellent!":score>=50?"Good job!":"Keep practicing!" };
   const btnLabel = { ru:"Сохранить →", uz:"Saqlash →", en:"Save →" };
   return (
@@ -253,15 +301,15 @@ function GameResult({ score, talent, onFinish, lang }) {
 // ── Shared game styles ────────────────────────────────────────────────────────
 const G = {
   wrap:     { display:"flex", flexDirection:"column", alignItems:"center", gap:14, padding:"8px 0", minHeight:260 },
-  badge:    { background:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", color:"#1565C0", fontWeight:800, fontSize:"0.85rem", padding:"6px 16px", borderRadius:99, boxShadow:"0 2px 8px rgba(21,101,192,0.12)", letterSpacing:"0.04em" },
-  question: { fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem", color:"#1565C0", textAlign:"center", lineHeight:1.4, padding:"0 8px" },
+  badge:    { background:"linear-gradient(135deg,#E1F5EE,#9FE1CB)", color:"#0F6E56", fontWeight:800, fontSize:"0.85rem", padding:"6px 16px", borderRadius:99, boxShadow:"0 2px 8px rgba(15,110,86,0.12)", letterSpacing:"0.04em" },
+  question: { fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem", color:"#0F6E56", textAlign:"center", lineHeight:1.4, padding:"0 8px" },
   opts:     { display:"flex", flexDirection:"column", gap:10, width:"100%" },
-  opt:      { padding:"13px 18px", border:"2px solid #E3F2FD", borderRadius:16, background:"#F8FBFF", fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", color:"#37474F", cursor:"pointer", textAlign:"left", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(21,101,192,0.04)", position:"relative", overflow:"hidden" },
+  opt:      { padding:"13px 18px", border:"2px solid #E1F5EE", borderRadius:16, background:"#F8FBFF", fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", color:"#37474F", cursor:"pointer", textAlign:"left", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(15,110,86,0.04)", position:"relative", overflow:"hidden" },
   optRight: { background:"linear-gradient(135deg,#E8F5E9,#F1F8E9)", borderColor:"#66BB6A", color:"#2E7D32", boxShadow:"0 4px 16px rgba(102,187,106,0.25)", transform:"translateX(6px)" },
-  optWrong: { background:"linear-gradient(135deg,#FFEBEE,#FFF3E0)", borderColor:"#EF5350", color:"#C62828", boxShadow:"0 4px 16px rgba(239,83,80,0.2)", animation:"shake 0.4s ease" },
-  emojiBtn: { fontSize:"1.8rem", border:"2px solid #E3F2FD", borderRadius:14, background:"linear-gradient(135deg,#F8FBFF,#EEF6FF)", cursor:"pointer", padding:"10px", transition:"all 0.2s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(21,101,192,0.06)" },
-  textarea: { width:"100%", minHeight:120, padding:"14px 16px", border:"2px solid #E3F2FD", borderRadius:16, fontFamily:"'Nunito',sans-serif", fontSize:"0.92rem", fontWeight:600, resize:"none", outline:"none", color:"#37474F", boxShadow:"inset 0 2px 8px rgba(21,101,192,0.04)", transition:"border-color 0.2s" },
-  finBtn:   { padding:"14px 36px", background:"linear-gradient(135deg,#1565C0,#42A5F5)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 8px 24px rgba(21,101,192,0.35)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)", letterSpacing:"0.03em" },
+  optWrong: { background:"linear-gradient(135deg,#FFEBEE,#FAEEDA)", borderColor:"#EF5350", color:"#C62828", boxShadow:"0 4px 16px rgba(239,83,80,0.2)", animation:"shake 0.4s ease" },
+  emojiBtn: { fontSize:"1.8rem", border:"2px solid #E1F5EE", borderRadius:14, background:"linear-gradient(135deg,#F8FBFF,#E1F5EE)", cursor:"pointer", padding:"10px", transition:"all 0.2s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(15,110,86,0.06)" },
+  textarea: { width:"100%", minHeight:120, padding:"14px 16px", border:"2px solid #E1F5EE", borderRadius:16, fontFamily:"'Nunito',sans-serif", fontSize:"0.92rem", fontWeight:600, resize:"none", outline:"none", color:"#37474F", boxShadow:"inset 0 2px 8px rgba(15,110,86,0.04)", transition:"border-color 0.2s" },
+  finBtn:   { padding:"14px 36px", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 8px 24px rgba(15,110,86,0.35)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)", letterSpacing:"0.03em" },
 };
 
 // ── Nearby Establishments ─────────────────────────────────────────────────────
@@ -382,7 +430,7 @@ function EstablishmentsMap({ lang }) {
       {step === "done" && city && (
         <div>
           <p style={M.cityLabel}>
-            <span style={{ color:"#FF7043", fontWeight:900 }}>📍 {city}</span>
+            <span style={{ color:"#EF9F27", fontWeight:900 }}>📍 {city}</span>
             {" — "}{COURSE_TYPES.length} {L.results[lang]} {city}
           </p>
           <div style={M.list}>
@@ -411,36 +459,36 @@ function EstablishmentsMap({ lang }) {
 }
 
 const M = {
-  wrap:        { background:"linear-gradient(135deg,#F8FBFF,#F0F7FF)", borderRadius:24, padding:"24px", border:"1.5px solid #E3F2FD", marginTop:24, boxShadow:"0 4px 20px rgba(21,101,192,0.06)" },
+  wrap:        { background:"linear-gradient(135deg,#F8FBFF,#F1EFE8)", borderRadius:24, padding:"24px", border:"1.5px solid #E1F5EE", marginTop:24, boxShadow:"0 4px 20px rgba(15,110,86,0.06)" },
   header:      { display:"flex", alignItems:"center", gap:10, marginBottom:18, flexWrap:"wrap" },
-  title:       { fontFamily:"'Fredoka One',cursive", fontSize:"1.15rem", color:"#1565C0", flex:1 },
-  changeBtn:   { border:"none", background:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", color:"#E64A19", borderRadius:99, padding:"6px 14px", fontWeight:800, cursor:"pointer", fontSize:"0.78rem", fontFamily:"'Nunito',sans-serif", boxShadow:"0 2px 8px rgba(230,74,19,0.15)", transition:"all 0.2s" },
+  title:       { fontFamily:"'Fredoka One',cursive", fontSize:"1.15rem", color:"#0F6E56", flex:1 },
+  changeBtn:   { border:"none", background:"linear-gradient(135deg,#FAEEDA,#FAEEDA)", color:"#993C1D", borderRadius:99, padding:"6px 14px", fontWeight:800, cursor:"pointer", fontSize:"0.78rem", fontFamily:"'Nunito',sans-serif", boxShadow:"0 2px 8px rgba(230,74,19,0.15)", transition:"all 0.2s" },
   pickWrap:    { display:"flex", flexDirection:"column", gap:14 },
   subtitle:    { fontSize:"0.88rem", fontWeight:700, color:"#78909C", textAlign:"center" },
   errBox:      { background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:12, padding:"10px 16px", color:"#C62828", fontSize:"0.85rem", fontWeight:700 },
   inputRow:    { display:"flex", gap:8 },
-  input:       { flex:1, padding:"12px 16px", border:"2px solid #E3F2FD", borderRadius:14, fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", outline:"none", color:"#1A237E", transition:"border-color 0.2s, box-shadow 0.2s", boxShadow:"0 2px 8px rgba(21,101,192,0.04)" },
-  searchBtn:   { padding:"12px 20px", background:"linear-gradient(135deg,#1565C0,#42A5F5)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer", whiteSpace:"nowrap", boxShadow:"0 4px 14px rgba(21,101,192,0.3)", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)" },
+  input:       { flex:1, padding:"12px 16px", border:"2px solid #E1F5EE", borderRadius:14, fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:"0.92rem", outline:"none", color:"#04342C", transition:"border-color 0.2s, box-shadow 0.2s", boxShadow:"0 2px 8px rgba(15,110,86,0.04)" },
+  searchBtn:   { padding:"12px 20px", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer", whiteSpace:"nowrap", boxShadow:"0 4px 14px rgba(15,110,86,0.3)", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)" },
   quickCities: { display:"flex", flexWrap:"wrap", gap:8, justifyContent:"center" },
-  cityChip:    { border:"1.5px solid #BBDEFB", background:"linear-gradient(135deg,#E3F2FD,#EEF6FF)", color:"#1565C0", borderRadius:99, padding:"7px 16px", fontWeight:800, fontSize:"0.82rem", cursor:"pointer", fontFamily:"'Nunito',sans-serif", transition:"all 0.2s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(21,101,192,0.08)" },
+  cityChip:    { border:"1.5px solid #9FE1CB", background:"linear-gradient(135deg,#E1F5EE,#E1F5EE)", color:"#0F6E56", borderRadius:99, padding:"7px 16px", fontWeight:800, fontSize:"0.82rem", cursor:"pointer", fontFamily:"'Nunito',sans-serif", transition:"all 0.2s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 8px rgba(15,110,86,0.08)" },
   divider:     { display:"flex", alignItems:"center", gap:8 },
   dividerText: { fontSize:"0.8rem", color:"#B0BEC5", fontWeight:700, padding:"0 8px", background:"#F8FBFF" },
-  gpsBtn:      { width:"100%", padding:"14px", background:"linear-gradient(135deg,#FF7043,#FF8A65)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(255,112,67,0.35)", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)" },
+  gpsBtn:      { width:"100%", padding:"14px", background:"linear-gradient(135deg,#EF9F27,#FAC775)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(239,159,39,0.35)", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)" },
   cityLabel:   { fontSize:"0.88rem", fontWeight:700, color:"#546E7A", marginBottom:12, textAlign:"center" },
   list:        { display:"flex", flexDirection:"column", gap:10 },
-  card:        { background:"#fff", borderRadius:16, padding:"14px 18px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1.5px solid #E3F2FD", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 10px rgba(21,101,192,0.05)" },
+  card:        { background:"#fff", borderRadius:16, padding:"14px 18px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1.5px solid #E1F5EE", transition:"all 0.22s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 2px 10px rgba(15,110,86,0.05)" },
   left:        { display:"flex", alignItems:"center", gap:12 },
-  name:        { fontWeight:800, color:"#1A237E", fontSize:"0.9rem" },
+  name:        { fontWeight:800, color:"#04342C", fontSize:"0.9rem" },
   type:        { fontSize:"0.74rem", color:"#90A4AE", fontWeight:600, marginTop:2 },
-  openBtn:     { fontSize:"0.78rem", fontWeight:800, color:"#1565C0", textDecoration:"none", background:"linear-gradient(135deg,#E3F2FD,#EEF6FF)", padding:"7px 14px", borderRadius:99, whiteSpace:"nowrap", boxShadow:"0 2px 8px rgba(21,101,192,0.12)", transition:"all 0.2s" },
+  openBtn:     { fontSize:"0.78rem", fontWeight:800, color:"#0F6E56", textDecoration:"none", background:"linear-gradient(135deg,#E1F5EE,#E1F5EE)", padding:"7px 14px", borderRadius:99, whiteSpace:"nowrap", boxShadow:"0 2px 8px rgba(15,110,86,0.12)", transition:"all 0.2s" },
 };
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 const TASK_DEFS = [
-  { id:"logic",      color:"#1565C0", emoji:"🧠", Game: LogicGame      },
-  { id:"creativity", color:"#FF7043", emoji:"🎨", Game: CreativityGame  },
+  { id:"logic",      color:"#0F6E56", emoji:"🧠", Game: LogicGame      },
+  { id:"creativity", color:"#EF9F27", emoji:"🎨", Game: CreativityGame  },
   { id:"memory",     color:"#EF5350", emoji:"🃏", Game: MemoryGame      },
-  { id:"leadership", color:"#1976D2", emoji:"👑", Game: LeadershipGame  },
+  { id:"leadership", color:"#1D9E75", emoji:"👑", Game: LeadershipGame  },
 ];
 const LABELS = {
   logic:      { ru:"Логика",     uz:"Mantiq",     en:"Logic"       },
@@ -500,16 +548,25 @@ export default function TasksPage({ setPage, lang, dark }) {
       </div>
 
       <div className="task-section">
-        <h2 className="task-title">{t(lang,"tasks.title")}</h2>
+        <div style={{ textAlign:"center", marginBottom:24 }}>
+          <div style={{ fontSize:"2.4rem", marginBottom:8, animation:"float 3s ease-in-out infinite" }}>🎮</div>
+          <h2 className="task-title" style={{ marginBottom:6 }}>{t(lang,"tasks.title")}</h2>
+          <p style={{ fontSize:"0.85rem", fontWeight:700, color:"#5DCAA5", margin:0 }}>
+            {lang==="ru"?"Сыграй в 4 мини-игры и узнай свой уровень!":lang==="uz"?"4 ta mini-o'yin o'ynang va darajangizni biling!":"Play 4 mini-games and discover your level!"}
+          </p>
+        </div>
 
         {/* Active game panel */}
         {activeGame && ActiveGame && (
-          <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px", boxShadow:"0 8px 40px rgba(21,101,192,0.12)", border:"1.5px solid #E3F2FD", marginBottom:24, animation:"cardPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-              <span style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", color:"#1565C0" }}>
-                {LABELS[activeGame]?.[lang]}
-              </span>
-              <button onClick={() => setActiveGame(null)} style={{ border:"none", background:"#FFF3E0", color:"#E64A19", borderRadius:99, padding:"4px 12px", fontWeight:800, cursor:"pointer", fontSize:"0.82rem" }}>
+          <div style={{ background:"rgba(255,255,255,0.92)", backdropFilter:"blur(16px)", borderRadius:28, padding:"28px 24px", boxShadow:"0 24px 64px rgba(15,110,86,0.18), inset 0 1px 0 rgba(255,255,255,0.8)", border:`2px solid ${TASK_DEFS.find(t=>t.id===activeGame)?.color}33`, marginBottom:24, animation:"cardPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both", transformStyle:"preserve-3d" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <span style={{ fontSize:"1.6rem", animation:"float 2.5s ease-in-out infinite" }}>{TASK_DEFS.find(t=>t.id===activeGame)?.emoji}</span>
+                <span style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.15rem", color:"#0F6E56" }}>
+                  {LABELS[activeGame]?.[lang]}
+                </span>
+              </div>
+              <button className="close-btn" onClick={() => setActiveGame(null)} style={{ border:"none", background:"#FAEEDA", color:"#993C1D", borderRadius:99, padding:"6px 14px", fontWeight:800, cursor:"pointer", fontSize:"0.82rem", fontFamily:"'Nunito',sans-serif" }}>
                 ✕ {lang==="ru"?"Закрыть":lang==="uz"?"Yopish":"Close"}
               </button>
             </div>
@@ -525,23 +582,24 @@ export default function TasksPage({ setPage, lang, dark }) {
             return (
               <div key={task.id} className="task-card"
                 onClick={() => !done && setActiveGame(task.id)}
-                style={{ opacity:done?0.9:1, cursor:done?"default":"pointer", transform:"translateY(0)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
-                onMouseEnter={e => { if(!done){ e.currentTarget.style.transform="translateY(-8px) scale(1.03)"; e.currentTarget.style.boxShadow=`0 16px 40px ${task.color}33`; }}}
-                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0) scale(1)"; e.currentTarget.style.boxShadow=""; }}
-                onMouseDown={e => { if(!done) e.currentTarget.style.transform="scale(0.97)"; }}
+                style={{ opacity:done?0.92:1, cursor:done?"default":"pointer", transform:"translateY(0)", transition:"all 0.3s cubic-bezier(0.34,1.56,0.64,1)", animation:`cardPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${TASK_DEFS.indexOf(task)*0.08}s both`, boxShadow: done ? `0 4px 16px ${task.color}22` : "0 4px 16px rgba(15,110,86,0.08)" }}
+                onMouseEnter={e => { if(!done){ e.currentTarget.style.transform="translateY(-12px) scale(1.04)"; e.currentTarget.style.boxShadow=`0 20px 48px ${task.color}44`; } else { e.currentTarget.style.transform="translateY(-4px)"; }}}
+                onMouseLeave={e => { e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow=done?`0 4px 16px ${task.color}22`:"0 4px 16px rgba(15,110,86,0.08)"; }}
+                onMouseDown={e => { e.currentTarget.style.transform="scale(0.96)"; }}
+                onMouseUp={e => { e.currentTarget.style.transform=done?"translateY(-4px)":"translateY(-12px) scale(1.04)"; }}
               >
-                <div className="task-card-header" style={{ background: done ? "linear-gradient(135deg,#78909C,#90A4AE)" : `linear-gradient(135deg,${task.color},${task.color}cc)`, letterSpacing:"0.05em" }}>
-                  <span style={{ fontSize:"1.1rem" }}>{done?"✅":"⭐"}</span>
+                <div className="task-card-header" style={{ background: done ? "linear-gradient(135deg,#78909C,#90A4AE)" : `linear-gradient(135deg,${task.color},${task.color}bb)`, letterSpacing:"0.06em", fontSize:"0.82rem", backgroundSize: done?"100%":"200%", animation: done?"none":"shimmer 3s linear infinite" }}>
+                  <span style={{ fontSize:"1.15rem", filter: done?"none":"drop-shadow(0 0 6px rgba(255,255,255,0.5))" }}>{done?"✅":"⭐"}</span>
                   {LABELS[task.id]?.[lang]?.toUpperCase()}
                 </div>
                 <div className="task-card-body" style={{ background: done ? `${task.color}08` : "#fff" }}>
                   <div className="task-card-emoji" style={{ filter: done?"grayscale(0)":"none" }}>{task.emoji}</div>
                   {done
-                    ? <div style={{ fontWeight:900, color:task.color, fontSize:"1.5rem", fontFamily:"'Fredoka One',cursive" }}>{score}%</div>
-                    : <div className="task-card-desc">{DESCS[task.id]?.[lang]}</div>
+                    ? <div style={{ fontWeight:900, color:task.color, fontSize:"1.8rem", fontFamily:"'Fredoka One',cursive", animation:"scoreIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both", textShadow:`0 4px 16px ${task.color}44` }}>{score}%</div>
+                    : <div className="task-card-desc" style={{ lineHeight:1.4 }}>{DESCS[task.id]?.[lang]}</div>
                   }
-                  {!done && <div style={{ marginTop:8, fontSize:"0.72rem", fontWeight:700, color:task.color, background:`${task.color}12`, padding:"3px 10px", borderRadius:99, display:"inline-block" }}>
-                    {lang==="ru"?"Играть →":lang==="uz"?"O'ynash →":"Play →"}
+                  {!done && <div style={{ marginTop:10, fontSize:"0.75rem", fontWeight:800, color:"#fff", background:`linear-gradient(135deg,${task.color},${task.color}bb)`, padding:"5px 14px", borderRadius:99, display:"inline-block", boxShadow:`0 4px 12px ${task.color}44`, animation:"pulse 2s ease-in-out infinite", letterSpacing:"0.04em" }}>
+                    {lang==="ru"?"▶ Играть":lang==="uz"?"▶ O'ynash":"▶ Play"}
                   </div>}
                 </div>
               </div>
@@ -551,12 +609,17 @@ export default function TasksPage({ setPage, lang, dark }) {
 
         {/* All done */}
         {Object.keys(scores).length === 4 && (
-          <div style={{ background:"linear-gradient(135deg,#E3F2FD,#FFF8E1)", borderRadius:20, padding:"24px", marginTop:24, textAlign:"center", border:"1.5px solid #BBDEFB", animation:"cardPop 0.5s both" }}>
-            <div style={{ fontSize:"2.5rem", marginBottom:8 }}>🎉</div>
-            <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem", color:"#1565C0", marginBottom:16 }}>
+          <div style={{ background:"linear-gradient(135deg,#0F6E56,#1D9E75,#EF9F27)", backgroundSize:"200% 200%", animation:"shimmer 4s linear infinite, cardPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both", borderRadius:24, padding:"32px 24px", marginTop:24, textAlign:"center", boxShadow:"0 16px 48px rgba(15,110,86,0.35)" }}>
+            <div style={{ fontSize:"3rem", marginBottom:10, animation:"float 2s ease-in-out infinite, scoreIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>🏆</div>
+            <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.4rem", color:"#fff", marginBottom:8, textShadow:"0 2px 12px rgba(0,0,0,0.2)" }}>
               {lang==="ru"?"Все задания выполнены!":lang==="uz"?"Barcha vazifalar bajarildi!":"All tasks completed!"}
             </div>
-            <button className="hero-cta" onClick={() => setPage("results")}>
+            <div style={{ fontSize:"0.88rem", color:"rgba(255,255,255,0.8)", fontWeight:700, marginBottom:20 }}>
+              {lang==="ru"?"Посмотри свою карту талантов!":lang==="uz"?"Iste'dod xaritangizni ko'ring!":"Check out your talent map!"}
+            </div>
+            <button onClick={() => setPage("results")} style={{ background:"rgba(255,255,255,0.95)", color:"#0F6E56", border:"none", borderRadius:50, padding:"13px 32px", fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", boxShadow:"0 8px 24px rgba(0,0,0,0.2)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+              onMouseEnter={e => { e.currentTarget.style.transform="translateY(-3px) scale(1.04)"; e.currentTarget.style.boxShadow="0 14px 36px rgba(0,0,0,0.3)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 8px 24px rgba(0,0,0,0.2)"; }}>
               {lang==="ru"?"Посмотреть карту талантов →":lang==="uz"?"Iste'dod xaritasini ko'rish →":"See talent map →"}
             </button>
           </div>
