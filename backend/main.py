@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from pydantic import BaseModel as PydanticBase
+from typing import Optional, Dict, Any
 from collections import defaultdict
 from datetime import datetime, timedelta
 import httpx
@@ -467,7 +468,7 @@ def analytics_summary(db: Session = Depends(get_db)):
 
 # ── Rule-based AI Chatbot (no external API needed) ──────────────────────────
 from pydantic import BaseModel as PydanticBase
-from typing import Optional
+from typing import Optional, Dict, Any
 
 class ChatRequest(PydanticBase):
     message: Optional[str] = ""
