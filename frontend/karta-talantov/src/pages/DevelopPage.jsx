@@ -7,17 +7,17 @@ const DEV_CSS = `
   .talent-tab { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; }
   .talent-tab:hover { transform: translateY(-4px) scale(1.05) !important; }
   .tip-item { transition: all 0.2s ease !important; border-radius: 10px; padding: 8px 10px; }
-  .tip-item:hover { background: rgba(21,101,192,0.05) !important; transform: translateX(6px) !important; }
+  .tip-item:hover { background: rgba(15,110,86,0.05) !important; transform: translateX(6px) !important; }
   .course-item { transition: all 0.2s ease !important; border-radius: 10px; padding: 8px 10px; cursor: pointer; }
-  .course-item:hover { background: rgba(255,112,67,0.06) !important; transform: translateX(6px) !important; }
+  .course-item:hover { background: rgba(239,159,39,0.06) !important; transform: translateX(6px) !important; }
   .uni-chip { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; cursor: default; }
   .uni-chip:hover { transform: translateY(-4px) scale(1.04) !important; }
   .career-card { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; cursor: default; }
   .career-card:hover { transform: translateY(-6px) !important; }
-  .dev-btn-home:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(21,101,192,0.4) !important; }
-  .dev-btn-tasks:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(255,112,67,0.4) !important; }
+  .dev-btn-home:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(15,110,86,0.4) !important; }
+  .dev-btn-tasks:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(239,159,39,0.4) !important; }
   .develop-card { transition: box-shadow 0.2s ease !important; }
-  .develop-card:hover { box-shadow: 0 8px 32px rgba(21,101,192,0.12) !important; }
+  .develop-card:hover { box-shadow: 0 8px 32px rgba(15,110,86,0.12) !important; }
 `;
 import Nav from "../components/Nav";
 import Loader from "../components/Loader";
@@ -28,7 +28,7 @@ import { t } from "../i18n";
 const TALENT_TIPS = {
   logic: {
     icon: "🧠",
-    color: "#1565C0",
+    color: "#0F6E56",
     tips: {
       ru: ["Решай олимпиадные задачи по математике", "Изучи программирование (Python, Scratch)", "Играй в шахматы каждый день", "Попробуй робототехнику и Arduino"],
       uz: ["Matematika olimpiadasi masalalarini yech", "Dasturlashni o'rgan (Python, Scratch)", "Har kuni shaxmat o'yna", "Robototexnika va Arduino sinab ko'r"],
@@ -47,7 +47,7 @@ const TALENT_TIPS = {
   },
   creativity: {
     icon: "🎨",
-    color: "#FF7043",
+    color: "#EF9F27",
     tips: {
       ru: ["Рисуй каждый день — даже 10 минут", "Попробуй 3D-моделирование (Blender)", "Создай свой комикс или анимацию", "Участвуй в хакатонах и дизайн-конкурсах"],
       uz: ["Har kuni chiz — hatto 10 daqiqa", "3D-modellashtirish sinab ko'r (Blender)", "O'z komiksing yoki animatsiyangni yarat", "Xakatonlar va dizayn musobaqalarida qatnash"],
@@ -85,7 +85,7 @@ const TALENT_TIPS = {
   },
   leadership: {
     icon: "👑",
-    color: "#FFB300",
+    color: "#BA7517",
     tips: {
       ru: ["Организуй школьное мероприятие или клуб", "Читай биографии великих лидеров", "Практикуй публичные выступления", "Вступи в дебатный клуб или студенческий совет"],
       uz: ["Maktab tadbirini yoki klubini tashkil qil", "Buyuk rahbarlar tarjimai holini o'qi", "Ommaviy nutq amaliyotini qil", "Debat klubi yoki talabalar kengashiga qo'shil"],
@@ -140,15 +140,75 @@ const TALENT_TIPS = {
       en: ["🇺🇸 Berklee College of Music", "🇺🇸 Juilliard School (New York)", "🇬🇧 Royal Academy of Music", "🇩🇰 Royal Danish Academy of Music", "🇺🇿 State Conservatory of Uzbekistan"],
     },
   },
+  sport: {
+    icon: "🏃",
+    color: "#FF7043",
+    tips: {
+      ru: ["Тренируйся регулярно — минимум 3 раза в неделю", "Попробуй разные виды спорта чтобы найти свой", "Изучи спортивную психологию и тактику", "Участвуй в соревнованиях — любой уровень!"],
+      uz: ["Muntazam mashq qiling — haftada kamida 3 marta", "O'zingizga mos sport turini topish uchun turlichasini sinab ko'ring", "Sport psixologiyasi va taktikasini o'rganing", "Musobaqalarda qatnashing — istalgan daraja!"],
+      en: ["Train regularly — at least 3 times a week", "Try different sports to find your fit", "Study sports psychology and tactics", "Compete — any level counts!"],
+    },
+    courses: {
+      ru: ["Coursera — Спортивная наука", "YouTube — Тренировки без зала", "edX — Питание спортсмена", "Nike Training Club — бесплатно"],
+      uz: ["Coursera — Sport fani", "YouTube — Zalsiz mashqlar", "edX — Sportchi ovqatlanishi", "Nike Training Club — bepul"],
+      en: ["Coursera — Sports Science", "YouTube — Home Workouts", "edX — Athlete Nutrition", "Nike Training Club — Free"],
+    },
+    universities: {
+      ru: ["🇺🇸 Ohio State — Спортивная наука", "🇬🇧 Loughborough University", "🇺🇸 UCLA — Кинезиология", "🇷🇺 РГУФКСМИТ Москва", "🇺🇿 O'zDSIM Tashkent"],
+      uz: ["🇺🇸 Ohio State — Sport fani", "🇬🇧 Loughborough University", "🇺🇸 UCLA — Kineziologiya", "🇷🇺 RGUFKSMT Moskva", "🇺🇿 O'zDSIM Toshkent"],
+      en: ["🇺🇸 Ohio State — Sports Science", "🇬🇧 Loughborough University", "🇺🇸 UCLA — Kinesiology", "🇦🇺 University of Queensland", "🇺🇿 UzSIPC Tashkent"],
+    },
+  },
+  nature: {
+    icon: "🌿",
+    color: "#43A047",
+    tips: {
+      ru: ["Наблюдай за природой — веди дневник наблюдений", "Попробуй выращивать растения дома", "Читай о биологии, экологии и зоологии", "Участвуй в экологических проектах"],
+      uz: ["Tabiatni kuzating — kuzatuv kundaligi yuring", "Uyda o'simliklar o'stirishni sinab ko'ring", "Biologiya, ekologiya va zoologiya o'qing", "Ekologik loyihalarda qatnashing"],
+      en: ["Observe nature — keep a nature journal", "Try growing plants at home", "Read about biology, ecology and zoology", "Join environmental projects"],
+    },
+    courses: {
+      ru: ["Khan Academy — Биология", "Coursera — Экология (Duke)", "iNaturalist — Определение видов", "YouTube — SciShow Nature"],
+      uz: ["Khan Academy — Biologiya", "Coursera — Ekologiya (Duke)", "iNaturalist — Turlarni aniqlash", "YouTube — SciShow Nature"],
+      en: ["Khan Academy — Biology", "Coursera — Ecology (Duke)", "iNaturalist — Species ID", "YouTube — SciShow Nature"],
+    },
+    universities: {
+      ru: ["🇺🇸 UC Berkeley — Биология", "🇬🇧 Cambridge — Естественные науки", "🇺🇸 Cornell — Экология", "🇷🇺 МГУ — Биологический факультет", "🇺🇿 NUUz — Биология"],
+      uz: ["🇺🇸 UC Berkeley — Biologiya", "🇬🇧 Cambridge — Tabiiy fanlar", "🇺🇸 Cornell — Ekologiya", "🇷🇺 MGU — Biologiya fakulteti", "🇺🇿 NUUz — Biologiya"],
+      en: ["🇺🇸 UC Berkeley — Biology", "🇬🇧 Cambridge — Natural Sciences", "🇺🇸 Cornell — Ecology", "🇦🇺 ANU — Environmental Science", "🇺🇿 NUUz — Biology"],
+    },
+  },
+  social: {
+    icon: "🤝",
+    color: "#7E57C2",
+    tips: {
+      ru: ["Развивай эмоциональный интеллект — читай о психологии", "Участвуй в дебатном клубе или волонтёрстве", "Учись активному слушанию и эмпатии", "Организуй мероприятия в школе или районе"],
+      uz: ["Hissiy intellektni rivojlantiring — psixologiya o'qing", "Debat klubi yoki ko'ngillilikda qatnashing", "Faol tinglash va empatiyani o'rganing", "Maktab yoki mahallada tadbirlar tashkil qiling"],
+      en: ["Develop emotional intelligence — read psychology", "Join debate club or volunteer", "Learn active listening and empathy", "Organise events at school or in your community"],
+    },
+    courses: {
+      ru: ["Coursera — Эмоциональный интеллект (Yale)", "edX — Психология (Harvard)", "YouTube — TED Talks о лидерстве", "Udemy — Навыки общения"],
+      uz: ["Coursera — Hissiy intellekt (Yale)", "edX — Psixologiya (Harvard)", "YouTube — TED Talks liderlik haqida", "Udemy — Muloqot ko'nikmalari"],
+      en: ["Coursera — Emotional Intelligence (Yale)", "edX — Psychology (Harvard)", "YouTube — TED Talks on Leadership", "Udemy — Communication Skills"],
+    },
+    universities: {
+      ru: ["🇺🇸 Harvard — Психология", "🇺🇸 Stanford — Социология", "🇬🇧 Oxford — PPE", "🇷🇺 МГУ — Психологический факультет", "🇺🇿 NUUz — Психология"],
+      uz: ["🇺🇸 Harvard — Psixologiya", "🇺🇸 Stanford — Sotsiologiya", "🇬🇧 Oxford — PPE", "🇷🇺 MGU — Psixologiya fakulteti", "🇺🇿 NUUz — Psixologiya"],
+      en: ["🇺🇸 Harvard — Psychology", "🇺🇸 Stanford — Sociology", "🇬🇧 Oxford — PPE", "🇦🇺 University of Melbourne — Psychology", "🇺🇿 NUUz — Psychology"],
+    },
+  },
 };
 
 const TALENT_NAMES = {
   logic:      { ru:"Логика",      uz:"Mantiq",      en:"Logic"       },
   creativity: { ru:"Творчество",  uz:"Ijodkorlik",  en:"Creativity"  },
-  memory:     { ru:"Память",      uz:"Xotira",       en:"Memory"      },
-  leadership: { ru:"Лидерство",   uz:"Liderlik",     en:"Leadership"  },
-  languages:  { ru:"Языки",       uz:"Tillar",       en:"Languages"   },
-  music:      { ru:"Музыка",      uz:"Musiqa",       en:"Music"       },
+  memory:     { ru:"Память",      uz:"Xotira",      en:"Memory"      },
+  leadership: { ru:"Лидерство",   uz:"Liderlik",    en:"Leadership"  },
+  languages:  { ru:"Языки",       uz:"Tillar",      en:"Languages"   },
+  music:      { ru:"Музыка",      uz:"Musiqa",      en:"Music"       },
+  sport:      { ru:"Спорт",       uz:"Sport",       en:"Sport"       },
+  nature:     { ru:"Природа",     uz:"Tabiat",      en:"Nature"      },
+  social:     { ru:"Общение",     uz:"Muloqot",     en:"Social"      },
 };
 
 export default function DevelopPage({ setPage, results, lang, dark }) {
@@ -170,12 +230,15 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
         const d = res.data;
         setData({
           scores: {
-            logic:      d.score_logic,
-            creativity: d.score_creativity,
-            memory:     d.score_memory,
-            leadership: d.score_leadership,
-            languages:  d.score_languages,
-            music:      d.score_music,
+            logic:      d.score_logic      || 5,
+            creativity: d.score_creativity || 5,
+            memory:     d.score_memory     || 5,
+            leadership: d.score_leadership || 5,
+            languages:  d.score_languages  || 5,
+            music:      d.score_music      || 5,
+            sport:      d.score_sport      || 5,
+            nature:     d.score_nature     || 5,
+            social:     d.score_social     || 5,
           },
           careers:   [{ name: d.top_career, icon: "⭐", match_percent: null }],
           strengths: [],
@@ -201,8 +264,13 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
         .map(([key]) => key)
     : null;
 
-  const activeTalent = topTalents?.[activeTab];
-  const talentData   = activeTalent ? TALENT_TIPS[activeTalent] : null;
+  // Ensure activeTab is valid when topTalents changes
+  const safeTab      = Math.min(activeTab, (topTalents?.length || 1) - 1);
+  const activeTalent = topTalents?.[safeTab];
+  // Fall back to creativity tips if talent not in TALENT_TIPS (e.g. sport/nature/social)
+  const talentData   = activeTalent
+    ? (TALENT_TIPS[activeTalent] || TALENT_TIPS.creativity)
+    : null;
   const careers      = data?.careers || [];
 
   const L = {
@@ -260,7 +328,7 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
 
       <div className="develop-section">
         {/* Banner */}
-        <div className="develop-banner" style={{ background:"linear-gradient(135deg,#FF7043,#FF8A65,#FFB300)", backgroundSize:"200% 200%", animation:"shimmer 4s ease infinite" }}>
+        <div className="develop-banner" style={{ background:"linear-gradient(135deg,#EF9F27,#FAC775,#BA7517)", backgroundSize:"200% 200%", animation:"shimmer 4s ease infinite" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <span style={{ fontSize:"1.6rem" }}>🌟</span>
             <div className="develop-banner-title">{L.banner}</div>
@@ -289,13 +357,13 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                 {topTalents.map((talent, i) => {
                   const td = TALENT_TIPS[talent];
                   const score = Math.round(data.scores[talent]);
-                  const isActive = i === activeTab;
+                  const isActive = i === safeTab;
                   return (
                     <button key={talent} className="talent-tab" onClick={() => setActiveTab(i)}
-                      style={{ display:"flex", alignItems:"center", gap:8, padding:"11px 20px", borderRadius:50, border:`2px solid ${isActive ? td.color : "#E3F2FD"}`, background: isActive ? `linear-gradient(135deg,${td.color},${td.color}cc)` : (dark?"#1A2A3A":"#fff"), color: isActive ? "#fff" : (dark?"#E3F2FD":"#1A237E"), fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"0.9rem", cursor:"pointer", boxShadow: isActive ? `0 6px 20px ${td.color}44` : "0 2px 8px rgba(21,101,192,0.06)", animation: isActive?"tabIn 0.3s ease both":"none" }}>
+                      style={{ display:"flex", alignItems:"center", gap:8, padding:"11px 20px", borderRadius:50, border:`2px solid ${isActive ? td.color : "#E1F5EE"}`, background: isActive ? `linear-gradient(135deg,${td.color},${td.color}cc)` : (dark?"#1A2A3A":"#fff"), color: isActive ? "#fff" : (dark?"#E1F5EE":"#04342C"), fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"0.9rem", cursor:"pointer", boxShadow: isActive ? `0 6px 20px ${td.color}44` : "0 2px 8px rgba(15,110,86,0.06)", animation: isActive?"tabIn 0.3s ease both":"none" }}>
                       <span style={{ fontSize:"1.1rem" }}>{td.icon}</span>
                       {TALENT_NAMES[talent]?.[lang]}
-                      <span style={{ background: isActive?"rgba(255,255,255,0.25)":"#E3F2FD", color: isActive?"#fff":td.color, borderRadius:99, padding:"3px 10px", fontSize:"0.78rem", fontWeight:900 }}>
+                      <span style={{ background: isActive?"rgba(255,255,255,0.25)":"#E1F5EE", color: isActive?"#fff":td.color, borderRadius:99, padding:"3px 10px", fontSize:"0.78rem", fontWeight:900 }}>
                         {score}%
                       </span>
                     </button>
@@ -315,7 +383,7 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                   </div>
                   <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
                     {talentData.tips[lang]?.map((tip, i) => (
-                      <li key={i} className="tip-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E3F2FD":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
+                      <li key={i} className="tip-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E1F5EE":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
                         <span style={{ color:talentData.color, flexShrink:0, fontSize:"1rem" }}>✔</span> {tip}
                       </li>
                     ))}
@@ -329,8 +397,8 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                   </div>
                   <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
                     {talentData.courses[lang]?.map((course, i) => (
-                      <li key={i} className="course-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E3F2FD":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
-                        <span style={{ color:"#FF7043", flexShrink:0, fontSize:"1rem" }}>→</span> {course}
+                      <li key={i} className="course-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E1F5EE":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
+                        <span style={{ color:"#EF9F27", flexShrink:0, fontSize:"1rem" }}>→</span> {course}
                       </li>
                     ))}
                   </ul>
@@ -346,7 +414,7 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                 </div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginTop:4 }}>
                   {talentData.universities[lang]?.map((uni, i) => (
-                    <div key={i} className="uni-chip" style={{ background: dark?"#0F1923":`linear-gradient(135deg,#fff,${talentData.color}08)`, border:`1.5px solid ${talentData.color}33`, borderRadius:14, padding:"9px 16px", fontSize:"0.82rem", fontWeight:800, color: dark?"#E3F2FD":"#1A237E", boxShadow:`0 2px 10px ${talentData.color}18`, animation:`cardSlide 0.3s ease ${i*0.06}s both` }}>
+                    <div key={i} className="uni-chip" style={{ background: dark?"#0F1923":`linear-gradient(135deg,#fff,${talentData.color}08)`, border:`1.5px solid ${talentData.color}33`, borderRadius:14, padding:"9px 16px", fontSize:"0.82rem", fontWeight:800, color: dark?"#E1F5EE":"#04342C", boxShadow:`0 2px 10px ${talentData.color}18`, animation:`cardSlide 0.3s ease ${i*0.06}s both` }}>
                       {uni}
                     </div>
                   ))}
@@ -363,12 +431,12 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
                 <div className="develop-card-title">🚀 {L.careers}</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {careers.map((career, i) => (
-                    <div key={i} className="career-card" style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#0F1923":`linear-gradient(135deg,#F8FBFF,#fff)`, border:"1.5px solid #E3F2FD", borderRadius:16, padding:"12px 16px", flex:1, minWidth:160, boxShadow:"0 4px 16px rgba(21,101,192,0.06)" }}>
+                    <div key={i} className="career-card" style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#0F1923":`linear-gradient(135deg,#F8FBFF,#fff)`, border:"1.5px solid #E1F5EE", borderRadius:16, padding:"12px 16px", flex:1, minWidth:160, boxShadow:"0 4px 16px rgba(15,110,86,0.06)" }}>
                       <span style={{ fontSize:"1.8rem", filter:"drop-shadow(0 2px 6px rgba(0,0,0,0.12))" }}>{career.icon}</span>
                       <div>
-                        <div style={{ fontWeight:800, color: dark?"#E3F2FD":"#1A237E", fontSize:"0.9rem" }}>{career.name}</div>
+                        <div style={{ fontWeight:800, color: dark?"#E1F5EE":"#04342C", fontSize:"0.9rem" }}>{career.name}</div>
                         {career.match_percent != null && (
-                          <div style={{ fontSize:"0.78rem", fontWeight:700, color:"#1565C0" }}>
+                          <div style={{ fontSize:"0.78rem", fontWeight:700, color:"#0F6E56" }}>
                             {Math.round(career.match_percent)}% {L.match}
                           </div>
                         )}
@@ -389,12 +457,12 @@ export default function DevelopPage({ setPage, results, lang, dark }) {
         {/* Buttons */}
         <div style={{ display:"flex", gap:16, marginTop:24, justifyContent:"center", flexWrap:"wrap" }}>
           <button className="quiz-next dev-btn-home"
-            style={{ background:"linear-gradient(135deg,#1565C0,#42A5F5)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(21,101,192,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+            style={{ background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(15,110,86,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
             onClick={() => setPage("home")}>
             {L.toHome}
           </button>
           <button className="quiz-next dev-btn-tasks"
-            style={{ background:"linear-gradient(135deg,#FF7043,#FF8A65)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(255,112,67,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+            style={{ background:"linear-gradient(135deg,#EF9F27,#FAC775)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(239,159,39,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
             onClick={() => setPage("tasks")}>
             {L.toTasks}
           </button>

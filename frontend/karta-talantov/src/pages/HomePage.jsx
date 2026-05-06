@@ -171,23 +171,7 @@ const CHAT_MESSAGES = [
   { role: "ai",   delay: 5500, text: { ru: "Рекомендую: Программист (89%), Инженер (81%), Учёный (76%) 🚀", uz: "Tavsiya: Dasturchi (89%), Muhandis (81%), Olim (76%) 🚀", en: "Recommended: Programmer (89%), Engineer (81%), Scientist (76%) 🚀" } },
 ];
 
-const CODE_LINES = [
-  { indent: 0, tokens: [{ t:"keyword", v:"def " }, { t:"fn",      v:"analyze_talent"  }, { t:"plain",   v:"(answers):"   }] },
-  { indent: 1, tokens: [{ t:"comment", v:"# ML scoring engine"                                                            }] },
-  { indent: 1, tokens: [{ t:"plain",   v:"scores = "           }, { t:"fn",      v:"compute_scores" }, { t:"plain", v:"(answers)" }] },
-  { indent: 1, tokens: [{ t:"keyword", v:"top "                }, { t:"plain",   v:"= "             }, { t:"fn",    v:"max"       }, { t:"plain", v:"(scores, key=scores.get)" }] },
-  { indent: 1, tokens: [{ t:"keyword", v:"return " }, { t:"plain", v:"{" }] },
-  { indent: 2, tokens: [{ t:"str",     v:'"top_talent"'        }, { t:"plain",   v:": top,"         }] },
-  { indent: 2, tokens: [{ t:"str",     v:'"score"'             }, { t:"plain",   v:": scores[top]," }] },
-  { indent: 2, tokens: [{ t:"str",     v:'"careers"'           }, { t:"plain",   v:": "             }, { t:"fn", v:"match_careers" }, { t:"plain", v:"(scores)" }] },
-  { indent: 1, tokens: [{ t:"plain",   v:"}"                                                                              }] },
-  { indent: 0, tokens: []                                                                                                    },
-  { indent: 0, tokens: [{ t:"comment", v:"# Run analysis"                                                                 }] },
-  { indent: 0, tokens: [{ t:"plain",   v:"result = "           }, { t:"fn",      v:"analyze_talent" }, { t:"plain", v:"(user_answers)" }] },
-  { indent: 0, tokens: [{ t:"fn",      v:"print"               }, { t:"plain",   v:"(result["        }, { t:"str",   v:'"top_talent"'  }, { t:"plain", v:"])" }] },
-];
 
-const TOKEN_COLORS = { keyword:"#EF9F27", fn:"#5DCAA5", str:"#66BB6A", comment:"#78909C", plain:"#E1F5EE" };
 
 // ── Auto chat messages (left panel - unchanged) ──────────────────────────────
 const CHAT_MESSAGES = [
@@ -233,6 +217,7 @@ const CODE_FILES = {
     { indent:1, tokens:[{ t:"keyword", v:"return " },{ t:"fn", v:"sorted" },{ t:"plain", v:"(ranked, reverse=" },{ t:"keyword", v:"True" },{ t:"plain", v:")" }] },
   ],
 };
+
 
 const TOKEN_COLORS = { keyword:"#EF9F27", fn:"#5DCAA5", str:"#66BB6A", comment:"#78909C", plain:"#E1F5EE" };
 
