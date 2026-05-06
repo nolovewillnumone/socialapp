@@ -189,169 +189,147 @@ const CODE_LINES = [
 
 const TOKEN_COLORS = { keyword:"#EF9F27", fn:"#5DCAA5", str:"#66BB6A", comment:"#78909C", plain:"#E1F5EE" };
 
-// ── Terminal command responses ────────────────────────────────────────────────
-const TERMINAL_COMMANDS = {
+// ── Chat knowledge base ──────────────────────────────────────────────────────
+const CHAT_KB = {
   ru: {
-    help:    { out: ["Доступные команды:", "  help       — показать команды", "  talents    — список всех талантов", "  quiz       — информация о тесте", "  careers    — список профессий", "  about      — о проекте", "  clear      — очистить терминал"] },
-    talents: { out: ["🧠 Логика        — математика, программирование, инженерия", "🎨 Творчество   — дизайн, искусство, музыка, кино", "🃏 Память       — медицина, наука, лингвистика", "👑 Лидерство    — бизнес, политика, педагогика", "🌍 Языки        — дипломатия, перевод, журналистика", "🎵 Музыка       — исполнение, сочинение, продюсинг", "🏃 Спорт        — профессиональный спорт, тренерство", "🌿 Природа      — биология, экология, ветеринария", "🤝 Общение      — психология, социология, HR"] },
-    quiz:    { out: ["📋 Тест состоит из 30 вопросов по 5 зонам:", "  ❤️  Зона 1 — Что ты любишь (6 вопросов)", "  🎯  Зона 2 — Твои увлечения (6 вопросов)", "  💭  Зона 3 — Как ты думаешь (6 вопросов)", "  🚀  Зона 4 — Твоя мечта (6 вопросов)", "  ⚡  Зона 5 — Ты в действии (6 вопросов)", "Нет правильных ответов — только честные! 🌟"] },
-    careers: { out: ["20+ профессий в нашей базе:", "💻 Программист  🤖 AI-инженер   ⚙️ Инженер", "🔬 Учёный       🩺 Врач         🧠 Психолог", "🎨 Дизайнер     🖌️ Художник     🎵 Музыкант", "🎭 Актёр        ✍️ Писатель     🌍 Переводчик", "🤝 Дипломат     👑 CEO          📚 Учитель", "🏆 Спортсмен    🌿 Биолог       👨‍🍳 Шеф-повар", "🏛️ Архитектор   ⚖️ Юрист        📊 Финансист", "✈️ Пилот        🎮 Геймдизайнер"] },
-    about:   { out: ["🌟 Karta Talantov v2.0", "Платформа для детей 8-16 лет", "На основе теории Гарднера (Гарвард)", "ML-движок анализирует 9 измерений таланта", "Трёхязычный: RU · UZ · EN", "Разработчик: nolovewillnumone", "Сайт: levelup-talent.xyz"] },
-    clear:   { out: [], clear: true },
+    triggers: {
+      талант:    "Твой самый сильный талант определяется ответами на 30 вопросов о твоих интересах! Пройди тест — это займёт 7 минут 🌟",
+      профессия: "У нас 20+ профессий: программист 💻, дизайнер 🎨, музыкант 🎵, врач 🩺, спортсмен 🏆, биолог 🌿, юрист ⚖️ и многие другие!",
+      тест:      "Тест состоит из 30 вопросов по 5 зонам. Нет правильных ответов — просто отвечай честно о том, что тебе нравится! 📋",
+      логика:    "Логический интеллект — это способность решать задачи и мыслить системно. Идеально для IT, инженерии и науки! 🧠",
+      творчество:"Творческий интеллект — способность создавать новое. Дизайнер, художник, режиссёр, архитектор — всё это твоё! 🎨",
+      музыка:    "Музыкальный интеллект развивает мозг! Музыканты лучше учатся в школе благодаря нейронным связям. 🎵",
+      лидерство: "Лидерский интеллект — умение вдохновлять других. CEO, предприниматель, политик — это про тебя! 👑",
+      языки:     "Лингвистический интеллект открывает весь мир! Переводчик, дипломат, журналист — блестящие карьеры 🌍",
+      спорт:     "Спортивный интеллект — это не просто физика, это дисциплина, командная работа и стратегия! 🏃",
+      природа:   "Интеллект натуралиста — любовь к живому миру. Биолог, эколог, ветеринар — твои пути! 🌿",
+      привет:    "Привет! 👋 Я AI-советник Karta Talantov. Спроси меня о талантах, профессиях или тесте!",
+      помощь:    "Я могу ответить на вопросы о: талантах, профессиях, тесте, логике, творчестве, музыке, лидерстве, языках, спорте, природе!",
+    },
+    default: "Интересный вопрос! 🤔 Попробуй спросить о: талантах, профессиях, тесте или конкретном интеллекте (логика, музыка, спорт и т.д.)",
+    placeholder: "Спроси о талантах...",
+    title: "KARTA TALANTOV: AI CHAT",
+    send: "→",
   },
   uz: {
-    help:    { out: ["Mavjud buyruqlar:", "  help       — buyruqlarni ko'rsatish", "  talents    — barcha iste'dodlar", "  quiz       — test haqida ma'lumot", "  careers    — kasblar ro'yxati", "  about      — loyiha haqida", "  clear      — terminalni tozalash"] },
-    talents: { out: ["🧠 Mantiq        — matematika, dasturlash, muhandislik", "🎨 Ijodkorlik   — dizayn, san'at, musiqa, kino", "🃏 Xotira       — tibbiyot, fan, tilshunoslik", "👑 Liderlik     — biznes, siyosat, pedagogika", "🌍 Tillar       — diplomatiya, tarjima, jurnalistika", "🎵 Musiqa       — ijro, bastakorlik, produsserlik", "🏃 Sport        — professional sport, murabbiylik", "🌿 Tabiat       — biologiya, ekologiya, veterinariya", "🤝 Muloqot      — psixologiya, sosiologiya, HR"] },
-    quiz:    { out: ["📋 Test 30 savoldan iborat, 5 zona:", "  ❤️  Zona 1 — Nima yaxshi ko'rasiz (6 savol)", "  🎯  Zona 2 — Qiziqishlar (6 savol)", "  💭  Zona 3 — Qanday fikrlaysiz (6 savol)", "  🚀  Zona 4 — Sizning orzuyingiz (6 savol)", "  ⚡  Zona 5 — Siz harakatda (6 savol)", "To'g'ri yoki noto'g'ri javoblar yo'q! 🌟"] },
-    careers: { out: ["20+ kasb bazamizda:", "💻 Dasturchi    🤖 AI muhandis  ⚙️ Muhandis", "🔬 Olim         🩺 Shifokor     🧠 Psixolog", "🎨 Dizayner     🖌️ Rassom       🎵 Musiqachi", "🎭 Aktyor       ✍️ Yozuvchi     🌍 Tarjimon", "🤝 Diplomat     👑 CEO          📚 O'qituvchi", "🏆 Sportchi     🌿 Biolog       👨‍🍳 Oshpaz", "🏛️ Arxitektor   ⚖️ Yurist       📊 Iqtisodchi"] },
-    about:   { out: ["🌟 Karta Talantov v2.0", "8-16 yoshli bolalar uchun platforma", "Gardner nazariyasiga asoslangan (Harvard)", "ML dvigatel 9 iste'dod o'lchovini tahlil qiladi", "Uch tilli: RU · UZ · EN", "Ishlab chiquvchi: nolovewillnumone", "Sayt: levelup-talent.xyz"] },
-    clear:   { out: [], clear: true },
+    triggers: {
+      iste:      "Sizning eng kuchli iste'dodingiz 30 ta savol orqali aniqlanadi! Testni o'ting — atigi 7 daqiqa 🌟",
+      kasb:      "Bizda 20+ kasb bor: dasturchi 💻, dizayner 🎨, musiqachi 🎵, shifokor 🩺, sportchi 🏆, biolog 🌿, yurist ⚖️ va boshqalar!",
+      test:      "Test 30 savoldan iborat, 5 zona bo'yicha. To'g'ri yoki noto'g'ri javoblar yo'q — faqat sevganingiz haqida to'g'ri javob bering! 📋",
+      mantiq:    "Mantiqiy intellekt — muammolarni hal qilish qobiliyati. IT, muhandislik va fan uchun ideal! 🧠",
+      ijod:      "Ijodiy intellekt — yangi narsa yaratish qobiliyati. Dizayner, rassom, rejissyor — hammasi sizniki! 🎨",
+      musiqa:    "Musiqiy intellekt miyani rivojlantiradi! Musiqachilar neyron bog'lanishlar tufayli maktabda yaxshiroq o'qiydi. 🎵",
+      lider:     "Liderlik intellekti — boshqalarni ilhomlantirish qobiliyati. CEO, tadbirkor, siyosatchi — bu siz haqingizda! 👑",
+      til:       "Lingvistik intellekt butun dunyoni ochadi! Tarjimon, diplomat, jurnalist — ajoyib kasblar 🌍",
+      sport:     "Sport intellekti — bu nafaqat jismoniy, balki intizom, jamoa ishi va strategiya! 🏃",
+      tabiat:    "Naturalist intellekti — tirik dunyoga muhabbat. Biolog, ekolog, veterinar — sizning yo'lingiz! 🌿",
+      salom:     "Salom! 👋 Men Karta Talantov AI maslahatchimanman. Iste'dodlar, kasblar yoki test haqida so'rang!",
+      yordam:    "Men quyidagilar haqida javob bera olaman: iste'dodlar, kasblar, test, mantiq, ijod, musiqa, liderlik, tillar, sport, tabiat!",
+    },
+    default: "Qiziqarli savol! 🤔 So'raning: iste'dodlar, kasblar, test yoki aniq intellekt (mantiq, musiqa, sport va h.k.) haqida",
+    placeholder: "Iste'dodlar haqida so'rang...",
+    title: "KARTA TALANTOV: AI CHAT",
+    send: "→",
   },
   en: {
-    help:    { out: ["Available commands:", "  help       — show commands", "  talents    — list all talents", "  quiz       — quiz information", "  careers    — list of professions", "  about      — about the project", "  clear      — clear terminal"] },
-    talents: { out: ["🧠 Logic        — maths, coding, engineering", "🎨 Creativity  — design, art, music, film", "🃏 Memory      — medicine, science, linguistics", "👑 Leadership  — business, politics, education", "🌍 Languages  — diplomacy, translation, journalism", "🎵 Music       — performance, composing, producing", "🏃 Sport       — professional sport, coaching", "🌿 Nature      — biology, ecology, veterinary", "🤝 Social      — psychology, sociology, HR"] },
-    quiz:    { out: ["📋 The quiz has 30 questions across 5 zones:", "  ❤️  Zone 1 — What do you love (6 questions)", "  🎯  Zone 2 — Your hobbies (6 questions)", "  💭  Zone 3 — How you think (6 questions)", "  🚀  Zone 4 — Your dream (6 questions)", "  ⚡  Zone 5 — You in action (6 questions)", "No right or wrong answers — just be honest! 🌟"] },
-    careers: { out: ["20+ careers in our database:", "💻 Programmer  🤖 AI Engineer  ⚙️ Engineer", "🔬 Scientist   🩺 Doctor       🧠 Psychologist", "🎨 Designer    🖌️ Artist       🎵 Musician", "🎭 Actor       ✍️ Writer       🌍 Translator", "🤝 Diplomat    👑 CEO          📚 Teacher", "🏆 Athlete     🌿 Biologist    👨‍🍳 Chef", "🏛️ Architect   ⚖️ Lawyer       📊 Economist"] },
-    about:   { out: ["🌟 Karta Talantov v2.0", "Platform for kids aged 8-16", "Based on Gardner's Theory (Harvard)", "ML engine analyses 9 talent dimensions", "Trilingual: RU · UZ · EN", "Developer: nolovewillnumone", "Website: levelup-talent.xyz"] },
-    clear:   { out: [], clear: true },
+    triggers: {
+      talent:   "Your strongest talent is determined by 30 questions about your interests! Take the quiz — it only takes 7 minutes 🌟",
+      career:   "We have 20+ careers: programmer 💻, designer 🎨, musician 🎵, doctor 🩺, athlete 🏆, biologist 🌿, lawyer ⚖️ and many more!",
+      quiz:     "The quiz has 30 questions across 5 zones. No right or wrong answers — just answer honestly about what you love! 📋",
+      logic:    "Logical intelligence is the ability to solve problems and think systematically. Perfect for IT, engineering and science! 🧠",
+      creativ:  "Creative intelligence is the ability to create something new. Designer, artist, director, architect — all yours! 🎨",
+      music:    "Musical intelligence develops the brain! Musicians do better in school thanks to neural connections. 🎵",
+      leader:   "Leadership intelligence is the ability to inspire others. CEO, entrepreneur, politician — that's you! 👑",
+      language: "Linguistic intelligence opens the whole world! Translator, diplomat, journalist — brilliant careers 🌍",
+      sport:    "Sports intelligence isn't just physical — it's discipline, teamwork and strategy! 🏃",
+      nature:   "Naturalist intelligence — love for the living world. Biologist, ecologist, vet — your paths! 🌿",
+      hello:    "Hello! 👋 I'm the Karta Talantov AI advisor. Ask me about talents, careers or the quiz!",
+      hi:       "Hi there! 👋 Ask me anything about your talents, careers or how the quiz works!",
+      help:     "I can answer questions about: talents, careers, quiz, logic, creativity, music, leadership, languages, sport, nature!",
+    },
+    default: "Interesting question! 🤔 Try asking about: talents, careers, quiz or a specific intelligence (logic, music, sport etc.)",
+    placeholder: "Ask about your talents...",
+    title: "KARTA TALANTOV: AI CHAT",
+    send: "→",
   },
 };
 
-function InteractiveTerminal({ lang }) {
-  const WELCOME = {
-    ru: ["Добро пожаловать в терминал Karta Talantov!", "Введи 'help' чтобы увидеть команды ↓"],
-    uz: ["Karta Talantov terminaliga xush kelibsiz!", "'help' kiriting va buyruqlarni ko'ring ↓"],
-    en: ["Welcome to the Karta Talantov terminal!", "Type 'help' to see available commands ↓"],
-  };
+function getReply(lang, msg) {
+  const kb = CHAT_KB[lang] || CHAT_KB.en;
+  const lower = msg.toLowerCase();
+  for (const [key, reply] of Object.entries(kb.triggers)) {
+    if (lower.includes(key)) return reply;
+  }
+  return kb.default;
+}
 
-  const [lines, setLines] = useState([
-    { type:"system", text: WELCOME[lang]?.[0] || WELCOME.en[0] },
-    { type:"system", text: WELCOME[lang]?.[1] || WELCOME.en[1] },
-    { type:"prompt",  text: "" },
-  ]);
+function InteractiveChatPanel({ lang }) {
+  const kb = CHAT_KB[lang] || CHAT_KB.en;
+  const INIT = [
+    { role:"ai", text: lang==="ru"?"Привет! Я AI-советник по талантам. Задай мне любой вопрос!":lang==="uz"?"Salom! Men iste'dod bo'yicha AI maslahatchimanman. Istalgan savol bering!":"Hi! I'm the AI talent advisor. Ask me anything!" },
+  ];
+  const [msgs, setMsgs]   = useState(INIT);
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState([]);
-  const [histIdx, setHistIdx] = useState(-1);
-  const [isTyping, setIsTyping] = useState(false);
-  const bottomRef = useRef(null);
-  const inputRef  = useRef(null);
+  const [typing, setTyping] = useState(false);
+  const chatRef = useRef(null);
 
-  const scrollDown = () => setTimeout(() => bottomRef.current?.scrollIntoView({ behavior:"smooth" }), 50);
+  const scroll = () => setTimeout(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, 50);
 
-  const runCommand = (cmd) => {
-    const trimmed = cmd.trim().toLowerCase();
-    if (!trimmed) return;
-
-    const cmds = TERMINAL_COMMANDS[lang] || TERMINAL_COMMANDS.en;
-    const result = cmds[trimmed];
-
-    // Add the typed command line
-    setLines(prev => {
-      const withoutLastPrompt = prev.filter(l => l.type !== "prompt");
-      return [
-        ...withoutLastPrompt,
-        { type:"input", text: `$ ${cmd}` },
-      ];
-    });
-
-    setHistory(h => [cmd, ...h]);
-    setHistIdx(-1);
-    setIsTyping(true);
-
+  const send = () => {
+    const q = input.trim();
+    if (!q || typing) return;
+    setInput("");
+    setMsgs(prev => [...prev, { role:"user", text:q }]);
+    setTyping(true);
+    scroll();
     setTimeout(() => {
-      if (!result) {
-        setLines(prev => [
-          ...prev,
-          { type:"error", text: lang==="ru" ? `Команда не найдена: '${trimmed}'. Введи 'help'.` : lang==="uz" ? `Buyruq topilmadi: '${trimmed}'. 'help' kiriting.` : `Command not found: '${trimmed}'. Type 'help'.` },
-          { type:"prompt", text:"" },
-        ]);
-      } else if (result.clear) {
-        const welcome = TERMINAL_COMMANDS[lang] || TERMINAL_COMMANDS.en;
-        setLines([
-          { type:"system", text: WELCOME[lang]?.[0] || WELCOME.en[0] },
-          { type:"system", text: WELCOME[lang]?.[1] || WELCOME.en[1] },
-          { type:"prompt",  text: "" },
-        ]);
-      } else {
-        setLines(prev => [
-          ...prev,
-          ...result.out.map(t => ({ type:"output", text: t })),
-          { type:"prompt", text:"" },
-        ]);
-      }
-      setIsTyping(false);
-      scrollDown();
-    }, 300);
+      setMsgs(prev => [...prev, { role:"ai", text: getReply(lang, q) }]);
+      setTyping(false);
+      scroll();
+    }, 700 + Math.random() * 400);
   };
 
-  const onKeyDown = (e) => {
-    if (e.key === "Enter") {
-      runCommand(input);
-      setInput("");
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      const idx = Math.min(histIdx + 1, history.length - 1);
-      setHistIdx(idx);
-      setInput(history[idx] || "");
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const idx = Math.max(histIdx - 1, -1);
-      setHistIdx(idx);
-      setInput(idx === -1 ? "" : history[idx]);
-    } else if (e.key === "Tab") {
-      e.preventDefault();
-      const cmds = Object.keys(TERMINAL_COMMANDS[lang] || TERMINAL_COMMANDS.en);
-      const match = cmds.find(c => c.startsWith(input.toLowerCase()));
-      if (match) setInput(match);
-    }
-  };
-
-  useEffect(() => { scrollDown(); }, [lines]);
-
-  const lineColor = (type) => {
-    if (type === "input")  return "#5DCAA5";
-    if (type === "error")  return "#EF5350";
-    if (type === "system") return "#EF9F27";
-    if (type === "output") return "#E1F5EE";
-    return "#E1F5EE";
-  };
+  const onKey = (e) => { if (e.key === "Enter") send(); };
 
   return (
-    <div
-      onClick={() => inputRef.current?.focus()}
-      style={{ background:"#0D1117", height:340, display:"flex", flexDirection:"column", cursor:"text", fontFamily:"'Courier New',monospace", fontSize:"0.8rem" }}>
-
-      {/* Terminal output */}
-      <div style={{ flex:1, overflowY:"auto", padding:"14px 16px", display:"flex", flexDirection:"column", gap:3 }}>
-        {lines.map((line, i) => (
-          line.type === "prompt" ? null :
-          <div key={i} style={{ color: lineColor(line.type), lineHeight:1.6, animation:"fadeIn 0.15s ease both", whiteSpace:"pre-wrap", wordBreak:"break-all" }}>
-            {line.text}
+    <div style={{ width:"42%", background:"#161B22", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column" }}>
+      <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", fontSize:"0.72rem", fontWeight:800, color:"#78909C", letterSpacing:"0.1em" }}>
+        {kb.title}
+      </div>
+      {/* Messages */}
+      <div ref={chatRef} style={{ flex:1, overflowY:"auto", padding:"14px", display:"flex", flexDirection:"column", gap:10, scrollBehavior:"smooth" }}>
+        {msgs.map((msg, i) => (
+          <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", flexDirection: msg.role==="ai"?"row":"row-reverse", animation:"fadeIn 0.25s ease both" }}>
+            <div style={{ width:24, height:24, borderRadius:"50%", background: msg.role==="ai" ? "linear-gradient(135deg,#0F6E56,#5DCAA5)" : "#EF9F27", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", flexShrink:0 }}>
+              {msg.role==="ai" ? "🌟" : "👤"}
+            </div>
+            <div style={{ background: msg.role==="ai" ? "rgba(93,202,165,0.1)" : "rgba(239,159,39,0.1)", border:`1px solid ${msg.role==="ai" ? "rgba(93,202,165,0.2)" : "rgba(239,159,39,0.2)"}`, borderRadius: msg.role==="ai" ? "4px 12px 12px 12px" : "12px 4px 12px 12px", padding:"8px 12px", fontSize:"0.8rem", color:"#E1F5EE", fontWeight:600, lineHeight:1.5, maxWidth:"82%" }}>
+              {msg.text}
+            </div>
           </div>
         ))}
-        {isTyping && (
-          <div style={{ color:"#78909C", display:"flex", gap:4, alignItems:"center" }}>
-            <span>Processing</span>
-            {[0,1,2].map(d => <span key={d} style={{ animation:`pulse 0.8s ease-in-out ${d*0.2}s infinite` }}>.</span>)}
+        {typing && (
+          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+            <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem" }}>🌟</div>
+            <div style={{ display:"flex", gap:4, padding:"10px 14px", background:"rgba(93,202,165,0.1)", borderRadius:"4px 12px 12px 12px", border:"1px solid rgba(93,202,165,0.2)" }}>
+              {[0,1,2].map(d => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#5DCAA5", animation:`pulse 1.2s ease-in-out ${d*0.2}s infinite` }} />)}
+            </div>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
-
-      {/* Input row */}
-      <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"10px 16px", display:"flex", alignItems:"center", gap:8, background:"#0D1117" }}>
-        <span style={{ color:"#5DCAA5", fontWeight:900, flexShrink:0, fontSize:"0.9rem" }}>$</span>
+      {/* Input */}
+      <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"10px 12px", display:"flex", gap:8, background:"#0D1117" }}>
         <input
-          ref={inputRef}
           value={input}
           onChange={e => setInput(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={lang==="ru"?"Введи команду (например: help)":lang==="uz"?"Buyruq kiriting (masalan: help)":"Type a command (e.g. help)"}
-          style={{ flex:1, background:"transparent", border:"none", outline:"none", color:"#E1F5EE", fontFamily:"'Courier New',monospace", fontSize:"0.82rem", caretColor:"#5DCAA5" }}
-          autoComplete="off"
-          spellCheck={false}
+          onKeyDown={onKey}
+          placeholder={kb.placeholder}
+          style={{ flex:1, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 12px", color:"#E1F5EE", fontSize:"0.8rem", fontFamily:"'Nunito',sans-serif", fontWeight:600, outline:"none", caretColor:"#5DCAA5" }}
         />
-        <span style={{ width:8, height:14, background:"#5DCAA5", display:"inline-block", animation:"pulse 1s ease-in-out infinite", flexShrink:0, borderRadius:1 }} />
+        <button onClick={send} disabled={!input.trim() || typing}
+          style={{ background: input.trim() && !typing ? "linear-gradient(135deg,#0F6E56,#5DCAA5)" : "rgba(255,255,255,0.05)", border:"none", borderRadius:8, padding:"7px 12px", color: input.trim() && !typing ? "#fff" : "#78909C", cursor: input.trim() && !typing ? "pointer":"default", fontWeight:900, fontSize:"1rem", transition:"all 0.2s" }}>
+          {kb.send}
+        </button>
       </div>
     </div>
   );
@@ -359,55 +337,85 @@ function InteractiveTerminal({ lang }) {
 
 function AIDemoSection({ lang, dark }) {
   const [ref, visible] = useInView(0.1);
+  const [shownLines, setShownLines] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!visible || started) return;
+    setStarted(true);
+    let line = 0;
+    const iv = setInterval(() => {
+      line++;
+      setShownLines(line);
+      if (line >= CODE_LINES.length) clearInterval(iv);
+    }, 120);
+    return () => clearInterval(iv);
+  }, [visible, started]);
 
   const label = {
-    ru: { title: "Интерактивный терминал талантов", sub: "Введи команду и исследуй свои таланты и карьеры" },
-    uz: { title: "Interaktiv iste'dod terminali",   sub: "Buyruq kiriting va iste'dodlaringizni o'rganing" },
-    en: { title: "Interactive Talent Terminal",     sub: "Type a command and explore your talents and careers" },
+    ru: { title: "Умный AI-анализ в реальном времени", sub: "Спроси нашего AI-советника о своих талантах прямо здесь!" },
+    uz: { title: "Real vaqtda aqlli AI tahlili",        sub: "AI maslahatchimizdан iste'dodlaringiz haqida so'rang!" },
+    en: { title: "Smart AI analysis in real time",      sub: "Ask our AI advisor about your talents right here!" },
   }[lang] || {};
 
   return (
     <div ref={ref} style={{ padding:"72px 24px", background: dark ? "#0F1923" : "#0D1117", overflow:"hidden" }}>
       <div style={{ textAlign:"center", marginBottom:48, opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(30px)", transition:"opacity 0.6s ease, transform 0.6s ease" }}>
         <div style={{ display:"inline-block", background:"rgba(93,202,165,0.15)", border:"1px solid rgba(93,202,165,0.3)", borderRadius:99, padding:"4px 16px", fontSize:"0.78rem", fontWeight:800, color:"#5DCAA5", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:16 }}>
-          INTERACTIVE TERMINAL
+          AI-POWERED
         </div>
         <h2 className="ai-demo-title" style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2.2rem", color:"#E1F5EE", marginBottom:12 }}>{label.title}</h2>
         <p style={{ color:"#78909C", fontWeight:600, fontSize:"0.95rem" }}>{label.sub}</p>
       </div>
 
-      {/* Terminal window */}
-      <div style={{ maxWidth:860, margin:"0 auto", borderRadius:16, overflow:"hidden", boxShadow:"0 24px 80px rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.08)", opacity:visible?1:0, transform:visible?"translateY(0) scale(1)":"translateY(40px) scale(0.97)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s" }}>
+      {/* VS Code style window */}
+      <div className="ai-demo-window" style={{ maxWidth:900, margin:"0 auto", borderRadius:16, overflow:"hidden", boxShadow:"0 24px 80px rgba(0,0,0,0.5)", border:"1px solid rgba(255,255,255,0.08)", opacity:visible?1:0, transform:visible?"translateY(0) scale(1)":"translateY(40px) scale(0.97)", transition:"opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s" }}>
 
         {/* Window chrome */}
         <div style={{ background:"#161B22", padding:"12px 16px", display:"flex", alignItems:"center", gap:8, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#FF5F57" }} />
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#FFBD2E" }} />
           <div style={{ width:12, height:12, borderRadius:"50%", background:"#28CA41" }} />
-          <div style={{ flex:1 }}>
-            <div style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 14px", fontSize:"0.73rem", color:"#78909C", fontWeight:700, display:"inline-flex", alignItems:"center", gap:8, margin:"0 auto" }}>
-              <span style={{ color:"#5DCAA5" }}>●</span>
-              karta-talantov — talent_terminal — 80×24
-            </div>
-          </div>
-          <div style={{ display:"flex", gap:6 }}>
-            {["talents","quiz","careers","about"].map(cmd => (
-              <div key={cmd} style={{ background:"rgba(93,202,165,0.1)", border:"1px solid rgba(93,202,165,0.2)", borderRadius:4, padding:"2px 8px", fontSize:"0.68rem", color:"#5DCAA5", fontFamily:"'Courier New',monospace", cursor:"default" }}>
-                {cmd}
+          <div style={{ flex:1, display:"flex", justifyContent:"center", gap:16 }}>
+            {["talent_analyzer.py", "ml_service.py"].map((f, i) => (
+              <div key={f} style={{ background: i===0 ? "#0D1117" : "transparent", border: i===0 ? "1px solid rgba(255,255,255,0.1)" : "none", borderRadius:"6px 6px 0 0", padding:"4px 12px", fontSize:"0.75rem", fontWeight:700, color: i===0 ? "#E1F5EE" : "#78909C", display:"flex", alignItems:"center", gap:6 }}>
+                <span style={{ color:"#5DCAA5" }}>■</span> {f}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Interactive terminal */}
-        <InteractiveTerminal lang={lang} />
-      </div>
+        {/* Split pane */}
+        <div style={{ display:"flex", height:340 }}>
 
-      {/* Hint */}
-      <div style={{ textAlign:"center", marginTop:20, opacity:visible?0.6:0, transition:"opacity 0.6s ease 0.5s" }}>
-        <p style={{ color:"#78909C", fontSize:"0.78rem", fontWeight:700, fontFamily:"'Courier New',monospace" }}>
-          {lang==="ru"?"↑↓ история · Tab автодополнение · Enter выполнить":lang==="uz"?"↑↓ tarix · Tab avtoto'ldirish · Enter bajarish":"↑↓ history · Tab autocomplete · Enter to run"}
-        </p>
+          {/* LEFT: Interactive chat */}
+          <InteractiveChatPanel lang={lang} />
+
+          {/* RIGHT: Code editor — hidden on mobile */}
+          <div className="ai-demo-code" style={{ flex:1, background:"#0D1117", overflow:"hidden", fontFamily:"'Courier New', monospace", fontSize:"0.78rem" }}>
+            <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", gap:16 }}>
+              {["76","77","78"].map(n => <span key={n} style={{ fontSize:"0.72rem", color:"#30363D", fontWeight:700 }}>{n}</span>)}
+            </div>
+            <div style={{ padding:"8px 0", overflowY:"auto", height:"calc(100% - 40px)" }}>
+              {CODE_LINES.slice(0, shownLines).map((line, i) => (
+                <div key={i} style={{ display:"flex", padding:"1px 16px", lineHeight:1.7, animation:"fadeIn 0.15s ease both" }}>
+                  <span style={{ color:"#30363D", fontWeight:700, fontSize:"0.7rem", minWidth:28, userSelect:"none" }}>{i + 77}</span>
+                  <span style={{ paddingLeft: line.indent * 16 }}>
+                    {line.tokens.map((tok, j) => (
+                      <span key={j} style={{ color: TOKEN_COLORS[tok.t] || "#E1F5EE" }}>{tok.v}</span>
+                    ))}
+                  </span>
+                </div>
+              ))}
+              {shownLines < CODE_LINES.length && started && (
+                <div style={{ padding:"1px 16px", lineHeight:1.7 }}>
+                  <span style={{ color:"#30363D", minWidth:28, display:"inline-block", fontSize:"0.7rem" }}>{shownLines + 77}</span>
+                  <span style={{ display:"inline-block", width:8, height:14, background:"#5DCAA5", verticalAlign:"middle", animation:"pulse 0.8s ease-in-out infinite" }} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
