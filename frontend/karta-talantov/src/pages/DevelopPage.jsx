@@ -1,473 +1,286 @@
-import { useState, useEffect } from "react";
-
-const DEV_CSS = `
-  @keyframes tabIn { from{opacity:0;transform:translateY(10px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
-  @keyframes cardSlide { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .talent-tab { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; }
-  .talent-tab:hover { transform: translateY(-4px) scale(1.05) !important; }
-  .tip-item { transition: all 0.2s ease !important; border-radius: 10px; padding: 8px 10px; }
-  .tip-item:hover { background: rgba(15,110,86,0.05) !important; transform: translateX(6px) !important; }
-  .course-item { transition: all 0.2s ease !important; border-radius: 10px; padding: 8px 10px; cursor: pointer; }
-  .course-item:hover { background: rgba(239,159,39,0.06) !important; transform: translateX(6px) !important; }
-  .uni-chip { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; cursor: default; }
-  .uni-chip:hover { transform: translateY(-4px) scale(1.04) !important; }
-  .career-card { transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important; cursor: default; }
-  .career-card:hover { transform: translateY(-6px) !important; }
-  .dev-btn-home:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(15,110,86,0.4) !important; }
-  .dev-btn-tasks:hover { transform: translateY(-3px) scale(1.03) !important; box-shadow: 0 10px 28px rgba(239,159,39,0.4) !important; }
-  .develop-card { transition: box-shadow 0.2s ease !important; }
-  .develop-card:hover { box-shadow: 0 8px 32px rgba(15,110,86,0.12) !important; }
-`;
+import { useState } from "react";
 import Nav from "../components/Nav";
-import Loader from "../components/Loader";
-import { quizAPI } from "../api/client";
-import { t } from "../i18n";
 
-// ── Per-talent development tips ───────────────────────────────────────────────
-const TALENT_TIPS = {
+// ── Full talent development database ──────────────────────────────────────────
+const TALENT_DATA = {
   logic: {
-    icon: "🧠",
-    color: "#0F6E56",
-    tips: {
-      ru: ["Решай олимпиадные задачи по математике", "Изучи программирование (Python, Scratch)", "Играй в шахматы каждый день", "Попробуй робототехнику и Arduino"],
-      uz: ["Matematika olimpiadasi masalalarini yech", "Dasturlashni o'rgan (Python, Scratch)", "Har kuni shaxmat o'yna", "Robototexnika va Arduino sinab ko'r"],
-      en: ["Solve math olympiad problems", "Learn programming (Python, Scratch)", "Play chess daily", "Try robotics and Arduino"],
-    },
-    courses: {
-      ru: ["Khan Academy — Математика", "Codecademy — Python", "Coursera — Алгоритмы (Stanford)", "edX — Введение в CS (MIT)"],
-      uz: ["Khan Academy — Matematika", "Codecademy — Python", "Coursera — Algoritmlar (Stanford)", "edX — CS ga kirish (MIT)"],
-      en: ["Khan Academy — Math", "Codecademy — Python", "Coursera — Algorithms (Stanford)", "edX — Intro to CS (MIT)"],
-    },
-    universities: {
-      ru: ["🇺🇸 MIT — Информатика", "🇺🇸 Stanford — Computer Science", "🇬🇧 Oxford — Математика", "🇷🇺 МФТИ — Прикладная математика", "🇺🇿 INHA University Tashkent"],
-      uz: ["🇺🇸 MIT — Informatika", "🇺🇸 Stanford — Computer Science", "🇬🇧 Oxford — Matematika", "🇷🇺 MFTI — Amaliy matematika", "🇺🇿 INHA University Toshkent"],
-      en: ["🇺🇸 MIT — Computer Science", "🇺🇸 Stanford — Computer Science", "🇬🇧 Oxford — Mathematics", "🇷🇺 MIPT — Applied Math", "🇺🇿 INHA University Tashkent"],
-    },
+    icon:"🧠", color:"#1565C0",
+    name:{ ru:"Логика", uz:"Mantiq", en:"Logic" },
+    desc:{ ru:"Твой мозг — настоящий процессор! Ты видишь закономерности там, где другие видят хаос.", uz:"Sizning miyangiz haqiqiy protsessor! Siz boshqalar aralashib ketgan joyda qonuniyatlarni ko'rasiz.", en:"Your brain is a real processor! You see patterns where others see chaos." },
+    careers:{ ru:["Программист","Data Scientist","Математик","Инженер","Финансист","Учёный","Архитектор","Пилот"], uz:["Dasturchi","Data Scientist","Matematik","Muhandis","Moliyachi","Olim"], en:["Programmer","Data Scientist","Mathematician","Engineer","Financier","Scientist","Architect","Pilot"] },
+    tips:{ ru:["Решай задачи на LeetCode или Codeforces ежедневно","Изучи Python или JavaScript — начни с Khan Academy","Играй в шахматы, го или стратегические игры","Читай книги по алгоритмам и логике","Участвуй в олимпиадах по математике и информатике"], uz:["LeetCode yoki Codeforces da kundalik masalalar yeching","Python yoki JavaScript o'rganing — Khan Academy dan boshlang","Shaxmat, go yoki strategik o'yinlar o'ynang","Algoritmlar va mantiq bo'yicha kitoblar o'qing"], en:["Solve daily problems on LeetCode or Codeforces","Learn Python or JavaScript — start with Khan Academy","Play chess, go or strategy games","Read books on algorithms and logic","Join math and programming olympiads"] },
+    courses:{ ru:["CS50 (Harvard, бесплатно)","Khan Academy — Математика","Coursera — Алгоритмы (Stanford)","Scratch.mit.edu — начало программирования","Code.org — для начинающих"], uz:["CS50 (Harvard, bepul)","Khan Academy — Matematika","Coursera — Algoritmlar (Stanford)","Scratch.mit.edu","Code.org"], en:["CS50 (Harvard, free)","Khan Academy — Mathematics","Coursera — Algorithms (Stanford)","Scratch.mit.edu","Code.org"] },
+    universities:{ ru:["🇺🇸 MIT — Computer Science","🇺🇸 Stanford — AI & ML","🇷🇺 ИТМО — Олимпиадное программирование","🇺🇿 INHA University Tashkent","🇺🇸 Carnegie Mellon — CS"], uz:["🇺🇸 MIT — Computer Science","🇺🇸 Stanford — AI & ML","🇺🇿 INHA University Toshkent","🇷🇺 ITMO — Olimpiada dasturlash"], en:["🇺🇸 MIT — Computer Science","🇺🇸 Stanford — AI & ML","🇬🇧 Oxford — Mathematics","🇺🇿 INHA University Tashkent","🇺🇸 Carnegie Mellon"] },
+    weekly:{ ru:["Пн: 30 мин LeetCode","Вт: Читай алгоритмы","Ср: Строй проект на Python","Чт: Шахматы онлайн","Пт: Новая тема CS50","Сб: Олимпиадная задача","Вс: Разбор ошибок недели"], en:["Mon: 30min LeetCode","Tue: Read algorithms","Wed: Build Python project","Thu: Chess online","Fri: New CS50 topic","Sat: Olympiad problem","Sun: Review week's mistakes"] },
   },
   creativity: {
-    icon: "🎨",
-    color: "#EF9F27",
-    tips: {
-      ru: ["Рисуй каждый день — даже 10 минут", "Попробуй 3D-моделирование (Blender)", "Создай свой комикс или анимацию", "Участвуй в хакатонах и дизайн-конкурсах"],
-      uz: ["Har kuni chiz — hatto 10 daqiqa", "3D-modellashtirish sinab ko'r (Blender)", "O'z komiksing yoki animatsiyangni yarat", "Xakatonlar va dizayn musobaqalarida qatnash"],
-      en: ["Draw every day — even 10 minutes", "Try 3D modeling (Blender)", "Create your own comic or animation", "Join hackathons and design competitions"],
-    },
-    courses: {
-      ru: ["Skillshare — Иллюстрация", "Adobe Creative Cloud — Учебники", "Coursera — Дизайн-мышление (IDEO)", "YouTube — Blender для начинающих"],
-      uz: ["Skillshare — Illyustratsiya", "Adobe Creative Cloud — Darsliklar", "Coursera — Dizayn-fikrlash (IDEO)", "YouTube — Blender boshlang'ichlar uchun"],
-      en: ["Skillshare — Illustration", "Adobe Creative Cloud — Tutorials", "Coursera — Design Thinking (IDEO)", "YouTube — Blender for Beginners"],
-    },
-    universities: {
-      ru: ["🇺🇸 Rhode Island School of Design", "🇺🇸 Parsons — Дизайн", "🇬🇧 Royal College of Art", "🇷🇺 Британская школа дизайна (Москва)", "🇺🇿 O'zDSMI Tashkent"],
-      uz: ["🇺🇸 Rhode Island School of Design", "🇺🇸 Parsons — Dizayn", "🇬🇧 Royal College of Art", "🇷🇺 Britaniya Dizayn Maktabi (Moskva)", "🇺🇿 O'zDSMI Toshkent"],
-      en: ["🇺🇸 Rhode Island School of Design", "🇺🇸 Parsons School of Design", "🇬🇧 Royal College of Art", "🇩🇰 Royal Danish Academy", "🇺🇿 O'zDSMI Tashkent"],
-    },
+    icon:"🎨", color:"#E64A19",
+    name:{ ru:"Творчество", uz:"Ijodkorlik", en:"Creativity" },
+    desc:{ ru:"Ты видишь мир не таким, какой он есть, а таким, каким он может быть. Это редкий дар!", uz:"Siz dunyoni bor holida emas, balki bo'lishi mumkin bo'lgan holda ko'rasiz. Bu kamyob sovg'a!", en:"You see the world not as it is, but as it could be. That's a rare gift!" },
+    careers:{ ru:["Дизайнер","UX/UI","Художник","Архитектор","Режиссёр","Геймдизайнер","Иллюстратор","Аниматор","Модельер"], uz:["Dizayner","UX/UI","Rassom","Arxitektor","Rejissyor","O'yin dizayneri","Illustrator","Animator"], en:["Designer","UX/UI","Artist","Architect","Director","Game Designer","Illustrator","Animator","Fashion Designer"] },
+    tips:{ ru:["Рисуй каждый день — хотя бы 15 минут","Изучи Figma, Canva или Adobe XD","Веди скетчбук — записывай идеи и зарисовки","Смотри фильмы и анализируй визуальный стиль","Создай собственный проект — сайт, комикс, игру"], uz:["Har kuni chizing — kamida 15 daqiqa","Figma, Canva yoki Adobe XD o'rganing","Sketchbook yuriing — g'oyalar va rasmlar","Filmlar tomosha qiling va vizual uslubni tahlil qiling"], en:["Draw every day — even 15 minutes","Learn Figma, Canva or Adobe XD","Keep a sketchbook — record ideas and sketches","Watch films and analyse visual style","Create your own project — website, comic, game"] },
+    courses:{ ru:["Canva Design School (бесплатно)","Figma — официальные туториалы","Skillshare — иллюстрация","Adobe Creative Cloud — студентам","Behance — вдохновение и портфолио"], uz:["Canva Design School (bepul)","Figma — rasmiy qo'llanmalar","Skillshare — illustratsiya","Adobe Creative Cloud — talabalar uchun"], en:["Canva Design School (free)","Figma — official tutorials","Skillshare — illustration","Adobe Creative Cloud — students","Behance — inspiration & portfolio"] },
+    universities:{ ru:["🇺🇸 Rhode Island School of Design","🇬🇧 Central Saint Martins","🇺🇿 O'zDSMI Tashkent","🇷🇺 МГХПА Строганова","🇩🇪 Bauhaus-Universität Weimar"], uz:["🇺🇸 Rhode Island School of Design","🇬🇧 Central Saint Martins","🇺🇿 O'zDSMI Toshkent","🇷🇺 MGXPA Stroganova"], en:["🇺🇸 Rhode Island School of Design","🇬🇧 Central Saint Martins","🇺🇸 Parsons School of Design","🇩🇪 Bauhaus-Universität Weimar"] },
+    weekly:{ ru:["Пн: 15 мин рисования","Вт: Изучи новый инструмент Figma","Ср: Анализ дизайна любимого сайта","Чт: Создай мудборд","Пт: Новый скетч-проект","Сб: Посмотри documentary о дизайне","Вс: Обновить портфолио"], en:["Mon: 15min drawing","Tue: Learn a new Figma tool","Wed: Analyse a favourite website's design","Thu: Create a moodboard","Fri: New sketch project","Sat: Watch a design documentary","Sun: Update portfolio"] },
   },
   memory: {
-    icon: "📚",
-    color: "#7E57C2",
-    tips: {
-      ru: ["Изучи технику Дворца памяти (Метод локусов)", "Читай книги разных жанров", "Учи стихи наизусть", "Пробуй технику интервальных повторений (Anki)"],
-      uz: ["Xotira saroyi texnikasini o'rgan (Lokus usuli)", "Turli janrdagi kitoblar o'qi", "She'rlarni yod ol", "Intervalli takrorlash texnikasini sinab ko'r (Anki)"],
-      en: ["Learn the Memory Palace technique (Method of Loci)", "Read books of different genres", "Memorize poetry", "Try spaced repetition (Anki)"],
-    },
-    courses: {
-      ru: ["Anki — Интервальные повторения", "Coursera — Учись учиться (UC San Diego)", "Khan Academy — Чтение и понимание", "Udemy — Скорочтение"],
-      uz: ["Anki — Intervalli takrorlash", "Coursera — O'rganishni o'rgan (UC San Diego)", "Khan Academy — O'qish va tushunish", "Udemy — Tez o'qish"],
-      en: ["Anki — Spaced Repetition", "Coursera — Learning How to Learn (UC San Diego)", "Khan Academy — Reading Comprehension", "Udemy — Speed Reading"],
-    },
-    universities: {
-      ru: ["🇺🇸 Harvard — Когнитивные науки", "🇬🇧 Cambridge — Психология", "🇺🇸 Stanford — Нейронаука", "🇷🇺 МГУ — Психология", "🇺🇿 NUUz — Психология"],
-      uz: ["🇺🇸 Harvard — Kognitiv fanlar", "🇬🇧 Cambridge — Psixologiya", "🇺🇸 Stanford — Neyrologiya", "🇷🇺 MGU — Psixologiya", "🇺🇿 NUUz — Psixologiya"],
-      en: ["🇺🇸 Harvard — Cognitive Science", "🇬🇧 Cambridge — Psychology", "🇺🇸 Stanford — Neuroscience", "🇷🇺 MSU — Psychology", "🇺🇿 NUUz — Psychology"],
-    },
+    icon:"🃏", color:"#7E57C2",
+    name:{ ru:"Память", uz:"Xotira", en:"Memory" },
+    desc:{ ru:"Твоя память — настоящее хранилище знаний! Ты легко запоминаешь детали, факты и события.", uz:"Sizning xotirangiz haqiqiy bilimlar ombori! Siz tafsilotlar, faktlar va voqealarni osonlikcha yodlaysiz.", en:"Your memory is a true knowledge vault! You easily remember details, facts and events." },
+    careers:{ ru:["Врач","Юрист","Переводчик","Историк","Учёный","Нотариус","Фармацевт","Библиотекарь"], uz:["Shifokor","Yurist","Tarjimon","Tarixchi","Olim","Notarius","Farmatsevt"], en:["Doctor","Lawyer","Translator","Historian","Scientist","Notary","Pharmacist"] },
+    tips:{ ru:["Используй метод 'Дворца памяти' (как Шерлок Холмс)","Повторяй материал через интервалы (приложение Anki)","Учи стихи и тексты наизусть","Играй в игры на запоминание карточек","Веди подробный дневник — это тренирует память"], uz:["'Xotira saroyi' usulidan foydalaning","Anki ilovasi bilan intervalli takrorlash","She'rlar va matnlarni yod oling","Kartochkalarni yodlash o'yinlarini o'ynang"], en:["Use the 'Memory Palace' technique (like Sherlock Holmes)","Review material at intervals (Anki app)","Memorise poems and texts","Play card memory games","Keep a detailed journal — it trains memory"] },
+    courses:{ ru:["Anki — интервальные повторения (бесплатно)","Coursera — Learning How to Learn","YouTube — метод Дворца памяти","Duolingo — языки через повторение","moonlighter.app — карточки"], uz:["Anki — intervalli takrorlash (bepul)","Coursera — Learning How to Learn","YouTube — Xotira saroyi usuli","Duolingo — takrorlash orqali tillar"], en:["Anki — spaced repetition (free)","Coursera — Learning How to Learn","YouTube — Memory Palace method","Duolingo — languages through repetition"] },
+    universities:{ ru:["🇺🇸 Harvard Medical School","🇬🇧 Oxford — Psychology","🇷🇺 МГУ — Психология","🇺🇿 NUUz — Медицина","🇺🇸 Johns Hopkins — Medicine"], uz:["🇺🇸 Harvard Medical School","🇬🇧 Oxford — Psixologiya","🇷🇺 MGU — Psixologiya","🇺🇿 NUUz — Tibbiyot"], en:["🇺🇸 Harvard Medical School","🇬🇧 Oxford — Psychology","🇺🇸 Johns Hopkins — Medicine","🇺🇿 NUUz — Medicine"] },
+    weekly:{ ru:["Пн: 20 карточек Anki","Вт: Выучи стихотворение","Ср: Дворец памяти — новая комната","Чт: Повтори прошлую неделю","Пт: Игра на запоминание","Сб: Запомни 10 новых слов языка","Вс: Дневник достижений"], en:["Mon: 20 Anki cards","Tue: Memorise a poem","Wed: Memory Palace — new room","Thu: Review last week","Fri: Memory game","Sat: Memorise 10 new words","Sun: Achievement journal"] },
   },
   leadership: {
-    icon: "👑",
-    color: "#BA7517",
-    tips: {
-      ru: ["Организуй школьное мероприятие или клуб", "Читай биографии великих лидеров", "Практикуй публичные выступления", "Вступи в дебатный клуб или студенческий совет"],
-      uz: ["Maktab tadbirini yoki klubini tashkil qil", "Buyuk rahbarlar tarjimai holini o'qi", "Ommaviy nutq amaliyotini qil", "Debat klubi yoki talabalar kengashiga qo'shil"],
-      en: ["Organize a school event or club", "Read biographies of great leaders", "Practice public speaking", "Join debate club or student council"],
-    },
-    courses: {
-      ru: ["Coursera — Лидерство (Yale)", "Harvard Online — Управление и лидерство", "TED Talks — Навыки презентации", "Toastmasters — Публичные выступления"],
-      uz: ["Coursera — Liderlik (Yale)", "Harvard Online — Boshqaruv va liderlik", "TED Talks — Taqdimot ko'nikmalari", "Toastmasters — Ommaviy nutq"],
-      en: ["Coursera — Leadership (Yale)", "Harvard Online — Management & Leadership", "TED Talks — Presentation Skills", "Toastmasters — Public Speaking"],
-    },
-    universities: {
-      ru: ["🇺🇸 Harvard Business School", "🇺🇸 Wharton School (UPenn)", "🇬🇧 London Business School", "🇷🇺 Сколково", "🇺🇿 Westminster Tashkent"],
-      uz: ["🇺🇸 Harvard Business School", "🇺🇸 Wharton School (UPenn)", "🇬🇧 London Business School", "🇷🇺 Skolkovo", "🇺🇿 Westminster Toshkent"],
-      en: ["🇺🇸 Harvard Business School", "🇺🇸 Wharton School (UPenn)", "🇬🇧 London Business School", "🇨🇭 IMD Lausanne", "🇺🇿 Westminster Tashkent"],
-    },
+    icon:"👑", color:"#F9A825",
+    name:{ ru:"Лидерство", uz:"Liderlik", en:"Leadership" },
+    desc:{ ru:"Ты рождён вести за собой! Люди тянутся к тебе, ты умеешь вдохновлять и организовывать.", uz:"Siz rahbarlik qilish uchun tug'ilgansiz! Odamlar sizga intiladi, siz ilhomlantirishni va tashkil qilishni bilasiz.", en:"You were born to lead! People are drawn to you, you know how to inspire and organise." },
+    careers:{ ru:["Предприниматель","CEO","Политик","Менеджер","HR-директор","Дипломат","Тренер","Педагог"], uz:["Tadbirkor","CEO","Siyosatchi","Menejer","HR-direktor","Diplomat","Murabbiy","Pedagog"], en:["Entrepreneur","CEO","Politician","Manager","HR Director","Diplomat","Coach","Educator"] },
+    tips:{ ru:["Организуй мероприятие в школе или районе","Вступи в дебатный клуб или студсовет","Читай биографии великих лидеров","Учись активному слушанию — это ключ к лидерству","Веди команду в любом групповом проекте"], uz:["Maktab yoki mahallada tadbir tashkil qiling","Debat klubi yoki talaba kengashiga kiring","Buyuk liderlar tarjimai holini o'qing","Faol tinglashni o'rganing — bu liderlikning asosi"], en:["Organise an event at school or in your community","Join a debate club or student council","Read biographies of great leaders","Learn active listening — it's the key to leadership","Lead a team in any group project"] },
+    courses:{ ru:["Coursera — Leadership (Yale)","edX — Emotional Intelligence (Harvard)","YouTube — TED Talks о лидерстве","Toastmasters — публичные выступления","Khan Academy — Экономика и бизнес"], uz:["Coursera — Liderlik (Yale)","edX — Hissiy intellekt (Harvard)","YouTube — TED Talks liderlik haqida","Toastmasters — jamoat oldida nutq"], en:["Coursera — Leadership (Yale)","edX — Emotional Intelligence (Harvard)","YouTube — TED Talks on Leadership","Toastmasters — public speaking","Khan Academy — Economics & Business"] },
+    universities:{ ru:["🇺🇸 Harvard Business School","🇺🇸 Wharton (UPenn)","🇬🇧 London Business School","🇺🇿 Westminster Tashkent","🇺🇿 TSUE"], uz:["🇺🇸 Harvard Business School","🇺🇸 Wharton (UPenn)","🇬🇧 London Business School","🇺🇿 Westminster Toshkent","🇺🇿 TDIU"], en:["🇺🇸 Harvard Business School","🇺🇸 Wharton (UPenn)","🇬🇧 London Business School","🇸🇬 INSEAD","🇺🇿 Westminster Tashkent"] },
+    weekly:{ ru:["Пн: Прочитай главу биографии лидера","Вт: Возьми инициативу в группе","Ср: TED Talk + разбор идей","Чт: Напиши план своего проекта","Пт: Практика публичного выступления","Сб: Встреча с командой/друзьями","Вс: Рефлексия недели"], en:["Mon: Read a chapter of a leader's biography","Tue: Take initiative in a group","Wed: TED Talk + idea breakdown","Thu: Write your project plan","Fri: Public speaking practice","Sat: Team/friends meeting","Sun: Weekly reflection"] },
   },
   languages: {
-    icon: "🌍",
-    color: "#26C6DA",
-    tips: {
-      ru: ["Смотри фильмы на иностранном языке без субтитров", "Говори с носителями языка (italki, Tandem)", "Читай книги в оригинале", "Учи по 10 новых слов каждый день"],
-      uz: ["Xorijiy tillarda filmlarni subtitrlar siz ko'r", "Ona tili so'zlovchilari bilan gaplash (italki, Tandem)", "Kitoblarni asliyatida o'qi", "Har kuni 10 ta yangi so'z o'rgan"],
-      en: ["Watch films in foreign languages without subtitles", "Speak with native speakers (italki, Tandem)", "Read books in the original language", "Learn 10 new words every day"],
-    },
-    courses: {
-      ru: ["Duolingo — Ежедневная практика", "italki — Разговор с носителями", "Coursera — Лингвистика (MIT)", "BBC Languages — Бесплатные уроки"],
-      uz: ["Duolingo — Kundalik amaliyot", "italki — Ona tili so'zlovchilari bilan suhbat", "Coursera — Lingvistika (MIT)", "BBC Languages — Bepul darslar"],
-      en: ["Duolingo — Daily Practice", "italki — Native Speaker Conversations", "Coursera — Linguistics (MIT)", "BBC Languages — Free Lessons"],
-    },
-    universities: {
-      ru: ["🇺🇸 Georgetown — Лингвистика", "🇬🇧 Cambridge — Современные языки", "🇫🇷 Сорбонна — Французский", "🇷🇺 МГИМО — Международные отношения", "🇺🇿 O'zDJTU Tashkent"],
-      uz: ["🇺🇸 Georgetown — Lingvistika", "🇬🇧 Cambridge — Zamonaviy tillar", "🇫🇷 Sorbonna — Fransuz tili", "🇷🇺 MGIMO — Xalqaro munosabatlar", "🇺🇿 O'zDJTU Toshkent"],
-      en: ["🇺🇸 Georgetown — Linguistics", "🇬🇧 Cambridge — Modern Languages", "🇫🇷 Sorbonne — French", "🇷🇺 MGIMO — International Relations", "🇺🇿 O'zDJTU Tashkent"],
-    },
+    icon:"🌍", color:"#00838F",
+    name:{ ru:"Языки", uz:"Tillar", en:"Languages" },
+    desc:{ ru:"Языки — твоя суперсила! Каждый новый язык открывает целый новый мир мышления и культуры.", uz:"Tillar — sizning superkuchingiz! Har bir yangi til butun yangi fikrlash va madaniyat dunyosini ochadi.", en:"Languages are your superpower! Every new language opens a whole new world of thinking and culture." },
+    careers:{ ru:["Переводчик","Дипломат","Журналист","Писатель","Лингвист","Учитель языков","Международный менеджер"], uz:["Tarjimon","Diplomat","Jurnalist","Yozuvchi","Tilshunos","Til o'qituvchisi","Xalqaro menejer"], en:["Translator","Diplomat","Journalist","Writer","Linguist","Language Teacher","International Manager"] },
+    tips:{ ru:["Смотри фильмы и сериалы без субтитров","Используй Duolingo каждый день — хотя бы 10 мин","Найди носителя языка для разговорной практики","Читай книги на языке, который учишь","Веди дневник на иностранном языке"], uz:["Filmlar va seriallar subtitrsiz tomosha qiling","Duolingo ni har kuni ishlating — kamida 10 daqiqa","Til sohibini topib, og'zaki amaliyot qiling","O'rganayotgan tilda kitoblar o'qing"], en:["Watch films and series without subtitles","Use Duolingo daily — even 10 minutes","Find a native speaker for conversation practice","Read books in the language you're learning","Keep a diary in a foreign language"] },
+    courses:{ ru:["Duolingo (бесплатно)","italki — уроки с носителями","Coursera — Linguistics (UPenn)","BBC Learning English (бесплатно)","LingQ — чтение на языке"], uz:["Duolingo (bepul)","italki — ona tili so'zlovchilari bilan darslar","Coursera — Tilshunoslik (UPenn)","BBC Learning English (bepul)"], en:["Duolingo (free)","italki — lessons with native speakers","Coursera — Linguistics (UPenn)","BBC Learning English (free)","LingQ — reading in target language"] },
+    universities:{ ru:["🇺🇸 Georgetown — Дипломатия","🇷🇺 МГИМО","🇬🇧 Cambridge — Лингвистика","🇺🇿 O'zDJTU","🇫🇷 Sciences Po Paris"], uz:["🇺🇸 Georgetown — Diplomatiya","🇷🇺 MGIMO","🇬🇧 Cambridge — Tilshunoslik","🇺🇿 O'zDJTU"], en:["🇺🇸 Georgetown — Diplomacy","🇬🇧 Cambridge — Linguistics","🇫🇷 Sciences Po Paris","🇺🇿 O'zDJTU","🇺🇸 Middlebury College"] },
+    weekly:{ ru:["Пн: 20 мин Duolingo","Вт: Посмотри эпизод сериала на языке","Ср: 15 мин разговорной практики","Чт: Читай статью на языке","Пт: Выучи 10 новых слов","Сб: Напиши параграф на языке","Вс: Разбор грамматики"], en:["Mon: 20min Duolingo","Tue: Watch one episode in target language","Wed: 15min conversation practice","Thu: Read an article in the language","Fri: Learn 10 new words","Sat: Write a paragraph in the language","Sun: Grammar review"] },
   },
   music: {
-    icon: "🎵",
-    color: "#66BB6A",
-    tips: {
-      ru: ["Занимайся на инструменте минимум 30 минут в день", "Учись читать ноты", "Запиши свою первую мелодию (GarageBand, FL Studio)", "Слушай музыку разных эпох и стилей"],
-      uz: ["Har kuni kamida 30 daqiqa asbobda mashq qil", "Notalarni o'qishni o'rgan", "Birinchi melodiyangni yozib ol (GarageBand, FL Studio)", "Turli davrlar va uslubdagi musiqalarni eshit"],
-      en: ["Practice your instrument at least 30 minutes daily", "Learn to read music notation", "Record your first melody (GarageBand, FL Studio)", "Listen to music from different eras and styles"],
-    },
-    courses: {
-      ru: ["Simply Piano — Фортепиано", "Yousician — Гитара/Фортепиано", "Coursera — Введение в музыку (Berklee)", "YouTube — Теория музыки бесплатно"],
-      uz: ["Simply Piano — Fortepiano", "Yousician — Gitara/Fortepiano", "Coursera — Musiqaga kirish (Berklee)", "YouTube — Musiqa nazariyasi bepul"],
-      en: ["Simply Piano — Piano", "Yousician — Guitar/Piano", "Coursera — Introduction to Music (Berklee)", "YouTube — Music Theory Free"],
-    },
-    universities: {
-      ru: ["🇺🇸 Berklee College of Music", "🇺🇸 Juilliard School (New York)", "🇬🇧 Royal Academy of Music", "🇷🇺 Московская консерватория", "🇺🇿 O'zbekiston Davlat Konservatoriyasi"],
-      uz: ["🇺🇸 Berklee College of Music", "🇺🇸 Juilliard School (Nyu-York)", "🇬🇧 Royal Academy of Music", "🇷🇺 Moskva Konservatoriyasi", "🇺🇿 O'zbekiston Davlat Konservatoriyasi"],
-      en: ["🇺🇸 Berklee College of Music", "🇺🇸 Juilliard School (New York)", "🇬🇧 Royal Academy of Music", "🇩🇰 Royal Danish Academy of Music", "🇺🇿 State Conservatory of Uzbekistan"],
-    },
+    icon:"🎵", color:"#2E7D32",
+    name:{ ru:"Музыка", uz:"Musiqa", en:"Music" },
+    desc:{ ru:"Музыкальный интеллект — это особый дар! Учёные доказали: музыканты имеют более развитые нейронные связи.", uz:"Musiqiy intellekt — bu alohida sovg'a! Olimlar isbotladi: musiqachilar rivojlangan neyron bog'lanishlariga ega.", en:"Musical intelligence is a special gift! Scientists proved: musicians have more developed neural connections." },
+    careers:{ ru:["Музыкант","Композитор","Певец","Звукорежиссёр","Дирижёр","Музыкальный продюсер","Учитель музыки"], uz:["Musiqachi","Bastakor","Qo'shiqchi","Ovoz rejissyori","Dirijyor","Musiqa produseri","Musiqa o'qituvchisi"], en:["Musician","Composer","Singer","Sound Engineer","Conductor","Music Producer","Music Teacher"] },
+    tips:{ ru:["Занимайся на инструменте 30 минут в день","Слушай разные жанры — классика, джаз, фолк","Записывай свои мелодии и идеи","Изучи нотную грамоту — это основа музыки","Участвуй в школьных или городских концертах"], uz:["Har kuni 30 daqiqa cholg'u asbobida mashq qiling","Turli janrlarni tinglang — klassika, jazz, folk","Melodiya va g'oyalaringizni yozib oling","Notani o'rganing — bu musiqaning asosi"], en:["Practice an instrument 30 minutes daily","Listen to different genres — classical, jazz, folk","Record your melodies and ideas","Learn music notation — it's the foundation","Participate in school or city concerts"] },
+    courses:{ ru:["Simply Piano (iPhone/Android)","Yousician — гитара, пианино, укулеле","Coursera — Music Theory (Berklee)","YouTube — chromatic.fm","musictheory.net — бесплатно"], uz:["Simply Piano (iPhone/Android)","Yousician — gitara, piano, ukulele","Coursera — Musiqa nazariyasi (Berklee)","musictheory.net — bepul"], en:["Simply Piano (iPhone/Android)","Yousician — guitar, piano, ukulele","Coursera — Music Theory (Berklee)","YouTube — chromatic.fm","musictheory.net — free"] },
+    universities:{ ru:["🇺🇸 Berklee College of Music","🇺🇸 Juilliard School","🇬🇧 Royal Academy of Music","🇺🇿 O'zbekiston Davlat Konservatoriyasi","🇷🇺 Московская консерватория"], uz:["🇺🇸 Berklee College of Music","🇺🇸 Juilliard School","🇬🇧 Royal Academy of Music","🇺🇿 O'zbekiston Davlat Konservatoriyasi"], en:["🇺🇸 Berklee College of Music","🇺🇸 Juilliard School","🇬🇧 Royal Academy of Music","🇦🇺 Sydney Conservatorium","🇺🇿 State Conservatory of Uzbekistan"] },
+    weekly:{ ru:["Пн: 30 мин инструмента","Вт: Разбор любимой песни нотами","Ср: Запись своей мелодии","Чт: Слушай классику осознанно","Пт: Musictheory.net — один урок","Сб: Мини-выступление для семьи","Вс: Плейлист новых жанров"], en:["Mon: 30min instrument","Tue: Analyse favourite song notes","Wed: Record your own melody","Thu: Listen to classical music consciously","Fri: Musictheory.net — one lesson","Sat: Mini-performance for family","Sun: New genres playlist"] },
   },
   sport: {
-    icon: "🏃",
-    color: "#FF7043",
-    tips: {
-      ru: ["Тренируйся регулярно — минимум 3 раза в неделю", "Попробуй разные виды спорта чтобы найти свой", "Изучи спортивную психологию и тактику", "Участвуй в соревнованиях — любой уровень!"],
-      uz: ["Muntazam mashq qiling — haftada kamida 3 marta", "O'zingizga mos sport turini topish uchun turlichasini sinab ko'ring", "Sport psixologiyasi va taktikasini o'rganing", "Musobaqalarda qatnashing — istalgan daraja!"],
-      en: ["Train regularly — at least 3 times a week", "Try different sports to find your fit", "Study sports psychology and tactics", "Compete — any level counts!"],
-    },
-    courses: {
-      ru: ["Coursera — Спортивная наука", "YouTube — Тренировки без зала", "edX — Питание спортсмена", "Nike Training Club — бесплатно"],
-      uz: ["Coursera — Sport fani", "YouTube — Zalsiz mashqlar", "edX — Sportchi ovqatlanishi", "Nike Training Club — bepul"],
-      en: ["Coursera — Sports Science", "YouTube — Home Workouts", "edX — Athlete Nutrition", "Nike Training Club — Free"],
-    },
-    universities: {
-      ru: ["🇺🇸 Ohio State — Спортивная наука", "🇬🇧 Loughborough University", "🇺🇸 UCLA — Кинезиология", "🇷🇺 РГУФКСМИТ Москва", "🇺🇿 O'zDSIM Tashkent"],
-      uz: ["🇺🇸 Ohio State — Sport fani", "🇬🇧 Loughborough University", "🇺🇸 UCLA — Kineziologiya", "🇷🇺 RGUFKSMT Moskva", "🇺🇿 O'zDSIM Toshkent"],
-      en: ["🇺🇸 Ohio State — Sports Science", "🇬🇧 Loughborough University", "🇺🇸 UCLA — Kinesiology", "🇦🇺 University of Queensland", "🇺🇿 UzSIPC Tashkent"],
-    },
+    icon:"🏃", color:"#BF360C",
+    name:{ ru:"Спорт", uz:"Sport", en:"Sport" },
+    desc:{ ru:"Физическая сила и выносливость — это не просто тело, это дисциплина и характер!", uz:"Jismoniy kuch va chidamlilik — bu nafaqat tana, bu intizom va xarakter!", en:"Physical strength and endurance — it's not just the body, it's discipline and character!" },
+    careers:{ ru:["Профессиональный спортсмен","Тренер","Спортивный психолог","Физиотерапевт","Спортивный менеджер","Диетолог","Судья"], uz:["Professional sportchi","Murabbiy","Sport psixologi","Fizioterapevt","Sport menejeri","Diyetolog"], en:["Professional Athlete","Coach","Sports Psychologist","Physiotherapist","Sports Manager","Dietitian","Referee"] },
+    tips:{ ru:["Тренируйся 4-5 раз в неделю с планом","Изучи спортивную психологию — она меняет игру","Веди дневник тренировок и прогресса","Питайся правильно — это 70% результата","Участвуй в местных соревнованиях любого уровня"], uz:["Haftasiga 4-5 marta reja bilan mashq qiling","Sport psixologiyasini o'rganing — u o'yinni o'zgartiradi","Mashg'ulot va taraqqiyot kundaligi yuriing","To'g'ri ovqatlaning — bu natijaning 70%"], en:["Train 4-5 times a week with a plan","Study sports psychology — it changes the game","Keep a training and progress journal","Eat right — it's 70% of results","Compete in local events at any level"] },
+    courses:{ ru:["Nike Training Club (бесплатно)","Coursera — Sports Science","YouTube — AthleanX","edX — Спортивное питание","Khan Academy — Биология человека"], uz:["Nike Training Club (bepul)","Coursera — Sport fani","YouTube — AthleanX","edX — Sport ovqatlanishi"], en:["Nike Training Club (free)","Coursera — Sports Science","YouTube — AthleanX","edX — Athlete Nutrition","Khan Academy — Human Biology"] },
+    universities:{ ru:["🇺🇸 Ohio State — Sports Science","🇬🇧 Loughborough University","🇺🇸 UCLA — Kinesiology","🇷🇺 РГУФКСМИТ","🇺🇿 O'zDSIM Tashkent"], uz:["🇺🇸 Ohio State — Sport fani","🇬🇧 Loughborough University","🇺🇸 UCLA — Kineziologiya","🇺🇿 O'zDSIM Toshkent"], en:["🇺🇸 Ohio State — Sports Science","🇬🇧 Loughborough University","🇺🇸 UCLA — Kinesiology","🇦🇺 University of Queensland","🇺🇿 UzSIPC Tashkent"] },
+    weekly:{ ru:["Пн: Тренировка (силовая)","Вт: Восстановление + растяжка","Ср: Кардио + техника","Чт: Командная игра","Пт: Тренировка (выносливость)","Сб: Соревнование или спарринг","Вс: Дневник + план недели"], en:["Mon: Strength training","Tue: Recovery + stretching","Wed: Cardio + technique","Thu: Team game","Fri: Endurance training","Sat: Competition or sparring","Sun: Journal + week planning"] },
   },
   nature: {
-    icon: "🌿",
-    color: "#43A047",
-    tips: {
-      ru: ["Наблюдай за природой — веди дневник наблюдений", "Попробуй выращивать растения дома", "Читай о биологии, экологии и зоологии", "Участвуй в экологических проектах"],
-      uz: ["Tabiatni kuzating — kuzatuv kundaligi yuring", "Uyda o'simliklar o'stirishni sinab ko'ring", "Biologiya, ekologiya va zoologiya o'qing", "Ekologik loyihalarda qatnashing"],
-      en: ["Observe nature — keep a nature journal", "Try growing plants at home", "Read about biology, ecology and zoology", "Join environmental projects"],
-    },
-    courses: {
-      ru: ["Khan Academy — Биология", "Coursera — Экология (Duke)", "iNaturalist — Определение видов", "YouTube — SciShow Nature"],
-      uz: ["Khan Academy — Biologiya", "Coursera — Ekologiya (Duke)", "iNaturalist — Turlarni aniqlash", "YouTube — SciShow Nature"],
-      en: ["Khan Academy — Biology", "Coursera — Ecology (Duke)", "iNaturalist — Species ID", "YouTube — SciShow Nature"],
-    },
-    universities: {
-      ru: ["🇺🇸 UC Berkeley — Биология", "🇬🇧 Cambridge — Естественные науки", "🇺🇸 Cornell — Экология", "🇷🇺 МГУ — Биологический факультет", "🇺🇿 NUUz — Биология"],
-      uz: ["🇺🇸 UC Berkeley — Biologiya", "🇬🇧 Cambridge — Tabiiy fanlar", "🇺🇸 Cornell — Ekologiya", "🇷🇺 MGU — Biologiya fakulteti", "🇺🇿 NUUz — Biologiya"],
-      en: ["🇺🇸 UC Berkeley — Biology", "🇬🇧 Cambridge — Natural Sciences", "🇺🇸 Cornell — Ecology", "🇦🇺 ANU — Environmental Science", "🇺🇿 NUUz — Biology"],
-    },
+    icon:"🌿", color:"#1B5E20",
+    name:{ ru:"Природа", uz:"Tabiat", en:"Nature" },
+    desc:{ ru:"Ты чувствуешь связь с живым миром! Это фундаментальный интеллект, который помогал людям выжить тысячи лет.", uz:"Siz tirik dunyo bilan bog'liqlikni his qilasiz! Bu odamlarga ming yillar davomida yashashga yordam bergan fundamental intellekt.", en:"You feel a connection to the living world! This is a fundamental intelligence that helped humans survive for thousands of years." },
+    careers:{ ru:["Биолог","Эколог","Ветеринар","Ботаник","Зоолог","Лесник","Учёный-природовед","Шеф-повар"], uz:["Biolog","Ekolog","Veterinar","Botanik","Zoolog","O'rmonchi","Tabiat olimi","Oshpaz"], en:["Biologist","Ecologist","Veterinarian","Botanist","Zoologist","Forester","Environmental Scientist","Chef"] },
+    tips:{ ru:["Веди дневник наблюдений за природой","Используй iNaturalist для определения видов","Читай о биологии, экологии и зоологии","Участвуй в экологических проектах","Выращивай растения дома или в саду"], uz:["Tabiat kuzatuv kundaligi yuriing","Turlarni aniqlash uchun iNaturalist dan foydalaning","Biologiya, ekologiya va zoologiya o'qing","Ekologik loyihalarda qatnashing","Uyda yoki bog'da o'simliklar o'stirng"], en:["Keep a nature observation journal","Use iNaturalist for species identification","Read about biology, ecology and zoology","Join environmental projects","Grow plants at home or in a garden"] },
+    courses:{ ru:["Khan Academy — Биология (бесплатно)","Coursera — Ecology (Duke University)","iNaturalist — определение видов","YouTube — SciShow Nature","edX — Биоразнообразие"], uz:["Khan Academy — Biologiya (bepul)","Coursera — Ekologiya (Duke University)","iNaturalist — turlarni aniqlash","YouTube — SciShow Nature"], en:["Khan Academy — Biology (free)","Coursera — Ecology (Duke University)","iNaturalist — species ID","YouTube — SciShow Nature","edX — Biodiversity"] },
+    universities:{ ru:["🇺🇸 UC Berkeley — Biology","🇬🇧 Cambridge — Natural Sciences","🇺🇸 Cornell — Ecology","🇷🇺 МГУ — Биологический факультет","🇺🇿 NUUz — Биология"], uz:["🇺🇸 UC Berkeley — Biologiya","🇬🇧 Cambridge — Tabiiy fanlar","🇺🇸 Cornell — Ekologiya","🇺🇿 NUUz — Biologiya"], en:["🇺🇸 UC Berkeley — Biology","🇬🇧 Cambridge — Natural Sciences","🇺🇸 Cornell — Ecology","🇦🇺 ANU — Environmental Science","🇺🇿 NUUz — Biology"] },
+    weekly:{ ru:["Пн: Прогулка — найди 3 новых растения","Вт: Khan Academy — биология","Ср: iNaturalist — загрузи наблюдение","Чт: Читай о любимом животном","Пт: Coursera — один урок экологии","Сб: Волонтёрство в природоохране","Вс: Дневник наблюдений"], en:["Mon: Walk — find 3 new plants","Tue: Khan Academy — biology","Wed: iNaturalist — upload observation","Thu: Read about your favourite animal","Fri: Coursera — one ecology lesson","Sat: Nature conservation volunteering","Sun: Observation journal"] },
   },
   social: {
-    icon: "🤝",
-    color: "#7E57C2",
-    tips: {
-      ru: ["Развивай эмоциональный интеллект — читай о психологии", "Участвуй в дебатном клубе или волонтёрстве", "Учись активному слушанию и эмпатии", "Организуй мероприятия в школе или районе"],
-      uz: ["Hissiy intellektni rivojlantiring — psixologiya o'qing", "Debat klubi yoki ko'ngillilikda qatnashing", "Faol tinglash va empatiyani o'rganing", "Maktab yoki mahallada tadbirlar tashkil qiling"],
-      en: ["Develop emotional intelligence — read psychology", "Join debate club or volunteer", "Learn active listening and empathy", "Organise events at school or in your community"],
-    },
-    courses: {
-      ru: ["Coursera — Эмоциональный интеллект (Yale)", "edX — Психология (Harvard)", "YouTube — TED Talks о лидерстве", "Udemy — Навыки общения"],
-      uz: ["Coursera — Hissiy intellekt (Yale)", "edX — Psixologiya (Harvard)", "YouTube — TED Talks liderlik haqida", "Udemy — Muloqot ko'nikmalari"],
-      en: ["Coursera — Emotional Intelligence (Yale)", "edX — Psychology (Harvard)", "YouTube — TED Talks on Leadership", "Udemy — Communication Skills"],
-    },
-    universities: {
-      ru: ["🇺🇸 Harvard — Психология", "🇺🇸 Stanford — Социология", "🇬🇧 Oxford — PPE", "🇷🇺 МГУ — Психологический факультет", "🇺🇿 NUUz — Психология"],
-      uz: ["🇺🇸 Harvard — Psixologiya", "🇺🇸 Stanford — Sotsiologiya", "🇬🇧 Oxford — PPE", "🇷🇺 MGU — Psixologiya fakulteti", "🇺🇿 NUUz — Psixologiya"],
-      en: ["🇺🇸 Harvard — Psychology", "🇺🇸 Stanford — Sociology", "🇬🇧 Oxford — PPE", "🇦🇺 University of Melbourne — Psychology", "🇺🇿 NUUz — Psychology"],
-    },
+    icon:"🤝", color:"#4527A0",
+    name:{ ru:"Общение", uz:"Muloqot", en:"Social" },
+    desc:{ ru:"Ты понимаешь людей лучше, чем они понимают себя! Это мощный эмоциональный интеллект.", uz:"Siz odamlarni ularning o'zidan ko'ra yaxshiroq tushunasiz! Bu kuchli hissiy intellekt.", en:"You understand people better than they understand themselves! This is powerful emotional intelligence." },
+    careers:{ ru:["Психолог","Социолог","HR-менеджер","Педагог","Дипломат","Журналист","Тренер","Политик"], uz:["Psixolog","Sotsiolog","HR-menejer","Pedagog","Diplomat","Jurnalist","Murabbiy","Siyosatchi"], en:["Psychologist","Sociologist","HR Manager","Educator","Diplomat","Journalist","Coach","Politician"] },
+    tips:{ ru:["Практикуй активное слушание в разговорах","Читай книги по психологии и эмоциям","Волонтёрь — это прокачивает эмпатию","Участвуй в дебатах и публичных выступлениях","Веди дневник эмоций и наблюдений за людьми"], uz:["Suhbatlarda faol tinglashni mashq qiling","Psixologiya va hissiyotlar haqida kitoblar o'qing","Ko'ngillilik — bu empatiyani rivojlantiradi","Debatlar va jamoat oldida nutqlarda qatnashing"], en:["Practice active listening in conversations","Read books on psychology and emotions","Volunteer — it develops empathy","Participate in debates and public speaking","Keep a journal of emotions and observations"] },
+    courses:{ ru:["Coursera — Emotional Intelligence (Yale)","edX — Psychology (Harvard)","Toastmasters — публичные выступления","YouTube — TED Talks о психологии","Khan Academy — Психология"], uz:["Coursera — Hissiy intellekt (Yale)","edX — Psixologiya (Harvard)","Toastmasters — jamoat oldida nutq","YouTube — TED Talks psixologiya haqida"], en:["Coursera — Emotional Intelligence (Yale)","edX — Psychology (Harvard)","Toastmasters — public speaking","YouTube — TED Talks on psychology","Khan Academy — Psychology"] },
+    universities:{ ru:["🇺🇸 Harvard — Psychology","🇺🇸 Stanford — Sociology","🇬🇧 Oxford — PPE","🇷🇺 МГУ — Психологический факультет","🇺🇿 NUUz — Психология"], uz:["🇺🇸 Harvard — Psixologiya","🇺🇸 Stanford — Sotsiologiya","🇬🇧 Oxford — PPE","🇺🇿 NUUz — Psixologiya"], en:["🇺🇸 Harvard — Psychology","🇺🇸 Stanford — Sociology","🇬🇧 Oxford — PPE","🇬🇧 London School of Economics","🇺🇿 NUUz — Psychology"] },
+    weekly:{ ru:["Пн: Прочитай главу по психологии","Вт: Практика активного слушания","Ср: Дневник эмоций дня","Чт: TED Talk о людях и обществе","Пт: Помоги кому-то решить проблему","Сб: Групповое мероприятие","Вс: Рефлексия отношений недели"], en:["Mon: Read a psychology chapter","Tue: Active listening practice","Wed: Emotion journal for the day","Thu: TED Talk on people & society","Fri: Help someone solve a problem","Sat: Group event","Sun: Reflect on the week's relationships"] },
   },
 };
 
-const TALENT_NAMES = {
-  logic:      { ru:"Логика",      uz:"Mantiq",      en:"Logic"       },
-  creativity: { ru:"Творчество",  uz:"Ijodkorlik",  en:"Creativity"  },
-  memory:     { ru:"Память",      uz:"Xotira",      en:"Memory"      },
-  leadership: { ru:"Лидерство",   uz:"Liderlik",    en:"Leadership"  },
-  languages:  { ru:"Языки",       uz:"Tillar",      en:"Languages"   },
-  music:      { ru:"Музыка",      uz:"Musiqa",      en:"Music"       },
-  sport:      { ru:"Спорт",       uz:"Sport",       en:"Sport"       },
-  nature:     { ru:"Природа",     uz:"Tabiat",      en:"Nature"      },
-  social:     { ru:"Общение",     uz:"Muloqot",     en:"Social"      },
+const DAYS = {
+  ru:["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
+  uz:["Du","Se","Ch","Pa","Ju","Sh","Ya"],
+  en:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
 };
 
 export default function DevelopPage({ setPage, results, lang, dark }) {
-  const [loading, setLoading]   = useState(false);
-  const [data, setData]         = useState(null);
-  const [activeTab, setActiveTab] = useState(0); // which top talent is shown
+  // Get sorted talents from results
+  const scores = results?.scores || {};
+  const sortedTalents = Object.keys(TALENT_DATA).sort((a,b) => (scores[b]||0)-(scores[a]||0));
+  const [activeTab, setActiveTab] = useState(0);
+  const [section, setSection] = useState("tips"); // tips | courses | careers | universities | weekly
 
-  // Load latest results if not passed from quiz
-  useEffect(() => {
-    if (results?.scores) {
-      setData(results);
-      return;
-    }
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    setLoading(true);
-    quizAPI.latestResult()
-      .then((res) => {
-        const d = res.data;
-        setData({
-          scores: {
-            logic:      d.score_logic      || 5,
-            creativity: d.score_creativity || 5,
-            memory:     d.score_memory     || 5,
-            leadership: d.score_leadership || 5,
-            languages:  d.score_languages  || 5,
-            music:      d.score_music      || 5,
-            sport:      d.score_sport      || 5,
-            nature:     d.score_nature     || 5,
-            social:     d.score_social     || 5,
-          },
-          careers:   [{ name: d.top_career, icon: "⭐", match_percent: null }],
-          strengths: [],
-          top_talents: [d.top_talent],
-        });
-      })
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
-  }, [results]);
-
-  if (loading) return (
-    <div className="page-wrap">
-      <Nav page="develop" setPage={setPage} lang={lang} dark={dark} />
-      <Loader message={lang==="ru"?"Загружаем рекомендации...":lang==="uz"?"Tavsiyalar yuklanmoqda...":"Loading recommendations..."} />
-    </div>
-  );
-
-  // Get top 3 talents sorted by score
-  const topTalents = data?.scores
-    ? Object.entries(data.scores)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([key]) => key)
-    : null;
-
-  // Ensure activeTab is valid when topTalents changes
-  const safeTab      = Math.min(activeTab, (topTalents?.length || 1) - 1);
-  const activeTalent = topTalents?.[safeTab];
-  // Fall back to creativity tips if talent not in TALENT_TIPS (e.g. sport/nature/social)
-  const talentData   = activeTalent
-    ? (TALENT_TIPS[activeTalent] || TALENT_TIPS.creativity)
-    : null;
-  const careers      = data?.careers || [];
+  const talent     = sortedTalents[activeTab];
+  const td         = TALENT_DATA[talent] || TALENT_DATA.logic;
+  const score      = Math.round(scores[talent] || 0);
+  const hasResults = Object.keys(scores).length > 0;
 
   const L = {
-    ru: {
-      banner:      "Развивай свои таланты!",
-      personal:    "⭐ Персональные рекомендации",
-      noResults:   "Пройди тест сначала, чтобы получить персональные рекомендации!",
-      startQuiz:   "Пройти тест →",
-      topTalents:  "Твои топ таланты:",
-      tips:        "Как развивать:",
-      courses:     "Рекомендуемые курсы:",
-      universities:"🎓 Университеты для тебя:",
-      careers:     "Карьеры для тебя:",
-      match:       "совпадение",
-      toHome:      "← На главную",
-      toTasks:     "Пройти игры 🎮",
-      framework:   "На основе исследований Gardner (Harvard) · MIT · Stanford · Oxford",
-    },
-    uz: {
-      banner:      "Iste'dodingni rivojlantir!",
-      personal:    "⭐ Shaxsiy tavsiyalar",
-      noResults:   "Shaxsiy tavsiyalar olish uchun avval testni o'ting!",
-      startQuiz:   "Testni boshlash →",
-      topTalents:  "Eng yuqori iste'dodlaring:",
-      tips:        "Qanday rivojlantirish:",
-      courses:     "Tavsiya etilgan kurslar:",
-      universities:"🎓 Sening universitetlaring:",
-      careers:     "Sening kasblar:",
-      match:       "mos",
-      toHome:      "← Bosh sahifa",
-      toTasks:     "O'yinlarni o'yna 🎮",
-      framework:   "Gardner (Harvard) · MIT · Stanford · Oxford tadqiqotlari asosida",
-    },
-    en: {
-      banner:      "Develop your talents!",
-      personal:    "⭐ Personal recommendations",
-      noResults:   "Take the quiz first to get your personal recommendations!",
-      startQuiz:   "Take the quiz →",
-      topTalents:  "Your top talents:",
-      tips:        "How to develop:",
-      courses:     "Recommended courses:",
-      universities:"🎓 Universities for you:",
-      careers:     "Careers for you:",
-      match:       "match",
-      toHome:      "← Home",
-      toTasks:     "Play games 🎮",
-      framework:   "Based on Gardner (Harvard) · MIT · Stanford · Oxford research",
-    },
+    ru:{ title:"Развивай таланты", sub:"Персональный план развития на основе твоих результатов", noResults:"Пройди тест чтобы получить персональный план!", takeQuiz:"Пройти тест →", score:"твой результат", topTalent:"Твой топ-талант", sections:{ tips:"💡 Советы", courses:"📚 Курсы", careers:"🚀 Карьеры", universities:"🎓 Университеты", weekly:"📅 Неделя" }, retake:"Пройти заново" },
+    uz:{ title:"Iste'dodlarni rivojlantiring", sub:"Natijalaringizga asoslangan shaxsiy rivojlanish rejasi", noResults:"Shaxsiy rejani olish uchun testni topshiring!", takeQuiz:"Testni topshirish →", score:"sizning natijangiz", topTalent:"Sizning top iste'dodingiz", sections:{ tips:"💡 Maslahatlar", courses:"📚 Kurslar", careers:"🚀 Kasblar", universities:"🎓 Universitetlar", weekly:"📅 Hafta" }, retake:"Qaytadan topshirish" },
+    en:{ title:"Develop Your Talents", sub:"Personalised development plan based on your results", noResults:"Take the quiz to get your personalised plan!", takeQuiz:"Take quiz →", score:"your score", topTalent:"Your top talent", sections:{ tips:"💡 Tips", courses:"📚 Courses", careers:"🚀 Careers", universities:"🎓 Universities", weekly:"📅 Weekly plan" }, retake:"Retake quiz" },
   }[lang] || {};
 
   return (
     <div className="page-wrap">
-      <style>{DEV_CSS}</style>
+      <style>{`
+        @keyframes fadeSlide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes cardPop{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:scale(1)}}
+        @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+        .sec-btn:hover{transform:translateY(-2px)!important;box-shadow:0 6px 16px rgba(15,110,86,0.2)!important;}
+        .talent-tab:hover{background:rgba(15,110,86,0.08)!important;}
+        .tip-item:hover{transform:translateX(6px)!important;border-color:#5DCAA5!important;}
+        .uni-item:hover{transform:translateY(-3px)!important;box-shadow:0 8px 20px rgba(15,110,86,0.12)!important;}
+      `}</style>
+
       <Nav page="develop" setPage={setPage} lang={lang} dark={dark} />
 
-      <div className="develop-section">
-        {/* Banner */}
-        <div className="develop-banner" style={{ background:"linear-gradient(135deg,#EF9F27,#FAC775,#BA7517)", backgroundSize:"200% 200%", animation:"shimmer 4s ease infinite" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <span style={{ fontSize:"1.6rem" }}>🌟</span>
-            <div className="develop-banner-title">{L.banner}</div>
-          </div>
-          <span style={{ color:"rgba(255,255,255,0.9)", fontSize:"0.88rem", fontWeight:700, background:"rgba(255,255,255,0.15)", padding:"4px 12px", borderRadius:99, backdropFilter:"blur(4px)" }}>{L.personal}</span>
+      {/* Hero banner */}
+      <div style={{ background:`linear-gradient(135deg,${td.color},${td.color}bb)`, padding:"28px 24px", textAlign:"center" }}>
+        <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", color:"#fff", marginBottom:6 }}>{L.title}</h1>
+        <p style={{ color:"rgba(255,255,255,0.85)", fontWeight:600, fontSize:"0.9rem" }}>{L.sub}</p>
+      </div>
+
+      {/* No results state */}
+      {!hasResults && (
+        <div style={{ textAlign:"center", padding:"60px 24px" }}>
+          <div style={{ fontSize:"3rem", marginBottom:16 }}>🎯</div>
+          <p style={{ fontWeight:700, color:dark?"#9FE1CB":"#546E7A", marginBottom:20, fontSize:"1.05rem" }}>{L.noResults}</p>
+          <button onClick={() => setPage("quiz")} className="hero-cta" style={{ display:"inline-block" }}>{L.takeQuiz}</button>
         </div>
+      )}
 
-        {/* No results state */}
-        {!data && (
-          <div style={{ textAlign:"center", padding:"48px 24px" }}>
-            <div style={{ fontSize:"3rem", marginBottom:16 }}>📊</div>
-            <p style={{ fontWeight:700, color:"#546E7A", marginBottom:24, fontSize:"1rem" }}>{L.noResults}</p>
-            <button className="hero-cta" onClick={() => setPage("quiz")}>{L.startQuiz}</button>
+      {hasResults && (
+        <div style={{ display:"flex", gap:0, maxWidth:1000, margin:"0 auto", padding:"0 0 40px" }}>
+
+          {/* ── Left sidebar: talent tabs ── */}
+          <div style={{ width:160, flexShrink:0, padding:"16px 0", borderRight:`1px solid ${dark?"#2A4070":"#E1F5EE"}` }}>
+            {sortedTalents.map((t, i) => {
+              const td2 = TALENT_DATA[t];
+              const sc  = Math.round(scores[t]||0);
+              const isActive = i===activeTab;
+              return (
+                <button key={t} className="talent-tab"
+                  onClick={() => { setActiveTab(i); setSection("tips"); }}
+                  style={{ width:"100%", padding:"12px 14px", border:"none", borderLeft:`3px solid ${isActive?td2.color:"transparent"}`, background:isActive?`${td2.color}12`:"transparent", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"flex-start", gap:4, transition:"all 0.2s" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:6, width:"100%" }}>
+                    <span style={{ fontSize:"1.1rem" }}>{td2.icon}</span>
+                    <span style={{ fontWeight:800, fontSize:"0.8rem", color:isActive?td2.color:dark?"#9FE1CB":"#546E7A" }}>
+                      {td2.name[lang]||td2.name.en}
+                    </span>
+                    {i===0 && <span style={{ marginLeft:"auto", fontSize:"0.6rem", background:"#EF9F27", color:"#fff", borderRadius:99, padding:"1px 5px", fontWeight:900 }}>TOP</span>}
+                  </div>
+                  {/* Score bar */}
+                  <div style={{ width:"100%", height:4, background:dark?"#2A4070":"#E1F5EE", borderRadius:99 }}>
+                    <div style={{ width:`${sc}%`, height:"100%", background:td2.color, borderRadius:99, transition:"width 0.5s ease" }} />
+                  </div>
+                  <span style={{ fontSize:"0.68rem", fontWeight:800, color:td2.color }}>{sc}%</span>
+                </button>
+              );
+            })}
+            {/* Retake */}
+            <button onClick={() => setPage("quiz")}
+              style={{ width:"100%", marginTop:8, padding:"10px 14px", border:"none", background:"transparent", cursor:"pointer", fontSize:"0.75rem", fontWeight:800, color:"#EF9F27", textAlign:"left", borderTop:`1px solid ${dark?"#2A4070":"#E1F5EE"}` }}>
+              🔄 {L.retake}
+            </button>
           </div>
-        )}
 
-        {/* Results available */}
-        {data && topTalents && (
-          <>
-            {/* ── Top talent tabs ── */}
-            <div style={{ marginBottom:20 }}>
-              <p style={{ fontSize:"0.8rem", fontWeight:800, color:"#90A4AE", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>
-                {L.topTalents}
-              </p>
-              <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-                {topTalents.map((talent, i) => {
-                  const td = TALENT_TIPS[talent];
-                  const score = Math.round(data.scores[talent]);
-                  const isActive = i === safeTab;
-                  return (
-                    <button key={talent} className="talent-tab" onClick={() => setActiveTab(i)}
-                      style={{ display:"flex", alignItems:"center", gap:8, padding:"11px 20px", borderRadius:50, border:`2px solid ${isActive ? td.color : "#E1F5EE"}`, background: isActive ? `linear-gradient(135deg,${td.color},${td.color}cc)` : (dark?"#1A2A3A":"#fff"), color: isActive ? "#fff" : (dark?"#E1F5EE":"#04342C"), fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"0.9rem", cursor:"pointer", boxShadow: isActive ? `0 6px 20px ${td.color}44` : "0 2px 8px rgba(15,110,86,0.06)", animation: isActive?"tabIn 0.3s ease both":"none" }}>
-                      <span style={{ fontSize:"1.1rem" }}>{td.icon}</span>
-                      {TALENT_NAMES[talent]?.[lang]}
-                      <span style={{ background: isActive?"rgba(255,255,255,0.25)":"#E1F5EE", color: isActive?"#fff":td.color, borderRadius:99, padding:"3px 10px", fontSize:"0.78rem", fontWeight:900 }}>
-                        {score}%
-                      </span>
-                    </button>
-                  );
-                })}
+          {/* ── Right: content ── */}
+          <div style={{ flex:1, padding:"20px 24px", animation:"fadeSlide 0.3s ease both" }} key={talent}>
+
+            {/* Talent header */}
+            <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:20, padding:"16px 20px", background:dark?"#1A2A3A":`${td.color}08`, borderRadius:18, border:`1.5px solid ${td.color}33` }}>
+              <div style={{ fontSize:"2.5rem" }}>{td.icon}</div>
+              <div style={{ flex:1 }}>
+                <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.4rem", color:td.color, marginBottom:4 }}>
+                  {td.name[lang]||td.name.en}
+                </h2>
+                <p style={{ fontSize:"0.85rem", fontWeight:600, color:dark?"#B0BEC5":"#546E7A", margin:0, lineHeight:1.5 }}>
+                  {td.desc[lang]||td.desc.en}
+                </p>
+              </div>
+              <div style={{ textAlign:"center", background:td.color, color:"#fff", borderRadius:16, padding:"10px 16px", flexShrink:0 }}>
+                <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"1.8rem", lineHeight:1 }}>{score}%</div>
+                <div style={{ fontSize:"0.65rem", fontWeight:800, opacity:0.85 }}>{L.score}</div>
               </div>
             </div>
 
-            {/* ── Active talent detail ── */}
-            {talentData && (
-              <div style={{ display:"flex", gap:20, flexWrap:"wrap", marginBottom:24 }}>
+            {/* Section tabs */}
+            <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
+              {Object.entries(L.sections||{}).map(([key, label]) => (
+                <button key={key} className="sec-btn"
+                  onClick={() => setSection(key)}
+                  style={{ padding:"8px 16px", border:`2px solid ${section===key?td.color:dark?"#2A4070":"#E1F5EE"}`, borderRadius:99, background:section===key?td.color:"transparent", color:section===key?"#fff":dark?"#9FE1CB":"#546E7A", fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"0.82rem", cursor:"pointer", transition:"all 0.2s" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
 
-                {/* Tips card */}
-                <div className="develop-card" style={{ flex:1, minWidth:220, borderTop:`3px solid ${talentData.color}` }}>
-                  <div className="develop-card-title" style={{ color:talentData.color }}>
-                    {talentData.icon} {L.tips}
+            {/* ── TIPS ── */}
+            {section==="tips" && (
+              <div style={{ animation:"fadeSlide 0.25s ease both" }}>
+                {(td.tips[lang]||td.tips.en||[]).map((tip,i) => (
+                  <div key={i} className="tip-item"
+                    style={{ padding:"14px 18px", marginBottom:10, background:dark?"#1A2A3A":"#fff", borderRadius:14, border:`1.5px solid ${dark?"#2A4070":"#E1F5EE"}`, display:"flex", gap:12, alignItems:"flex-start", transition:"all 0.2s" }}>
+                    <div style={{ width:28, height:28, borderRadius:"50%", background:td.color, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Fredoka One',cursive", fontSize:"0.85rem", flexShrink:0 }}>{i+1}</div>
+                    <span style={{ fontWeight:700, color:dark?"#E1F5EE":"#2E4057", lineHeight:1.5, fontSize:"0.9rem" }}>{tip}</span>
                   </div>
-                  <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
-                    {talentData.tips[lang]?.map((tip, i) => (
-                      <li key={i} className="tip-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E1F5EE":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
-                        <span style={{ color:talentData.color, flexShrink:0, fontSize:"1rem" }}>✔</span> {tip}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Courses card */}
-                <div className="develop-card" style={{ flex:1, minWidth:220, borderTop:`3px solid ${talentData.color}` }}>
-                  <div className="develop-card-title" style={{ color:talentData.color }}>
-                    💻 {L.courses}
-                  </div>
-                  <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
-                    {talentData.courses[lang]?.map((course, i) => (
-                      <li key={i} className="course-item" style={{ fontSize:"0.88rem", fontWeight:700, color: dark?"#E1F5EE":"#37474F", display:"flex", gap:8, alignItems:"flex-start", animation:`cardSlide 0.3s ease ${i*0.07}s both` }}>
-                        <span style={{ color:"#EF9F27", flexShrink:0, fontSize:"1rem" }}>→</span> {course}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                ))}
               </div>
             )}
 
-            {/* ── University recommendations ── */}
-            {talentData && (
-              <div className="develop-card" style={{ marginBottom:24, borderTop:`3px solid ${talentData.color}`, background: dark?"#1A2A3A": `linear-gradient(135deg, ${talentData.color}08, #fff)` }}>
-                <div className="develop-card-title" style={{ color:talentData.color, fontSize:"1rem" }}>
-                  {L.universities}
-                </div>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginTop:4 }}>
-                  {talentData.universities[lang]?.map((uni, i) => (
-                    <div key={i} className="uni-chip" style={{ background: dark?"#0F1923":`linear-gradient(135deg,#fff,${talentData.color}08)`, border:`1.5px solid ${talentData.color}33`, borderRadius:14, padding:"9px 16px", fontSize:"0.82rem", fontWeight:800, color: dark?"#E1F5EE":"#04342C", boxShadow:`0 2px 10px ${talentData.color}18`, animation:`cardSlide 0.3s ease ${i*0.06}s both` }}>
-                      {uni}
-                    </div>
-                  ))}
-                </div>
-                <p style={{ fontSize:"0.72rem", color:"#90A4AE", fontWeight:700, marginTop:12 }}>
-                  📚 {L.framework}
+            {/* ── COURSES ── */}
+            {section==="courses" && (
+              <div style={{ animation:"fadeSlide 0.25s ease both", display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                {(td.courses[lang]||td.courses.en||[]).map((c,i) => (
+                  <div key={i} style={{ padding:"16px", background:dark?"#1A2A3A":"#fff", borderRadius:14, border:`1.5px solid ${td.color}33`, display:"flex", alignItems:"center", gap:10, animation:`cardPop 0.3s ${i*0.06}s both` }}>
+                    <span style={{ fontSize:"1.3rem" }}>📖</span>
+                    <span style={{ fontWeight:700, color:dark?"#E1F5EE":"#2E4057", fontSize:"0.85rem", lineHeight:1.4 }}>{c}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── CAREERS ── */}
+            {section==="careers" && (
+              <div style={{ animation:"fadeSlide 0.25s ease both", display:"flex", flexWrap:"wrap", gap:10 }}>
+                {(td.careers[lang]||td.careers.en||[]).map((c,i) => (
+                  <div key={i} style={{ padding:"10px 18px", background:`${td.color}12`, border:`1.5px solid ${td.color}44`, borderRadius:99, fontWeight:800, color:td.color, fontSize:"0.88rem", animation:`cardPop 0.3s ${i*0.05}s both` }}>
+                    {c}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── UNIVERSITIES ── */}
+            {section==="universities" && (
+              <div style={{ animation:"fadeSlide 0.25s ease both", display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                {(td.universities[lang]||td.universities.en||[]).map((u,i) => (
+                  <div key={i} className="uni-item"
+                    style={{ padding:"16px", background:dark?"#1A2A3A":"#fff", borderRadius:14, border:`1.5px solid ${dark?"#2A4070":"#E1F5EE"}`, fontWeight:700, color:dark?"#E1F5EE":"#2E4057", fontSize:"0.88rem", transition:"all 0.2s", animation:`cardPop 0.3s ${i*0.07}s both` }}>
+                    {u}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── WEEKLY PLAN ── */}
+            {section==="weekly" && (
+              <div style={{ animation:"fadeSlide 0.25s ease both" }}>
+                <p style={{ fontSize:"0.82rem", fontWeight:800, color:dark?"#9FE1CB":"#78909C", marginBottom:14, textTransform:"uppercase", letterSpacing:"0.06em" }}>
+                  📅 {lang==="ru"?"Твой план на эту неделю":lang==="uz"?"Bu hafta uchun rejangiz":"Your plan for this week"}
                 </p>
-              </div>
-            )}
-
-            {/* ── Career recommendations ── */}
-            {careers.length > 0 && (
-              <div className="develop-card" style={{ marginBottom:24 }}>
-                <div className="develop-card-title">🚀 {L.careers}</div>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
-                  {careers.map((career, i) => (
-                    <div key={i} className="career-card" style={{ display:"flex", alignItems:"center", gap:10, background: dark?"#0F1923":`linear-gradient(135deg,#F8FBFF,#fff)`, border:"1.5px solid #E1F5EE", borderRadius:16, padding:"12px 16px", flex:1, minWidth:160, boxShadow:"0 4px 16px rgba(15,110,86,0.06)" }}>
-                      <span style={{ fontSize:"1.8rem", filter:"drop-shadow(0 2px 6px rgba(0,0,0,0.12))" }}>{career.icon}</span>
-                      <div>
-                        <div style={{ fontWeight:800, color: dark?"#E1F5EE":"#04342C", fontSize:"0.9rem" }}>{career.name}</div>
-                        {career.match_percent != null && (
-                          <div style={{ fontSize:"0.78rem", fontWeight:700, color:"#0F6E56" }}>
-                            {Math.round(career.match_percent)}% {L.match}
-                          </div>
-                        )}
-                        {career.universities && (
-                          <div style={{ fontSize:"0.72rem", color:"#90A4AE", fontWeight:600, marginTop:2 }}>
-                            🎓 {career.universities}
-                          </div>
-                        )}
-                      </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:8 }}>
+                  {(td.weekly[lang]||td.weekly.en||[]).map((day,i) => (
+                    <div key={i} style={{ background:dark?"#1A2A3A":"#fff", borderRadius:14, padding:"12px 8px", textAlign:"center", border:`1.5px solid ${td.color}33`, animation:`cardPop 0.3s ${i*0.05}s both` }}>
+                      <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"0.9rem", color:td.color, marginBottom:6 }}>{DAYS[lang]?.[i]||DAYS.en[i]}</div>
+                      <div style={{ fontSize:"0.7rem", fontWeight:700, color:dark?"#B0BEC5":"#546E7A", lineHeight:1.4 }}>{day}</div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-          </>
-        )}
-
-        {/* Buttons */}
-        <div style={{ display:"flex", gap:16, marginTop:24, justifyContent:"center", flexWrap:"wrap" }}>
-          <button className="quiz-next dev-btn-home"
-            style={{ background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(15,110,86,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
-            onClick={() => setPage("home")}>
-            {L.toHome}
-          </button>
-          <button className="quiz-next dev-btn-tasks"
-            style={{ background:"linear-gradient(135deg,#EF9F27,#FAC775)", flex:1, maxWidth:240, boxShadow:"0 6px 20px rgba(239,159,39,0.3)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
-            onClick={() => setPage("tasks")}>
-            {L.toTasks}
-          </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

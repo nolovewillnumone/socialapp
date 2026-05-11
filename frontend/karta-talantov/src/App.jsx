@@ -11,7 +11,12 @@ import AdminPage  from "./pages/AdminPage";
 
 export default function App() {
   const [page, setPage]       = useState("auth");
-  const [results, setResults] = useState(null);
+  const [results, setResults] = useState(() => {
+    try {
+      const saved = localStorage.getItem("kt_results");
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
 
   const [lang, setLang] = useState(() => localStorage.getItem("lang") || "ru");
   const handleSetLang = (l) => { setLang(l); localStorage.setItem("lang", l); };
@@ -40,12 +45,18 @@ export default function App() {
       case "auth":    return <AuthPage    setPage={setPage} setUser={setUser} {...shared} />;
       case "home":    return <HomePage    setPage={setPage} user={user} onLogout={handleLogout} {...shared} />;
       case "tasks":   return <TasksPage   setPage={setPage} {...shared} />;
-      case "quiz":    return <QuizPage    setPage={setPage} setResults={setResults} {...shared} />;
+      case "quiz":    return <QuizPage    setPage={setPage} setResults={saveResults} {...shared} />;
       case "results": return <ResultsPage setPage={setPage} results={results} {...shared} />;
       case "develop": return <DevelopPage setPage={setPage} results={results} {...shared} />;
       case "admin":   return <AdminPage setPage={setPage} />;
       default:        return <AuthPage    setPage={setPage} setUser={setUser} {...shared} />;
     }
+  };
+
+  // Persist results across refreshes
+  const saveResults = (data) => {
+    setResults(data);
+    try { localStorage.setItem("kt_results", JSON.stringify(data)); } catch {}
   };
 
   return (
