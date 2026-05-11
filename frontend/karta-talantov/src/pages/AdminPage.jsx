@@ -73,28 +73,46 @@ export default function AdminPage({ setPage }) {
   const [tab,      setTab]      = useState("overview");
   const [pwInput,  setPwInput]  = useState("");
 
+  const [waking, setWaking] = useState(false);
+
   const login = async () => {
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`${API}/admin/data?password=${encodeURIComponent(pwInput)}`);
-      if (!res.ok) { setError("Wrong password!"); setLoading(false); return; }
+      // Wake up Render (cold start can take 30s)
+      setWaking(true);
+      try { await fetch(`${API}/health`, { signal: AbortSignal.timeout(5000) }); } catch {}
+      setWaking(false);
+
+      const res = await fetch(`${API}/admin/data?password=${encodeURIComponent(pwInput)}`, {
+        signal: AbortSignal.timeout(30000),
+      });
+      if (res.status === 403) { setError("Wrong password! Try again."); setLoading(false); return; }
+      if (!res.ok) { setError(`Server error ${res.status}. Try again.`); setLoading(false); return; }
       const json = await res.json();
       setData(json);
       setPassword(pwInput);
       setAuthed(true);
-    } catch {
-      setError("Cannot connect to backend.");
-    } finally { setLoading(false); }
+    } catch (e) {
+      if (e.name === "TimeoutError") {
+        setError("Backend is waking up (Render free tier). Wait 30s and try again.");
+      } else {
+        setError("Cannot connect to backend. Make sure Render is deployed.");
+      }
+    } finally { setLoading(false); setWaking(false); }
   };
 
   const refresh = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/admin/data?password=${encodeURIComponent(password)}`);
+      const res = await fetch(`${API}/admin/data?password=${encodeURIComponent(password)}`, {
+        signal: AbortSignal.timeout(30000),
+      });
+      if (!res.ok) throw new Error("Failed");
       const json = await res.json();
       setData(json);
-    } catch {}
-    finally { setLoading(false); }
+    } catch (e) {
+      alert("Refresh failed: " + e.message);
+    } finally { setLoading(false); }
   };
 
   // ── Login screen ────────────────────────────────────────────────────────────
@@ -117,9 +135,14 @@ export default function AdminPage({ setPage }) {
         />
         {error && <div style={{ color:"#EF5350", fontWeight:700, fontSize:"0.85rem", marginBottom:10 }}>⚠️ {error}</div>}
         <button onClick={login} disabled={loading}
-          style={{ width:"100%", padding:"14px", background:"linear-gradient(135deg,#0F6E56,#1D9E75)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(15,110,86,0.3)" }}>
-          {loading ? "Logging in..." : "Enter Dashboard →"}
+          style={{ width:"100%", padding:"14px", background: loading?"#9FE1CB":"linear-gradient(135deg,#0F6E56,#1D9E75)", color:"#fff", border:"none", borderRadius:14, fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:loading?"wait":"pointer", boxShadow:"0 6px 20px rgba(15,110,86,0.3)", transition:"all 0.3s" }}>
+          {waking ? "⏳ Waking up server..." : loading ? "⏳ Loading..." : "Enter Dashboard →"}
         </button>
+        {loading && (
+          <p style={{ fontSize:"0.78rem", color:"#78909C", textAlign:"center", marginTop:8, fontWeight:600 }}>
+            ⚠️ Render free tier may take up to 30 seconds to wake up
+          </p>
+        )}
         <button onClick={() => setPage("home")} style={{ width:"100%", marginTop:12, background:"none", border:"none", color:"#90A4AE", fontWeight:700, cursor:"pointer", fontSize:"0.85rem" }}>
           ← Back to site
         </button>

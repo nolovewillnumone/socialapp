@@ -40,6 +40,12 @@ export default function App() {
 
   const shared = { lang, dark };
 
+  // Persist results across refreshes
+  const saveResults = (data) => {
+    setResults(data);
+    try { localStorage.setItem("kt_results", JSON.stringify(data)); } catch {}
+  };
+
   const renderPage = () => {
     switch (page) {
       case "auth":    return <AuthPage    setPage={setPage} setUser={setUser} {...shared} />;
@@ -48,15 +54,9 @@ export default function App() {
       case "quiz":    return <QuizPage    setPage={setPage} setResults={saveResults} {...shared} />;
       case "results": return <ResultsPage setPage={setPage} results={results} {...shared} />;
       case "develop": return <DevelopPage setPage={setPage} results={results} {...shared} />;
-      case "admin":   return <AdminPage setPage={setPage} />;
+      case "admin":   return <AdminPage   setPage={setPage} />;
       default:        return <AuthPage    setPage={setPage} setUser={setUser} {...shared} />;
     }
-  };
-
-  // Persist results across refreshes
-  const saveResults = (data) => {
-    setResults(data);
-    try { localStorage.setItem("kt_results", JSON.stringify(data)); } catch {}
   };
 
   return (

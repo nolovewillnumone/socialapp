@@ -334,71 +334,57 @@ def verify_admin(password: str):
 @app.get("/admin/data")
 def admin_data(password: str, db: Session = Depends(get_db)):
     verify_admin(password)
+    from sqlalchemy import func as sqlfunc, text as sqtext
+
+    # Auto-create missing tables
     try:
-        from sqlalchemy import func as sqlfunc
+        from .database import engine
+        models.Base.metadata.create_all(bind=engine)
+    except Exception: pass
 
-        # Users
-        users = db.query(models.User).order_by(models.User.created_at.desc()).limit(50).all()
+    def safe(fn, default):
+        try: return fn()
+        except Exception: return default
 
-        # Quiz results
-        results = db.query(models.QuizResult).order_by(models.QuizResult.created_at.desc()).limit(50).all()
+    users     = safe(lambda: db.query(models.User).order_by(models.User.created_at.desc()).limit(50).all(), [])
+    feedbacks = safe(lambda: db.query(models.Feedback).order_by(models.Feedback.created_at.desc()).limit(100).all(), [])
+    anon      = safe(lambda: db.query(models.AnonymousResult).order_by(models.AnonymousResult.created_at.desc()).limit(100).all(), [])
 
-        # Anonymous results
-        anon = db.query(models.AnonymousResult).order_by(models.AnonymousResult.created_at.desc()).limit(100).all()
+    total_users    = safe(lambda: db.query(models.User).count(), 0)
+    total_results  = safe(lambda: db.query(models.QuizResult).count(), 0)
+    total_anon     = safe(lambda: db.query(models.AnonymousResult).count(), 0)
+    fb_list        = safe(lambda: db.query(models.Feedback).all(), [])
+    avg_rating     = round(sum(f.rating for f in fb_list) / len(fb_list), 2) if fb_list else 0
 
-        # Feedback
-        feedbacks = db.query(models.Feedback).order_by(models.Feedback.created_at.desc()).limit(100).all()
+    top_careers = safe(lambda: db.query(
+        models.AnonymousResult.top_career, sqlfunc.count(models.AnonymousResult.id).label("cnt")
+    ).group_by(models.AnonymousResult.top_career).order_by(sqlfunc.count(models.AnonymousResult.id).desc()).limit(10).all(), [])
 
-        # Stats
-        total_users    = db.query(models.User).count()
-        total_results  = db.query(models.QuizResult).count()
-        total_anon     = db.query(models.AnonymousResult).count()
-        total_feedback = db.query(models.Feedback).count()
-        fb_list        = db.query(models.Feedback).all()
-        avg_rating     = round(sum(f.rating for f in fb_list) / len(fb_list), 2) if fb_list else 0
+    top_talents = safe(lambda: db.query(
+        models.AnonymousResult.top_talent, sqlfunc.count(models.AnonymousResult.id).label("cnt")
+    ).group_by(models.AnonymousResult.top_talent).order_by(sqlfunc.count(models.AnonymousResult.id).desc()).limit(9).all(), [])
 
-        # Top careers from anon
-        top_careers = (
-            db.query(models.AnonymousResult.top_career, sqlfunc.count(models.AnonymousResult.id).label("cnt"))
-            .group_by(models.AnonymousResult.top_career)
-            .order_by(sqlfunc.count(models.AnonymousResult.id).desc())
-            .limit(10).all()
-        )
+    lang_dist = safe(lambda: db.query(
+        models.AnonymousResult.lang, sqlfunc.count(models.AnonymousResult.id).label("cnt")
+    ).group_by(models.AnonymousResult.lang).all(), [])
 
-        # Top talents
-        top_talents = (
-            db.query(models.AnonymousResult.top_talent, sqlfunc.count(models.AnonymousResult.id).label("cnt"))
-            .group_by(models.AnonymousResult.top_talent)
-            .order_by(sqlfunc.count(models.AnonymousResult.id).desc())
-            .limit(9).all()
-        )
-
-        # Lang distribution
-        lang_dist = (
-            db.query(models.AnonymousResult.lang, sqlfunc.count(models.AnonymousResult.id).label("cnt"))
-            .group_by(models.AnonymousResult.lang)
-            .all()
-        )
-
-        return {
-            "stats": {
-                "total_users": total_users,
-                "total_quizzes": total_results + total_anon,
-                "registered_quizzes": total_results,
-                "guest_quizzes": total_anon,
-                "total_feedback": total_feedback,
-                "avg_rating": avg_rating,
-                "helpful_pct": round(sum(1 for f in fb_list if f.helpful) / len(fb_list) * 100, 1) if fb_list else 0,
-            },
-            "top_careers": [{"career": r[0], "count": r[1]} for r in top_careers],
-            "top_talents": [{"talent": r[0], "count": r[1]} for r in top_talents],
-            "lang_dist":   [{"lang": r[0], "count": r[1]} for r in lang_dist],
-            "users": [{"id":u.id,"name":u.name,"email":u.email,"age":u.age,"lang":u.lang,"created_at":str(u.created_at)[:10]} for u in users],
-            "feedbacks": [{"id":f.id,"name":f.name,"rating":f.rating,"comment":f.comment,"career":f.career,"lang":f.lang,"helpful":f.helpful,"date":str(f.created_at)[:10]} for f in feedbacks],
-            "anon_results": [{"id":a.id,"lang":a.lang,"top_talent":a.top_talent,"top_career":a.top_career,"date":str(a.created_at)[:10]} for a in anon],
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "stats": {
+            "total_users":         total_users,
+            "total_quizzes":       total_results + total_anon,
+            "registered_quizzes":  total_results,
+            "guest_quizzes":       total_anon,
+            "total_feedback":      len(fb_list),
+            "avg_rating":          avg_rating,
+            "helpful_pct":         round(sum(1 for f in fb_list if f.helpful) / len(fb_list) * 100, 1) if fb_list else 0,
+        },
+        "top_careers":  [{"career": r[0] or "—", "count": r[1]} for r in top_careers],
+        "top_talents":  [{"talent": r[0] or "—", "count": r[1]} for r in top_talents],
+        "lang_dist":    [{"lang":   r[0] or "—", "count": r[1]} for r in lang_dist],
+        "users":        [{"id":u.id,"name":u.name,"email":u.email,"age":u.age or "—","lang":u.lang,"created_at":str(u.created_at)[:10]} for u in users],
+        "feedbacks":    [{"id":f.id,"name":f.name,"rating":f.rating,"comment":f.comment or "","career":f.career or "","lang":f.lang,"helpful":f.helpful,"date":str(f.created_at)[:10]} for f in feedbacks],
+        "anon_results": [{"id":a.id,"lang":a.lang,"top_talent":a.top_talent or "—","top_career":a.top_career or "—","date":str(a.created_at)[:10]} for a in anon],
+    }
 
 
 # ── Anonymous result tracking ─────────────────────────────────────────────────

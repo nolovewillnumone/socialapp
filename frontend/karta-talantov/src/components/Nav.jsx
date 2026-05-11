@@ -10,6 +10,7 @@ const ITEMS = [
 
 export default function Nav({ page, setPage, lang = "ru", dark = false, user, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [logoClicks, setLogoClicks] = useState(0);
 
   const go = (key) => { setPage(key); setOpen(false); };
 
@@ -23,8 +24,13 @@ export default function Nav({ page, setPage, lang = "ru", dark = false, user, on
   return (
     <>
       <nav className="nav-bar" style={{ background: navBg, borderBottom: border }}>
-        {/* Logo */}
-        <div className="nav-logo" style={{ color: textCol }} onClick={() => go("home")}>
+        {/* Logo — triple click = admin */}
+        <div className="nav-logo" style={{ color: textCol }}
+          onClick={() => {
+            const next = logoClicks + 1;
+            if (next >= 3) { go("admin"); setLogoClicks(0); }
+            else { go("home"); setLogoClicks(next); setTimeout(() => setLogoClicks(0), 2000); }
+          }}>
           🌟 Карта Талантов
         </div>
 
