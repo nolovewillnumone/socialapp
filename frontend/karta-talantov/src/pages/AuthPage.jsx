@@ -187,9 +187,11 @@ export default function AuthPage({ setPage, setUser, lang, dark }) {
         // Pydantic validation error
         if (Array.isArray(detail)) {
           const msg = detail.map(d => d.msg || d.message || "").filter(Boolean).join(", ");
-          setError(msg || (lang==="ru"?"Проверь данные":lang==="uz"?"Ma'lumotlarni tekshiring":"Check your data"));
+          const checkMsg = lang==="ru" ? "Проверь данные" : lang==="uz" ? "Tekshiring" : "Check your data";
+          setError(msg || checkMsg);
         } else {
-          setError(lang==="ru"?"Проверь данные":lang==="uz"?"Ma'lumotlarni tekshiring":"Check your data");
+          const checkMsg2 = lang==="ru" ? "Проверь данные" : lang==="uz" ? "Tekshiring" : "Check your data";
+          setError(checkMsg2);
         }
       } else if (status === 429) {
         setError(lang==="ru"?"Слишком много попыток. Подожди минуту.":lang==="uz"?"Ko'p urinish. 1 daqiqa kuting.":"Too many attempts. Wait 1 minute.");
