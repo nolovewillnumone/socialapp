@@ -815,14 +815,25 @@ def analytics_summary(db: Session = Depends(get_db)):
 @app.delete("/admin/user/{user_id}")
 def admin_delete_user(user_id: int, password: str, db: Session = Depends(get_db)):
     verify_admin(password)
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.query(models.QuizResult).filter(models.QuizResult.user_id == user_id).delete()
-    db.query(models.Feedback).filter(models.Feedback.user_id == user_id).delete()
-    db.delete(user)
-    db.commit()
-    return {"deleted": True, "user_id": user_id}
+    try:
+        user = db.query(models.User).filter(models.User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        # Delete related records safely
+        try:
+            db.query(models.QuizResult).filter(models.QuizResult.user_id == user_id).delete()
+        except Exception: pass
+        try:
+            db.query(models.Feedback).filter(models.Feedback.user_id == user_id).delete()
+        except Exception: pass
+        db.delete(user)
+        db.commit()
+        return {"deleted": True, "user_id": user_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/admin/feedback/{feedback_id}")
 def admin_delete_feedback(feedback_id: int, password: str, db: Session = Depends(get_db)):
