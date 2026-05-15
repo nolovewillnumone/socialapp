@@ -1,17 +1,37 @@
-"""Pydantic schemas — compatible with pydantic v1 (1.10.13)"""
+"""Pydantic schemas — pydantic v1 compatible"""
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, validator
 from typing import Optional
 from datetime import datetime
 
 
 class UserCreate(BaseModel):
     name:     str
-    email:    EmailStr
+    email:    str      # plain str — avoid EmailStr dependency issues
     password: str
     age:      Optional[int] = None
     lang:     Optional[str] = "ru"
     role:     Optional[str] = "child"
+
+    @validator("email")
+    def email_valid(cls, v):
+        v = v.strip().lower()
+        if "@" not in v or "." not in v.split("@")[-1]:
+            raise ValueError("Invalid email")
+        return v
+
+    @validator("name")
+    def name_valid(cls, v):
+        v = v.strip()
+        if len(v) < 1:
+            raise ValueError("Name is required")
+        return v
+
+    @validator("password")
+    def password_valid(cls, v):
+        if len(v) < 6:
+            raise ValueError("Password must be at least 6 characters")
+        return v
 
 
 class UserUpdate(BaseModel):
@@ -31,7 +51,7 @@ class UserOut(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True          # pydantic v1
 
 
 class UserPublic(BaseModel):
@@ -42,7 +62,7 @@ class UserPublic(BaseModel):
     role: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class TokenOut(BaseModel):
@@ -59,10 +79,10 @@ class ResultCreate(BaseModel):
 
 
 class ResultOut(BaseModel):
-    id:              int
-    user_id:         int
-    top_talent:      Optional[str]
-    top_career:      Optional[str]
+    id:               int
+    user_id:          int
+    top_talent:       Optional[str]
+    top_career:       Optional[str]
     score_logic:      float
     score_creativity: float
     score_memory:     float
@@ -75,7 +95,7 @@ class ResultOut(BaseModel):
     created_at:       datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class TaskResultCreate(BaseModel):
