@@ -141,24 +141,69 @@ export default function AuthPage({ setPage, setUser, lang, dark }) {
 
   const handleRegister = async () => {
     setError(null); setSuccess(null);
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      setError(lbl.errFill); return;
-    }
+
+    // Client-side validation first
+    if (!name.trim())     { setError(lang==="ru"?"Введи имя":lang==="uz"?"Ismingizni kiriting":"Enter your name"); return; }
+    if (!email.trim())    { setError(lang==="ru"?"Введи email":"Email manzilini kiriting":"Enter your email"); return; }
+    if (!password.trim()) { setError(lang==="ru"?"Введи пароль":lang==="uz"?"Parolni kiriting":"Enter your password"); return; }
     if (password.length < 6) {
-      setError(lang==="ru"?"Пароль минимум 6 символов":lang==="uz"?"Parol kamida 6 ta belgi":"Password must be at least 6 characters");
+      setError(lang==="ru"?"Пароль минимум 6 символов":lang==="uz"?"Parol kamida 6 ta belgi":"Password min 6 characters");
       return;
     }
+    if (!email.includes("@")) {
+      setError(lang==="ru"?"Неверный формат email":lang==="uz"?"Email formati noto'g'ri":"Invalid email format");
+      return;
+    }
+
     setLoading(true);
     try {
-      await authAPI.register({ name: name.trim(), email: email.trim(), password, age: age ? parseInt(age) : null, lang, role:"child" });
-      setSuccess(lbl.success);
-      setTimeout(() => switchTo("login"), 1500);
+      const res = await authAPI.register({
+        name:     name.trim(),
+        email:    email.trim().toLowerCase(),
+        password,
+        age:      age ? parseInt(age) : null,
+        lang,
+        role:     "child",
+      });
+
+      // 201 = success
+      if (res.status === 201 || res.data?.id) {
+        setSuccess(lbl.success);
+        setError(null);
+        // Pre-fill email for login
+        setTimeout(() => {
+          switchTo("login");
+          setPass("");
+        }, 1500);
+      }
     } catch (err) {
+      const status = err?.response?.status;
       const detail = err?.response?.data?.detail;
-      if (typeof detail === "string") setError(detail);
-      else if (Array.isArray(detail)) setError(detail.map(d=>d.msg).join(", "));
-      else setError(lbl.errFill);
-    } finally { setLoading(false); }
+
+      if (status === 400) {
+        // Email already registered
+        setError(lang==="ru"?"Email уже зарегистрирован":lang==="uz"?"Bu email allaqachon ro'yxatdan o'tgan":"Email already registered");
+      } else if (status === 422) {
+        // Pydantic validation error
+        if (Array.isArray(detail)) {
+          const msg = detail.map(d => d.msg || d.message || "").filter(Boolean).join(", ");
+          setError(msg || (lang==="ru"?"Проверь данные":"Ma'lumotlarni tekshiring":"Check your data"));
+        } else {
+          setError(lang==="ru"?"Проверь данные":"Ma'lumotlarni tekshiring":"Check your data");
+        }
+      } else if (status === 429) {
+        setError(lang==="ru"?"Слишком много попыток. Подожди минуту.":lang==="uz"?"Ko'p urinish. 1 daqiqa kuting.":"Too many attempts. Wait 1 minute.");
+      } else if (typeof detail === "string") {
+        setError(detail);
+      } else {
+        // Network error — but registration might have succeeded!
+        // Check by trying to log in
+        setError(lang==="ru"?"Аккаунт создан! Попробуй войти.":lang==="uz"?"Hisob yaratildi! Kirishga urinib ko'ring.":"Account may be created. Try logging in.");
+        setTimeout(() => switchTo("login"), 2000);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const switchTo = (m) => {
