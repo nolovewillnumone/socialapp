@@ -7,7 +7,8 @@ import TasksPage   from "./pages/TasksPage";
 import QuizPage    from "./pages/QuizPage";
 import ResultsPage from "./pages/ResultsPage";
 import DevelopPage from "./pages/DevelopPage";
-import AdminPage  from "./pages/AdminPage";
+import AdminPage       from "./pages/AdminPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
 
 export default function App() {
   const [page, setPage]       = useState("auth");
@@ -54,7 +55,8 @@ export default function App() {
       case "quiz":    return <QuizPage    setPage={setPage} setResults={saveResults} {...shared} />;
       case "results": return <ResultsPage setPage={setPage} results={results} {...shared} />;
       case "develop": return <DevelopPage setPage={setPage} results={results} {...shared} />;
-      case "admin":   return <AdminPage   setPage={setPage} />;
+      case "admin":       return <AdminPage       setPage={setPage} />;
+      case "leaderboard": return <LeaderboardPage setPage={setPage} results={results} {...shared} />;
       default:        return <AuthPage    setPage={setPage} setUser={setUser} {...shared} />;
     }
   };

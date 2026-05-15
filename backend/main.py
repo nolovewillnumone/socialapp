@@ -24,6 +24,86 @@ import os
 import re
 import time
 
+
+# ── Email helper (uses free SMTP or Gmail) ────────────────────────────────────
+def send_welcome_email(to_email: str, name: str, lang: str = "ru"):
+    """Send welcome email via SMTP. Set SMTP_HOST, SMTP_USER, SMTP_PASS in env."""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    smtp_host = os.environ.get("SMTP_HOST", "")
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASS", "")
+    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+
+    if not smtp_host or not smtp_user:
+        return  # Email not configured — skip silently
+
+    subjects = {
+        "ru": "Добро пожаловать в Karta Talantov! 🌟",
+        "uz": "Karta Talantov ga xush kelibsiz! 🌟",
+        "en": "Welcome to Karta Talantov! 🌟",
+    }
+    bodies = {
+        "ru": f"""Привет, {name}! 👋
+
+Добро пожаловать в Karta Talantov — платформу для открытия твоих талантов!
+
+🎯 Что тебя ждёт:
+• Тест из 30 вопросов (7 минут)
+• Анализ 9 талантов с ML-алгоритмом
+• 35+ карьерных рекомендаций
+• Персональный план развития
+
+Начни прямо сейчас: https://levelup-talent.xyz
+
+Удачи в открытии своих талантов! 🌟
+Команда Karta Talantov""",
+        "uz": f"""Salom, {name}! 👋
+
+Karta Talantov ga xush kelibsiz — iste'dodlaringizni ochish platformasiga!
+
+🎯 Sizni nima kutmoqda:
+• 30 savollik test (7 daqiqa)
+• ML-algoritm bilan 9 iste'dod tahlili
+• 35+ kasb tavsiyalari
+• Shaxsiy rivojlanish rejasi
+
+Hozir boshlang: https://levelup-talent.xyz
+
+Iste'dodlaringizni kashf etishda omad! 🌟
+Karta Talantov jamoasi""",
+        "en": f"""Hi {name}! 👋
+
+Welcome to Karta Talantov — the platform for discovering your talents!
+
+🎯 What awaits you:
+• 30-question quiz (7 minutes)
+• ML analysis of 9 talent dimensions
+• 35+ career recommendations
+• Personalised development plan
+
+Start now: https://levelup-talent.xyz
+
+Good luck discovering your talents! 🌟
+The Karta Talantov Team""",
+    }
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subjects.get(lang, subjects["en"])
+        msg["From"]    = smtp_user
+        msg["To"]      = to_email
+        msg.attach(MIMEText(bodies.get(lang, bodies["en"]), "plain", "utf-8"))
+
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.send_message(msg)
+    except Exception:
+        pass  # Never crash registration if email fails
+
 from .database import engine, get_db, Base
 from . import models, schemas, auth
 
@@ -120,6 +200,11 @@ def register(request: Request, body: schemas.UserCreate, db: Session = Depends(g
         db.add(user)
         db.commit()
         db.refresh(user)
+        # Send welcome email (non-blocking — never fails registration)
+        try:
+            send_welcome_email(user.email, user.name, user.lang)
+        except Exception:
+            pass
         return user
     except HTTPException:
         raise
@@ -283,24 +368,31 @@ def leaderboard(talent: str = "logic", db: Session = Depends(get_db)):
         "leadership": models.QuizResult.score_leadership,
         "languages":  models.QuizResult.score_languages,
         "music":      models.QuizResult.score_music,
+        "sport":      models.QuizResult.score_sport,
+        "nature":     models.QuizResult.score_nature,
+        "social":     models.QuizResult.score_social,
     }
     if talent not in col_map:
-        raise HTTPException(status_code=400, detail=f"Invalid talent. Choose: {list(col_map.keys())}")
+        talent = "logic"
 
-    rows = db.query(models.QuizResult, models.User)\
-        .join(models.User, models.QuizResult.user_id == models.User.id)\
-        .order_by(col_map[talent].desc()).limit(10).all()
+    try:
+        rows = db.query(models.QuizResult, models.User)\
+            .join(models.User, models.QuizResult.user_id == models.User.id)\
+            .order_by(col_map[talent].desc()).limit(20).all()
 
-    return [
-        {
-            "rank": i + 1,
-            "name": user.name,
-            "age": user.age,
-            "score": round(getattr(result, f"score_{talent}"), 1),
-            "top_talent": result.top_talent,
-        }
-        for i, (result, user) in enumerate(rows)
-    ]
+        return [
+            {
+                "rank":       i + 1,
+                "name":       user.name,
+                "age":        user.age or "—",
+                "score":      round(getattr(result, f"score_{talent}", 0) or 0, 1),
+                "top_talent": result.top_talent or talent,
+                "top_career": result.top_career or "",
+            }
+            for i, (result, user) in enumerate(rows)
+        ]
+    except Exception as e:
+        return []
 
 
 # ── Questions proxy ───────────────────────────────────────────────────────────
@@ -322,6 +414,51 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+
+# ── User comparison ───────────────────────────────────────────────────────────
+@app.get("/compare")
+def compare_with_average(
+    session_id: str = "",
+    db: Session = Depends(get_db)
+):
+    """Compare a user's scores with the platform average."""
+    try:
+        from sqlalchemy import func as sqlfunc
+
+        # Get all anonymous results for average
+        avgs = db.query(
+            sqlfunc.avg(models.AnonymousResult.score_logic).label("logic"),
+            sqlfunc.avg(models.AnonymousResult.score_creativity).label("creativity"),
+            sqlfunc.avg(models.AnonymousResult.score_memory).label("memory"),
+            sqlfunc.avg(models.AnonymousResult.score_leadership).label("leadership"),
+            sqlfunc.avg(models.AnonymousResult.score_languages).label("languages"),
+            sqlfunc.avg(models.AnonymousResult.score_music).label("music"),
+            sqlfunc.avg(models.AnonymousResult.score_sport).label("sport"),
+            sqlfunc.avg(models.AnonymousResult.score_nature).label("nature"),
+            sqlfunc.avg(models.AnonymousResult.score_social).label("social"),
+        ).first()
+
+        total = db.query(models.AnonymousResult).count()
+
+        avg_scores = {
+            "logic":      round(float(avgs.logic or 30), 1),
+            "creativity": round(float(avgs.creativity or 30), 1),
+            "memory":     round(float(avgs.memory or 30), 1),
+            "leadership": round(float(avgs.leadership or 30), 1),
+            "languages":  round(float(avgs.languages or 30), 1),
+            "music":      round(float(avgs.music or 30), 1),
+            "sport":      round(float(avgs.sport or 30), 1),
+            "nature":     round(float(avgs.nature or 30), 1),
+            "social":     round(float(avgs.social or 30), 1),
+        }
+
+        return {
+            "avg_scores": avg_scores,
+            "total_users": total,
+        }
+    except Exception as e:
+        return {"avg_scores": {t: 30 for t in ["logic","creativity","memory","leadership","languages","music","sport","nature","social"]}, "total_users": 0}
 
 
 # ── Admin Dashboard ───────────────────────────────────────────────────────────
@@ -385,6 +522,125 @@ def admin_data(password: str, db: Session = Depends(get_db)):
         "feedbacks":    [{"id":f.id,"name":f.name,"rating":f.rating,"comment":f.comment or "","career":f.career or "","lang":f.lang,"helpful":f.helpful,"date":str(f.created_at)[:10]} for f in feedbacks],
         "anon_results": [{"id":a.id,"lang":a.lang,"top_talent":a.top_talent or "—","top_career":a.top_career or "—","date":str(a.created_at)[:10]} for a in anon],
     }
+
+
+
+# ── Comparison endpoint ───────────────────────────────────────────────────────
+@app.get("/analytics/comparison")
+def comparison(db: Session = Depends(get_db)):
+    """Returns average scores across all users for radar chart comparison."""
+    try:
+        from sqlalchemy import func as sqlfunc
+        anon = db.query(models.AnonymousResult).all()
+        if not anon:
+            return {"avg": {"logic":50,"creativity":50,"memory":50,"leadership":50,"languages":50,"music":50,"sport":50,"nature":50,"social":50}, "count":0}
+
+        talents = ["logic","creativity","memory","leadership","languages","music","sport","nature","social"]
+        avgs = {}
+        for t in talents:
+            vals = [getattr(a, f"score_{t}", 0) or 0 for a in anon]
+            avgs[t] = round(sum(vals)/len(vals), 1) if vals else 50
+
+        return {"avg": avgs, "count": len(anon)}
+    except Exception as e:
+        return {"avg": {"logic":50,"creativity":50,"memory":50,"leadership":50,"languages":50,"music":50,"sport":50,"nature":50,"social":50}, "count":0, "error":str(e)}
+
+
+
+# ── Email notifications ───────────────────────────────────────────────────────
+def build_steps(steps):
+    """Build HTML step items for email."""
+    html = ""
+    for i, step in enumerate(steps):
+        html += (
+            f'<div style="margin-bottom:12px;">' +
+            f'<span style="display:inline-block;width:24px;height:24px;border-radius:50%;background:#0F6E56;color:#fff;font-weight:800;font-size:12px;text-align:center;line-height:24px;">{i+1}</span>' +
+            f'<span style="margin-left:12px;color:#2E4057;font-size:14px;font-weight:600;">{step}</span>' +
+            '</div>'
+        )
+    return html
+
+
+def send_welcome_email(to_email: str, name: str, lang: str = "ru"):
+    """Send welcome email after registration. Uses Gmail SMTP."""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    smtp_email = os.environ.get("SMTP_EMAIL", "")
+    smtp_pass  = os.environ.get("SMTP_PASSWORD", "")
+
+    if not smtp_email or not smtp_pass:
+        return  # Skip if not configured
+
+    subjects = {
+        "ru": "Добро пожаловать в Karta Talantov! 🌟",
+        "uz": "Karta Talantov ga xush kelibsiz! 🌟",
+        "en": "Welcome to Karta Talantov! 🌟",
+    }
+    bodies = {
+        "ru": f"""Привет, {name}! 👋
+
+Добро пожаловать в Karta Talantov — платформу для открытия талантов!
+
+🎯 Что делать дальше:
+1. Пройди тест из 30 вопросов
+2. Узнай свои топ-таланты
+3. Получи персональный план развития
+4. Посмотри свою карту талантов
+
+👉 Начни прямо сейчас: https://levelup-talent.xyz
+
+Удачи в открытии своих талантов! 🚀
+
+С уважением,
+Команда Karta Talantov""",
+        "uz": f"""Salom, {name}! 👋
+
+Karta Talantov ga xush kelibsiz — iste'dodlarni kashf etish platformasiga!
+
+🎯 Keyingi qadamlar:
+1. 30 savollik testni topshiring
+2. Top iste'dodlaringizni biling
+3. Shaxsiy rivojlanish rejasini oling
+4. Iste'dod xaritangizni ko'ring
+
+👉 Hozir boshlang: https://levelup-talent.xyz
+
+Iste'dodlaringizni kashf etishda omad! 🚀
+
+Hurmat bilan,
+Karta Talantov jamoasi""",
+        "en": f"""Hi {name}! 👋
+
+Welcome to Karta Talantov — the talent discovery platform!
+
+🎯 What to do next:
+1. Take the 30-question quiz
+2. Discover your top talents
+3. Get your personalised development plan
+4. See your talent map
+
+👉 Start now: https://levelup-talent.xyz
+
+Good luck discovering your talents! 🚀
+
+Best regards,
+The Karta Talantov Team""",
+    }
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subjects.get(lang, subjects["en"])
+        msg["From"]    = smtp_email
+        msg["To"]      = to_email
+        msg.attach(MIMEText(bodies.get(lang, bodies["en"]), "plain", "utf-8"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+            server.login(smtp_email, smtp_pass)
+            server.sendmail(smtp_email, to_email, msg.as_string())
+    except Exception:
+        pass  # Never block registration if email fails
 
 
 # ── Anonymous result tracking ─────────────────────────────────────────────────

@@ -5,7 +5,8 @@ const ITEMS = [
   { key: "tasks",   ru: "Задания",  uz: "Vazifalar", en: "Tasks"   },
   { key: "quiz",    ru: "Тест",     uz: "Test",      en: "Quiz"    },
   { key: "results", ru: "Карта",    uz: "Xarita",    en: "Results" },
-  { key: "develop", ru: "Развитие", uz: "Rivojl.",   en: "Develop" },
+  { key: "develop",     ru: "Развитие",  uz: "Rivojl.",    en: "Develop"      },
+  { key: "leaderboard", ru: "Рейтинг",   uz: "Reyting",    en: "Leaderboard"  },
 ];
 
 export default function Nav({ page, setPage, lang = "ru", dark = false, user, onLogout }) {
