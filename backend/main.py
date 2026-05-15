@@ -144,7 +144,7 @@ def rate_limit(request: Request, max_calls: int = 10, window_seconds: int = 60):
 
 def auth_rate_limit(request: Request):
     """Strict limit for auth endpoints — 5 attempts per minute."""
-    rate_limit(request, max_calls=5, window_seconds=60)
+    rate_limit(request, max_calls=20, window_seconds=60)
 
 # ── Input sanitizer ───────────────────────────────────────────────────────────
 def sanitize(value: str, max_len: int = 200) -> str:

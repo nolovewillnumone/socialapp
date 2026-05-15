@@ -112,33 +112,52 @@ export default function AuthPage({ setPage, setUser, lang, dark }) {
     setTimeout(() => setCardVisible(true), 80);
   }, []);
 
+  // Labels defined here so handlers can use them
+  const LABELS = {
+    ru: { errFill:"Заполни все поля!", errLogin:"Неверный email или пароль", success:"Аккаунт создан! Войди в систему." },
+    uz: { errFill:"Barcha maydonlarni to'ldiring!", errLogin:"Noto'g'ri email yoki parol", success:"Hisob yaratildi! Kiring." },
+    en: { errFill:"Fill in all fields!", errLogin:"Wrong email or password", success:"Account created! Please sign in." },
+  };
+  const lbl = LABELS[lang] || LABELS.en;
+
   const handleLogin = async () => {
     setError(null); setSuccess(null);
-    if (!email || !password) { setError(L.errFill); return; }
+    if (!email.trim() || !password.trim()) { setError(lbl.errFill); return; }
     setLoading(true);
     try {
-      const res = await authAPI.login(email, password);
+      const res = await authAPI.login(email.trim(), password);
       localStorage.setItem("token", res.data.access_token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setUser(res.data.user);
-      // Exit animation
       setCardVisible(false);
       setTimeout(() => setPage("home"), 350);
-    } catch {
-      setError(L.errLogin);
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 401) setError(lbl.errLogin);
+      else if (status === 429) setError("Слишком много попыток. Подожди минуту.");
+      else setError(lbl.errLogin);
     } finally { setLoading(false); }
   };
 
   const handleRegister = async () => {
     setError(null); setSuccess(null);
-    if (!name || !email || !password) { setError(L.errFill); return; }
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setError(lbl.errFill); return;
+    }
+    if (password.length < 6) {
+      setError(lang==="ru"?"Пароль минимум 6 символов":lang==="uz"?"Parol kamida 6 ta belgi":"Password must be at least 6 characters");
+      return;
+    }
     setLoading(true);
     try {
-      await authAPI.register({ name, email, password, age: age ? parseInt(age) : null, lang, role:"child" });
-      setSuccess(L.success);
+      await authAPI.register({ name: name.trim(), email: email.trim(), password, age: age ? parseInt(age) : null, lang, role:"child" });
+      setSuccess(lbl.success);
       setTimeout(() => switchTo("login"), 1500);
     } catch (err) {
-      setError(err.response?.data?.detail || L.errFill);
+      const detail = err?.response?.data?.detail;
+      if (typeof detail === "string") setError(detail);
+      else if (Array.isArray(detail)) setError(detail.map(d=>d.msg).join(", "));
+      else setError(lbl.errFill);
     } finally { setLoading(false); }
   };
 
