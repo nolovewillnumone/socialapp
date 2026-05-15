@@ -101,6 +101,22 @@ export default function AdminPage({ setPage }) {
     } finally { setLoading(false); setWaking(false); }
   };
 
+  const deleteUser = async (userId, userName) => {
+    if (!window.confirm(`Delete user "${userName}"? This also deletes their quiz results and feedback.`)) return;
+    try {
+      await fetch(`${API}/admin/user/${userId}?password=${encodeURIComponent(password)}`, { method:"DELETE" });
+      setData(prev => ({ ...prev, users: prev.users.filter(u => u.id !== userId), stats: { ...prev.stats, total_users: prev.stats.total_users - 1 } }));
+    } catch { alert("Delete failed"); }
+  };
+
+  const deleteFeedback = async (fbId) => {
+    if (!window.confirm("Delete this feedback?")) return;
+    try {
+      await fetch(`${API}/admin/feedback/${fbId}?password=${encodeURIComponent(password)}`, { method:"DELETE" });
+      setData(prev => ({ ...prev, feedbacks: prev.feedbacks.filter(f => f.id !== fbId) }));
+    } catch { alert("Delete failed"); }
+  };
+
   const refresh = async () => {
     setLoading(true);
     try {
@@ -261,6 +277,12 @@ export default function AdminPage({ setPage }) {
                   { key:"helpful", label:"Helpful",render: v => v ? "👍 Yes" : "🤔 No" },
                   { key:"career",  label:"Career"  },
                   { key:"comment", label:"Comment", render: v => v ? `"${v.slice(0,80)}${v.length>80?"...":""}"` : "—" },
+                  { key:"id",      label:"", render: v => (
+                    <button onClick={() => deleteFeedback(v)}
+                      style={{ background:"#FFEBEE", border:"none", color:"#EF5350", borderRadius:8, padding:"4px 12px", fontWeight:800, cursor:"pointer", fontSize:"0.8rem" }}>
+                      🗑
+                    </button>
+                  )},
                 ]}
                 rows={feedbacks||[]}
                 emptyMsg="No feedback yet — share the site!"
@@ -282,6 +304,12 @@ export default function AdminPage({ setPage }) {
                   { key:"email",      label:"Email"    },
                   { key:"age",        label:"Age"      },
                   { key:"lang",       label:"Lang", render: v => `${LANG_FLAG[v]||""} ${v}` },
+                  { key:"id",         label:"", render: (v, row) => (
+                    <button onClick={() => deleteUser(v, row.name)}
+                      style={{ background:"#FFEBEE", border:"none", color:"#EF5350", borderRadius:8, padding:"4px 12px", fontWeight:800, cursor:"pointer", fontSize:"0.8rem" }}>
+                      🗑 Delete
+                    </button>
+                  )},
                 ]}
                 rows={users||[]}
                 emptyMsg="No registered users yet"

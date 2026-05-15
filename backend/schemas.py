@@ -52,8 +52,10 @@ class TokenOut(BaseModel):
 
 
 class ResultCreate(BaseModel):
-    answers: dict
-    lang:    Optional[str] = "ru"
+    answers:    dict
+    lang:       Optional[str] = "ru"
+    scores:     Optional[dict] = None
+    top_career: Optional[str] = ""
 
 
 class ResultOut(BaseModel):
@@ -61,13 +63,16 @@ class ResultOut(BaseModel):
     user_id:         int
     top_talent:      Optional[str]
     top_career:      Optional[str]
-    score_logic:     float
+    score_logic:      float
     score_creativity: float
-    score_memory:    float
+    score_memory:     float
     score_leadership: float
-    score_languages: float
-    score_music:     float
-    created_at:      datetime
+    score_languages:  float
+    score_music:      float
+    score_sport:      Optional[float] = 0
+    score_nature:     Optional[float] = 0
+    score_social:     Optional[float] = 0
+    created_at:       datetime
 
     class Config:
         from_attributes = True

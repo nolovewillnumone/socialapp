@@ -107,7 +107,11 @@ The Karta Talantov Team""",
 from .database import engine, get_db, Base
 from . import models, schemas, auth
 
-Base.metadata.create_all(bind=engine)
+# Create ALL tables including new ones (Feedback, AnonymousResult)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"DB init warning: {e}")
 
 app = FastAPI(
     title="Karta Talantov — Backend API",
@@ -248,6 +252,28 @@ async def submit_result(
     current_user: models.User = Depends(get_current_user)
 ):
     """Submit quiz answers → ML service analyzes → store and return results."""
+    # Also save to anonymous_results for analytics (non-blocking)
+    try:
+        scores = body.scores or {}
+        anon = models.AnonymousResult(
+            session_id   = f"user_{current_user.id}",
+            lang         = body.lang if body.lang in ["ru","uz","en"] else "ru",
+            score_logic      = float(scores.get("logic", 0)),
+            score_creativity = float(scores.get("creativity", 0)),
+            score_memory     = float(scores.get("memory", 0)),
+            score_leadership = float(scores.get("leadership", 0)),
+            score_languages  = float(scores.get("languages", 0)),
+            score_music      = float(scores.get("music", 0)),
+            score_sport      = float(scores.get("sport", 0)),
+            score_nature     = float(scores.get("nature", 0)),
+            score_social     = float(scores.get("social", 0)),
+            top_talent   = scores and max(scores, key=scores.get) or "",
+            top_career   = "",
+        )
+        db.add(anon)
+        db.commit()
+    except Exception:
+        db.rollback()
     async with httpx.AsyncClient() as client:
         try:
             ml_resp = await client.post(
@@ -784,6 +810,40 @@ def analytics_summary(db: Session = Depends(get_db)):
         }
     except Exception as e:
         return {"error": str(e)}
+
+# ── Admin delete endpoints ────────────────────────────────────────────────────
+@app.delete("/admin/user/{user_id}")
+def admin_delete_user(user_id: int, password: str, db: Session = Depends(get_db)):
+    verify_admin(password)
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.query(models.QuizResult).filter(models.QuizResult.user_id == user_id).delete()
+    db.query(models.Feedback).filter(models.Feedback.user_id == user_id).delete()
+    db.delete(user)
+    db.commit()
+    return {"deleted": True, "user_id": user_id}
+
+@app.delete("/admin/feedback/{feedback_id}")
+def admin_delete_feedback(feedback_id: int, password: str, db: Session = Depends(get_db)):
+    verify_admin(password)
+    fb = db.query(models.Feedback).filter(models.Feedback.id == feedback_id).first()
+    if not fb:
+        raise HTTPException(status_code=404, detail="Feedback not found")
+    db.delete(fb)
+    db.commit()
+    return {"deleted": True, "feedback_id": feedback_id}
+
+@app.delete("/admin/anon/{anon_id}")
+def admin_delete_anon(anon_id: int, password: str, db: Session = Depends(get_db)):
+    verify_admin(password)
+    a = db.query(models.AnonymousResult).filter(models.AnonymousResult.id == anon_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Not found")
+    db.delete(a)
+    db.commit()
+    return {"deleted": True}
+
 
 # ── Rule-based AI Chatbot (no external API needed) ──────────────────────────
 from pydantic import BaseModel as PydanticBase
