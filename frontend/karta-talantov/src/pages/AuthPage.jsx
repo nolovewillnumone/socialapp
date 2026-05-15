@@ -144,7 +144,7 @@ export default function AuthPage({ setPage, setUser, lang, dark }) {
 
     // Client-side validation first
     if (!name.trim())     { setError(lang==="ru"?"Введи имя":lang==="uz"?"Ismingizni kiriting":"Enter your name"); return; }
-    if (!email.trim())    { setError(lang==="ru"?"Введи email":"Email manzilini kiriting":"Enter your email"); return; }
+    if (!email.trim())    { setError(lang==="ru"?"Введи email":lang==="uz"?"Email manzilini kiriting":"Enter your email"); return; }
     if (!password.trim()) { setError(lang==="ru"?"Введи пароль":lang==="uz"?"Parolni kiriting":"Enter your password"); return; }
     if (password.length < 6) {
       setError(lang==="ru"?"Пароль минимум 6 символов":lang==="uz"?"Parol kamida 6 ta belgi":"Password min 6 characters");
