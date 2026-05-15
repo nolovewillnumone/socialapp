@@ -815,19 +815,29 @@ def analytics_summary(db: Session = Depends(get_db)):
 @app.delete("/admin/user/{user_id}")
 def admin_delete_user(user_id: int, password: str, db: Session = Depends(get_db)):
     verify_admin(password)
+    from sqlalchemy import text
     try:
+        # Check user exists
         user = db.query(models.User).filter(models.User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        # Delete related records safely
+
+        # Use raw SQL to bypass ORM foreign key issues
         try:
-            db.query(models.QuizResult).filter(models.QuizResult.user_id == user_id).delete()
-        except Exception: pass
+            db.execute(text("DELETE FROM quiz_results WHERE user_id = :uid"), {"uid": user_id})
+        except Exception: db.rollback()
+
         try:
-            db.query(models.Feedback).filter(models.Feedback.user_id == user_id).delete()
-        except Exception: pass
-        db.delete(user)
-        db.commit()
+            db.execute(text("DELETE FROM feedback WHERE user_id = :uid"), {"uid": user_id})
+        except Exception: db.rollback()
+
+        try:
+            db.execute(text("DELETE FROM users WHERE id = :uid"), {"uid": user_id})
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=500, detail=f"Could not delete: {str(e)}")
+
         return {"deleted": True, "user_id": user_id}
     except HTTPException:
         raise
