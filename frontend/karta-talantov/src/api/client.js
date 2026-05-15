@@ -7,9 +7,9 @@ const ML   = "https://karta-talantov-ml.onrender.com";
 // ── Wake up both services immediately on import ───────────────────────────────
 // Render free tier sleeps after 15 min. This ping fires as soon as the app
 // loads so the server is warm by the time the user does anything.
-const ping = (url) => fetch(`${url}/health`, { method:"GET", cache:"no-store" }).catch(() => {});
-ping(BASE);
-ping(ML);
+// Wake ping — uses /docs endpoint to avoid ad blocker false-positives
+const ping = (url) => fetch(`${url}/docs`, { method:"GET", cache:"no-store", mode:"no-cors" }).catch(() => {});
+setTimeout(() => { ping(BASE); ping(ML); }, 2000);
 
 // Re-ping every 10 minutes to keep services warm during a session
 setInterval(() => { ping(BASE); ping(ML); }, 10 * 60 * 1000);
