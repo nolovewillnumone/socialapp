@@ -145,7 +145,7 @@ socialapp/
 
 ## 👨‍💻 About the Developer
 
-Built by two devs**[Your Name]**, age 16, Tashkent, Uzbekistan.
+Built by two devs**Saidislambek and Samir**, age 16, Tashkent, Uzbekistan.
 Design → Frontend → Backend → ML Engine → DevOps → all done independently.
 
 - 🐙 GitHub: [@nolovewillnumone](https://github.com/nolovewillnumone)
