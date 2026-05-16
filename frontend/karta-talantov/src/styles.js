@@ -248,12 +248,17 @@ const styles = `
 
   /* ── QUIZ ── */
   .quiz-section {
-    max-width: 600px;
-    margin: 24px auto;
-    padding: 32px 28px;
+    max-width: 620px;
+    width: 100%;
+    margin: 28px auto;
+    padding: 36px 32px;
     background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 8px 40px rgba(15,110,86,0.10);
+    border-radius: 28px;
+    box-shadow: 0 12px 48px rgba(15,110,86,0.12), 0 2px 8px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .quiz-counter {
@@ -265,7 +270,7 @@ const styles = `
     margin-bottom: 12px;
   }
 
-  .quiz-q {
+  .quiz-q { text-align: center; width: 100%;
     font-family: 'Fredoka One', cursive;
     font-size: 1.3rem;
     color: #0F6E56;

@@ -171,6 +171,7 @@ export default function ResultsPage({ setPage, results, lang, dark }) {
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
 }
