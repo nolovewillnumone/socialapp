@@ -379,7 +379,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         </div>
         <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color:dark?"#E3F2FD":chapter.color, marginBottom:16 }}>{chapter.zone}</h2>
         <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#B0BEC5":"#546E7A", maxWidth:440, lineHeight:1.7, marginBottom:32 }}>{chapter.intro}</p>
-        <button className="quiz-next" style={{ background:chapter.color, maxWidth:280 }} onClick={() => setPhase("question")}>
+        <button className="quiz-next ripple-btn" onMouseDown={e=>{const r=document.createElement("span");const rect=e.currentTarget.getBoundingClientRect();r.style.cssText=`position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);width:80px;height:80px;left:${e.clientX-rect.left-40}px;top:${e.clientY-rect.top-40}px;transform:scale(0);animation:rippleAnim 0.5s linear;pointer-events:none`;e.currentTarget.appendChild(r);setTimeout(()=>r.remove(),600);}} style={{ background:chapter.color, maxWidth:280 }} onClick={() => setPhase("question")}>
           {lang==="ru"?"Поехали! →":lang==="uz"?"Ketdik! →":"Let's go! →"}
         </button>
       </div>
@@ -399,7 +399,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
           ))}
         </div>
         {chapterIdx < chapters.length-1 && (
-          <button className="quiz-next" style={{ background:chapters[chapterIdx+1]?.color||chapter.color, maxWidth:320 }} onClick={nextChapter}>
+          <button className="quiz-next ripple-btn" onMouseDown={e=>{const r=document.createElement("span");const rect=e.currentTarget.getBoundingClientRect();r.style.cssText=`position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);width:80px;height:80px;left:${e.clientX-rect.left-40}px;top:${e.clientY-rect.top-40}px;transform:scale(0);animation:rippleAnim 0.5s linear;pointer-events:none`;e.currentTarget.appendChild(r);setTimeout(()=>r.remove(),600);}} style={{ background:chapters[chapterIdx+1]?.color||chapter.color, maxWidth:320 }} onClick={nextChapter}>
             {chapters[chapterIdx+1]?.emoji} {chapters[chapterIdx+1]?.zone} →
           </button>
         )}
@@ -438,7 +438,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#9FE1CB" }}>{qInChapter+1}/{chapterQ.length}</span>
       </div>
 
-      <div className="quiz-section" style={{ textAlign:"center" }}>
+      <div className="quiz-section quiz-slide-in" style={{ textAlign:"center" }}>
         {error && <div style={{ background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"10px 14px", color:"#C62828", fontWeight:700, marginBottom:14 }}>❌ {error}</div>}
 
         <p className="quiz-q" style={{ fontSize:"1.2rem", lineHeight:1.5, color:dark?"#E3F2FD":"#04342C" }}>{currentQ?.q}</p>
@@ -457,7 +457,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
           ))}
         </div>
 
-        <button className="quiz-next"
+        <button className="quiz-next ripple-btn" onMouseDown={e=>{const r=document.createElement("span");const rect=e.currentTarget.getBoundingClientRect();r.style.cssText=`position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);width:80px;height:80px;left:${e.clientX-rect.left-40}px;top:${e.clientY-rect.top-40}px;transform:scale(0);animation:rippleAnim 0.5s linear;pointer-events:none`;e.currentTarget.appendChild(r);setTimeout(()=>r.remove(),600);}}
           style={{ background:selected===null?"#9FE1CB":chapter.color, opacity:selected===null?0.6:1, fontSize:"1.05rem", padding:"15px" }}
           onClick={handleAnswer} disabled={selected===null}>
           {qInChapter < chapterQ.length-1

@@ -289,6 +289,7 @@ export default function ChatBot({ lang, dark, results }) {
               ))}
             </div>
           )}
+          
 
           {/* Input */}
           <div style={{ padding:"10px 12px", borderTop:`1px solid ${bdr}`, display:"flex", gap:8, flexShrink:0, background:dark?"#1A2A3A":bg }}>

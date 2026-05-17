@@ -9,6 +9,7 @@ import ResultsPage from "./pages/ResultsPage";
 import DevelopPage from "./pages/DevelopPage";
 import AdminPage       from "./pages/AdminPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
+import MobileNav from "./components/MobileNav";
 
 export default function App() {
   const [page, setPage]       = useState("auth");
@@ -80,6 +81,7 @@ export default function App() {
 
       {renderPage()}
       {page !== "auth" && <ChatBot lang={lang} dark={dark} results={results} />}
+      {page !== "auth" && <MobileNav page={page} setPage={setPage} lang={lang} dark={dark} />}
     </>
   );
 }

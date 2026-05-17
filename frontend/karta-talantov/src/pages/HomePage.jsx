@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Nav from "../components/Nav";
+import { animateCounter } from "../animations";
 import { FeedbackSection } from "../components/FeedbackSection";
 import { t } from "../i18n";
 
