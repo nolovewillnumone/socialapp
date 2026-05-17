@@ -88,3 +88,22 @@ class Feedback(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user       = relationship("User", back_populates="feedbacks")
+
+
+class GameScore(Base):
+    """Leaderboard scores from mini-games on Tasks page."""
+    __tablename__ = "game_scores"
+
+    id         = Column(Integer, primary_key=True, index=True)
+    user_id    = Column(Integer, ForeignKey("users.id"), nullable=True)
+    session_id = Column(String(64), nullable=True, index=True)
+    name       = Column(String(100), default="Anonymous")
+    lang       = Column(String(5), default="ru")
+
+    score_logic      = Column(Integer, default=0)
+    score_creativity = Column(Integer, default=0)
+    score_memory     = Column(Integer, default=0)
+    score_leadership = Column(Integer, default=0)
+    total_score      = Column(Integer, default=0)  # average of all 4
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
