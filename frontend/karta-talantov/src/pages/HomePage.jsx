@@ -24,51 +24,51 @@ const TRACK = [...SLIDER_ITEMS, ...SLIDER_ITEMS];
 const BENEFITS = [
   {
     emoji: "🧠", accent: "#0F6E56",
-    bg: "linear-gradient(135deg, #E1F5EE 0%, #E1F5EE 100%)",
-    title: { ru: "Раскрой свой потенциал", uz: "Potentsialingizni oching", en: "Unlock your potential" },
-    desc:  { ru: "Наш ML-движок анализирует ответы по 6 измерениям таланта и строит персональную карту способностей.", uz: "ML mexanizmi javoblaringizni 6 iste'dod o'lchovi bo'yicha tahlil qiladi.", en: "Our ML engine analyses your answers across 6 talent dimensions and builds a personal ability map." },
+    bg: "linear-gradient(135deg,#E1F5EE,#F0FFF8)",
+    title: { ru:"Раскрой свой потенциал", uz:"Potentsialingizni oching", en:"Unlock your potential" },
+    desc:  { ru:"Наш ML-движок анализирует 30 ответов по 9 измерениям таланта и строит твою персональную карту способностей.", uz:"ML mexanizmi 30 ta javobni 9 iste'dod o'lchovi bo'yicha tahlil qiladi.", en:"Our ML engine analyses 30 answers across 9 talent dimensions and builds your personal ability map." },
     stats: [
-      { value: "6",    label: { ru: "измерений",      uz: "o'lchovlar",    en: "dimensions"    } },
-      { value: "10",   label: { ru: "вопросов",       uz: "savollar",      en: "questions"     } },
-      { value: "8",    label: { ru: "карьер",         uz: "kasblar",       en: "careers"       } },
+      { value:"9",    label:{ ru:"талантов",    uz:"iste'dod",    en:"talents"    } },
+      { value:"30",   label:{ ru:"вопросов",    uz:"savollar",    en:"questions"  } },
+      { value:"35+",  label:{ ru:"профессий",   uz:"kasblar",     en:"careers"    } },
     ],
-    visual: "radar",
+    visual:"radar",
   },
   {
     emoji: "🎮", accent: "#EF9F27",
-    bg: "linear-gradient(135deg, #FAEEDA 0%, #FAEEDA 100%)",
-    title: { ru: "Учись играя",            uz: "O'ynab o'rgan",            en: "Learn by playing"         },
-    desc:  { ru: "4 мини-игры на логику, память, творчество и лидерство. Каждый результат вливается в карту талантов.", uz: "4 mini-o'yin: mantiq, xotira, ijodkorlik va liderlik.", en: "4 mini-games covering logic, memory, creativity and leadership." },
+    bg: "linear-gradient(135deg,#FAEEDA,#FFF8EE)",
+    title: { ru:"Учись играя",   uz:"O'ynab o'rgan",   en:"Learn by playing"  },
+    desc:  { ru:"4 мини-игры на логику, память, творчество и лидерство. Каждый результат улучшает твою карту талантов.", uz:"4 mini-o'yin: mantiq, xotira, ijodkorlik va liderlik.", en:"4 mini-games covering logic, memory, creativity and leadership. Every result improves your talent map." },
     stats: [
-      { value: "4",    label: { ru: "мини-игры",      uz: "mini-o'yinlar", en: "mini-games"    } },
-      { value: "30s",  label: { ru: "на задание",     uz: "vazifa uchun",  en: "per challenge" } },
-      { value: "100%", label: { ru: "весело",         uz: "qiziqarli",     en: "fun"           } },
+      { value:"4",    label:{ ru:"мини-игры",   uz:"mini-o'yin",  en:"mini-games" } },
+      { value:"7min", label:{ ru:"на всё",      uz:"hammasi",     en:"total"      } },
+      { value:"100%", label:{ ru:"бесплатно",   uz:"bepul",       en:"free"       } },
     ],
-    visual: "games",
+    visual:"games",
   },
   {
-    emoji: "🗺️", accent: "#66BB6A",
-    bg: "linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%)",
-    title: { ru: "Найди курсы рядом",      uz: "Yaqin kurslarni top",      en: "Find courses near you"    },
-    desc:  { ru: "Введи свой город или используй GPS — покажем секции и школы рядом на Google Maps.", uz: "GPS yoki shahar nomi bilan yaqin kurslar.", en: "Enter your city or use GPS to find real clubs and schools near you." },
+    emoji: "🗺️", accent: "#1D9E75",
+    bg: "linear-gradient(135deg,#E1F5EE,#E8F5E9)",
+    title: { ru:"Найди курсы рядом",   uz:"Yaqin kurslarni top",   en:"Find courses near you"  },
+    desc:  { ru:"Введи свой город или используй GPS — найдём кружки и школы рядом с тобой.", uz:"GPS yoki shahar nomi bilan yaqin to'garaklar va maktablar.", en:"Enter your city or use GPS to find real clubs and schools near you." },
     stats: [
-      { value: "6",    label: { ru: "типов курсов",   uz: "kurs turlari",  en: "course types"  } },
-      { value: "GPS",  label: { ru: "определение",    uz: "aniqlash",      en: "detection"     } },
-      { value: "Free", label: { ru: "бесплатно",      uz: "bepul",         en: "free"          } },
+      { value:"6",    label:{ ru:"типов",       uz:"tur",         en:"types"      } },
+      { value:"GPS",  label:{ ru:"поиск",       uz:"qidirish",    en:"search"     } },
+      { value:"Free", label:{ ru:"бесплатно",   uz:"bepul",       en:"free"       } },
     ],
-    visual: "map",
+    visual:"map",
   },
   {
     emoji: "🌍", accent: "#7E57C2",
-    bg: "linear-gradient(135deg, #EDE7F6 0%, #F3E5F5 100%)",
-    title: { ru: "Три языка — один результат", uz: "Uch til — bir natija", en: "Three languages — one result" },
-    desc:  { ru: "Весь интерфейс, вопросы и результаты на русском, узбекском и английском. Переключайся в одно касание.", uz: "Barcha interfeys, savollar va natijalar uch tilda.", en: "Full interface, questions and results in Russian, Uzbek and English." },
+    bg: "linear-gradient(135deg,#EDE7F6,#F3E5F5)",
+    title: { ru:"Три языка — один результат", uz:"Uch til — bir natija", en:"Three languages — one result" },
+    desc:  { ru:"Весь интерфейс, вопросы и результаты на русском, узбекском и английском. Один тап — смена языка.", uz:"Barcha interfeys, savollar va natijalar uch tilda. Bir bosish bilan til almashtirish.", en:"Full interface, questions and results in Russian, Uzbek and English. One tap to switch." },
     stats: [
-      { value: "3",    label: { ru: "языка",          uz: "til",           en: "languages"     } },
-      { value: "1s",   label: { ru: "смена",          uz: "almashtirish",  en: "to switch"     } },
-      { value: "100%", label: { ru: "переведено",     uz: "tarjima",       en: "translated"    } },
+      { value:"3",    label:{ ru:"языка",       uz:"til",         en:"languages"  } },
+      { value:"1tap", label:{ ru:"смена",       uz:"almashtirish",en:"to switch"  } },
+      { value:"100%", label:{ ru:"переведено",  uz:"tarjima",     en:"translated" } },
     ],
-    visual: "lang",
+    visual:"lang",
   },
 ];
 
@@ -89,53 +89,128 @@ function useInView(threshold = 0.15) {
   return [ref, visible];
 }
 
-// ── Visual accents ────────────────────────────────────────────────────────────
-function Visual({ type, accent }) {
-  if (type === "radar") return (
-    <div style={{ ...V.box, alignItems:"center", justifyContent:"center" }}>
-      <svg width="120" height="120" viewBox="0 0 120 120">
-        {[0.3,0.6,1].map((l) => (
-          <polygon key={l} points={[0,1,2,3,4,5].map((i) => { const a=(Math.PI*2*i)/6-Math.PI/2; return `${60+48*l*Math.cos(a)},${60+48*l*Math.sin(a)}`; }).join(" ")} fill="none" stroke={accent+"44"} strokeWidth="1.5" />
-        ))}
-        <polygon points={[0.9,0.7,0.85,0.6,0.95,0.75].map((v,i)=>{ const a=(Math.PI*2*i)/6-Math.PI/2; return `${60+48*v*Math.cos(a)},${60+48*v*Math.sin(a)}`; }).join(" ")} fill={accent+"22"} stroke={accent} strokeWidth="2" />
-        {["Logic","Mem","Lang","Lead","Music","Art"].map((l,i)=>{ const a=(Math.PI*2*i)/6-Math.PI/2; return <text key={l} x={60+58*Math.cos(a)} y={60+58*Math.sin(a)} textAnchor="middle" dominantBaseline="middle" fontSize="7" fontWeight="800" fill={accent}>{l}</text>; })}
-      </svg>
-    </div>
-  );
+// ── Premium Visual accents ───────────────────────────────────────────────────
+function Visual({ type, accent, dark }) {
+  const box = {
+    display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+    background: dark ? "rgba(255,255,255,0.04)" : "#fff",
+    borderRadius:24, border:`1.5px solid ${accent}22`,
+    padding:24, width:"100%", maxWidth:340, margin:"0 auto",
+    boxShadow:`0 8px 32px ${accent}15, 0 2px 8px rgba(0,0,0,0.06)`,
+    backdropFilter:"blur(8px)",
+  };
+
+  if (type === "radar") {
+    const n = 9;
+    const R = 90, cx = 110, cy = 110;
+    const vals = [0.88,0.72,0.80,0.65,0.90,0.55,0.60,0.75,0.82];
+    const emojis = ["🧠","🎨","🃏","👑","🌍","🎵","🏃","🌿","🤝"];
+    const dotColors = ["#0F6E56","#EF9F27","#7E57C2","#F9A825","#00838F","#2E7D32","#BF360C","#1B5E20","#4527A0"];
+    const pt = (i,r) => {
+      const a = i*2*Math.PI/n - Math.PI/2;
+      return [cx+r*Math.cos(a), cy+r*Math.sin(a)];
+    };
+    const rings = [0.25,0.5,0.75,1.0];
+    const dataPts = vals.map((v,i) => pt(i,R*v));
+    return (
+      <div style={{ ...box, padding:16 }}>
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <defs>
+            <radialGradient id="rgFill" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={accent} stopOpacity="0.3"/>
+              <stop offset="100%" stopColor={accent} stopOpacity="0.05"/>
+            </radialGradient>
+          </defs>
+          {/* Grid rings */}
+          {rings.map(r => (
+            <polygon key={r}
+              points={Array.from({length:n},(_,i)=>pt(i,R*r).join(",")).join(" ")}
+              fill="none" stroke={accent} strokeWidth={r===1?"1.5":"1"} strokeOpacity={r===1?0.3:0.12}
+              strokeDasharray={r===1?"none":"4 4"}/>
+          ))}
+          {/* Axis lines */}
+          {Array.from({length:n},(_,i) => {
+            const [x,y] = pt(i,R);
+            return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke={accent} strokeWidth="1" strokeOpacity="0.15"/>;
+          })}
+          {/* Data polygon */}
+          <polygon points={dataPts.map(p=>p.join(",")).join(" ")} fill="url(#rgFill)" stroke={accent} strokeWidth="2"/>
+          {/* Glow dots */}
+          {dataPts.map((p,i) => (
+            <g key={i}>
+              <circle cx={p[0]} cy={p[1]} r="8" fill={dotColors[i]} fillOpacity="0.25"/>
+              <circle cx={p[0]} cy={p[1]} r="4" fill={dotColors[i]}/>
+              <circle cx={p[0]} cy={p[1]} r="2" fill="#fff"/>
+            </g>
+          ))}
+          {/* Emoji labels */}
+          {emojis.map((em,i) => {
+            const [x,y] = pt(i, R+20);
+            return <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="13">{em}</text>;
+          })}
+          {/* Center dot */}
+          <circle cx={cx} cy={cy} r="4" fill={accent} fillOpacity="0.5"/>
+        </svg>
+      </div>
+    );
+  }
+
   if (type === "games") return (
-    <div style={{ ...V.box, padding:24 }}>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, width:"100%" }}>
-        {["🧠","🃏","🎨","👑"].map((e,i) => (
-          <div key={i} style={{ height:70, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", background:accent+"18", border:`1.5px solid ${accent}44`, fontSize:"1.8rem" }}>{e}</div>
+    <div style={{ ...box, padding:20 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, width:"100%" }}>
+        {[
+          {e:"🧠",label:"Logic",   c:"#0F6E56"},
+          {e:"🃏",label:"Memory",  c:"#7E57C2"},
+          {e:"🎨",label:"Creative",c:"#EF9F27"},
+          {e:"👑",label:"Leader",  c:"#F9A825"},
+        ].map(({e,label,c},i) => (
+          <div key={i} style={{ height:86, borderRadius:18, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:6, background:`linear-gradient(135deg,${c}18,${c}08)`, border:`1.5px solid ${c}33`, boxShadow:`0 4px 12px ${c}15`, transition:"all 0.2s", cursor:"default" }}>
+            <span style={{ fontSize:"2rem" }}>{e}</span>
+            <span style={{ fontSize:"0.72rem", fontWeight:800, color:c, letterSpacing:"0.05em" }}>{label.toUpperCase()}</span>
+          </div>
         ))}
       </div>
     </div>
   );
+
   if (type === "map") return (
-    <div style={{ ...V.box, gap:10, padding:20, alignItems:"stretch" }}>
-      {[["💻","IT School","0.9km"],["🤖","Robotics Hub","1.2km"],["🏆","Chess Academy","2.8km"]].map(([em,name,dist],i) => (
-        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:12, background:accent+"12", border:`1px solid ${accent}33` }}>
-          <span style={{ fontSize:"1.3rem" }}>{em}</span>
-          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#04342C", flex:1 }}>{name}</span>
-          <span style={{ fontSize:"0.78rem", fontWeight:700, color:accent, background:accent+"18", padding:"2px 8px", borderRadius:99 }}>{dist}</span>
+    <div style={{ ...box, gap:10, padding:20, alignItems:"stretch" }}>
+      {[
+        {em:"💻",name:"IT School",    dist:"0.9 km", c:"#0F6E56"},
+        {em:"🤖",name:"Robotics Hub", dist:"1.2 km", c:"#EF9F27"},
+        {em:"🏆",name:"Chess Academy",dist:"2.8 km", c:"#7E57C2"},
+      ].map(({em,name,dist,c},i) => (
+        <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:16, background:`linear-gradient(135deg,${c}10,${c}05)`, border:`1.5px solid ${c}33`, boxShadow:`0 2px 8px ${c}10` }}>
+          <div style={{ width:38, height:38, borderRadius:12, background:`${c}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.3rem", flexShrink:0 }}>{em}</div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:"0.88rem", fontWeight:900, color: dark?"#E1F5EE":"#04342C" }}>{name}</div>
+            <div style={{ fontSize:"0.72rem", fontWeight:700, color:"#90A4AE" }}>Nearby course</div>
+          </div>
+          <div style={{ background:c, color:"#fff", borderRadius:99, padding:"3px 10px", fontSize:"0.72rem", fontWeight:900, flexShrink:0 }}>{dist}</div>
         </div>
       ))}
     </div>
   );
+
   if (type === "lang") return (
-    <div style={{ ...V.box, gap:10, padding:20, alignItems:"stretch" }}>
-      {[["🇷🇺","Карта Талантов","Русский"],["🇺🇿","Iste'dod Xaritasi","O'zbek"],["🇬🇧","Talent Map","English"]].map(([f,n,l],i) => (
-        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:12, background:i===0?accent+"18":"transparent", border:`1.5px solid ${i===0?accent:accent+"33"}` }}>
-          <span style={{ fontSize:"1.3rem" }}>{f}</span>
-          <span style={{ fontSize:"0.88rem", fontWeight:800, color:"#04342C", flex:1 }}>{n}</span>
-          <span style={{ fontSize:"0.78rem", fontWeight:700, color:accent }}>{l}</span>
+    <div style={{ ...box, gap:10, padding:20, alignItems:"stretch" }}>
+      {[
+        {f:"🇷🇺",n:"Карта Талантов",   l:"Русский", active:true,  c:"#0F6E56"},
+        {f:"🇺🇿",n:"Iste'dod Xaritasi",l:"O'zbek",  active:false, c:"#1D9E75"},
+        {f:"🇬🇧",n:"Talent Map",        l:"English", active:false, c:"#5DCAA5"},
+      ].map(({f,n,l,active,c},i) => (
+        <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:16, background:active?`linear-gradient(135deg,${c}20,${c}08)`:"transparent", border:`1.5px solid ${active?c:c+"33"}`, boxShadow:active?`0 4px 16px ${c}20`:"none", transition:"all 0.2s" }}>
+          <span style={{ fontSize:"1.5rem" }}>{f}</span>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:"0.88rem", fontWeight:900, color:dark?"#E1F5EE":"#04342C" }}>{n}</div>
+          </div>
+          <div style={{ background:active?c:`${c}22`, color:active?"#fff":c, borderRadius:99, padding:"3px 10px", fontSize:"0.72rem", fontWeight:900 }}>{l}</div>
         </div>
       ))}
     </div>
   );
   return null;
 }
-const V = { box: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, border:"1.5px solid #E1F5EE", padding:20, width:"100%", maxWidth:320, margin:"0 auto", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" } };
 
 function BenefitSection({ benefit, index, lang, dark }) {
   const [ref, visible] = useInView(0.15);
@@ -756,11 +831,7 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
           {lang==="ru"?"Пройди тест за 5 минут!":lang==="uz"?"5 daqiqada testni o'ting!":"Take the 5-minute quiz!"}
         </p>
         <button className="hero-cta" onClick={() => setPage("quiz")}>{t(lang,"home.cta")} →</button>
-        
       </div>
     </div>
-    
   );
-  
-  
 }

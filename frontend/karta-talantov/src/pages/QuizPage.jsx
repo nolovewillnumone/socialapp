@@ -424,10 +424,10 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
   return (
     <div className="page-wrap">
       <Nav page="quiz" setPage={setPage} lang={lang} dark={dark} />
-      <div className="progress-bar-wrap" style={{ marginTop:16 }}>
+      <div className="progress-bar-wrap" style={{ marginTop:16, padding:"0 16px" }}>
         <div className="progress-bar-fill" style={{ width:`${progress}%` }} />
       </div>
-      <div style={{ background:dark?"#1A2A3A":chapter.bg, padding:"10px 24px", display:"flex", alignItems:"center", gap:12, borderBottom:`2px solid ${chapter.color}33` }}>
+      <div style={{ background:dark?"#1A2A3A":chapter.bg, padding:"10px 24px", display:"flex", alignItems:"center", gap:12, borderBottom:`2px solid ${chapter.color}33`, maxWidth:620, margin:"0 auto", width:"100%", borderRadius:"0 0 0 0" }}>
         <span style={{ fontSize:"1.4rem" }}>{chapter.emoji}</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:"0.7rem", fontWeight:800, color:chapter.color, textTransform:"uppercase", letterSpacing:"0.08em" }}>
@@ -438,7 +438,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#9FE1CB" }}>{qInChapter+1}/{chapterQ.length}</span>
       </div>
 
-      <div className="quiz-section">
+      <div className="quiz-section" style={{ textAlign:"center" }}>
         {error && <div style={{ background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"10px 14px", color:"#C62828", fontWeight:700, marginBottom:14 }}>❌ {error}</div>}
 
         <p className="quiz-q" style={{ fontSize:"1.2rem", lineHeight:1.5, color:dark?"#E3F2FD":"#04342C" }}>{currentQ?.q}</p>
