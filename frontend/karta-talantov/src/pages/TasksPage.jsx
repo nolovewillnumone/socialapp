@@ -170,42 +170,264 @@ function MemoryGame({ onFinish, lang }) {
   );
 }
 
-// ── Game 3: Creativity ────────────────────────────────────────────────────────
+// ── Game 3: Creativity — Torrance Alternate Uses Test ───────────────────────
+// Measures 4 real divergent-thinking dimensions:
+//  Fluency(25%)   — how many valid ideas
+//  Flexibility(30%)— how many DIFFERENT categories of use
+//  Originality(30%)— how unusual vs common the ideas are
+//  Elaboration(15%)— how detailed each idea is
+
+const CREATIVITY_PROMPTS = {
+  ru: [
+    { obj:"📎 скрепку",
+      common:["держать бумагу","закладка","крючок","застёжка","скрепить листы"],
+      cats:  ["рыбалка","украшение","музыка","одежда","электроника","строительство","медицина","спорт","игра","кухня"] },
+    { obj:"🧱 кирпич",
+      common:["строить","стена","дом","фундамент","забор"],
+      cats:  ["арт","спорт","кулинария","садоводство","музыка","мебель","образование","игры","медицина","наука"] },
+    { obj:"🪣 ведро",
+      common:["воду носить","мусор","уборка","полив"],
+      cats:  ["музыка","спорт","кулинария","рыбалка","дети","транспорт","строительство","искусство","наука","игра"] },
+    { obj:"📦 коробку",
+      common:["хранить вещи","упаковка","переезд","ящик"],
+      cats:  ["домик","мебель","арт","игра","огород","транспорт","ловушка","музыка","наука","спорт"] },
+  ],
+  uz: [
+    { obj:"📎 qog'oz qisqichni",
+      common:["qog'oz tutish","xatcho'p","ilgak","biriktirish"],
+      cats:  ["baliq","bezak","musiqa","kiyim","elektronika","qurilish","tibbiyot","sport","o'yin","oshxona"] },
+    { obj:"🧱 g'ishtni",
+      common:["qurilish","devor","uy","poydevor","to'siq"],
+      cats:  ["san'at","sport","oshpaz","bog'dorchilik","musiqa","mebel","ta'lim","o'yin","tibbiyot","fan"] },
+    { obj:"🪣 chelakni",
+      common:["suv tashish","axlat","tozalash","sug'orish"],
+      cats:  ["musiqa","sport","oshpaz","baliq","bolalar","transport","qurilish","san'at","fan","o'yin"] },
+    { obj:"📦 qutini",
+      common:["narsalar saqlash","qadoqlash","ko'chirish","quti"],
+      cats:  ["uy","mebel","san'at","o'yin","bog'","transport","tutqich","musiqa","fan","sport"] },
+  ],
+  en: [
+    { obj:"📎 a paper clip",
+      common:["hold paper","bookmark","hook","fastener","attach pages"],
+      cats:  ["fishing","jewelry","music","clothing","electronics","construction","medical","sport","game","cooking"] },
+    { obj:"🧱 a brick",
+      common:["build","wall","house","foundation","fence"],
+      cats:  ["art","sport","cooking","gardening","music","furniture","education","games","medicine","science"] },
+    { obj:"🪣 a bucket",
+      common:["carry water","trash","cleaning","watering"],
+      cats:  ["music","sport","cooking","fishing","kids","transport","construction","art","science","game"] },
+    { obj:"📦 a cardboard box",
+      common:["store things","packaging","moving","container"],
+      cats:  ["fort","furniture","art","game","garden","transport","trap","music","science","sport"] },
+  ],
+};
+
+function scoreOriginality(idea, common) {
+  const t = idea.trim().toLowerCase();
+  if (t.length < 3) return 0;
+  const isCommon = common.some(c => t.includes(c.toLowerCase()));
+  if (isCommon)    return 1;
+  if (t.length < 6) return 2;
+  if (t.length > 35) return 5;
+  if (t.length > 18) return 4;
+  return 3;
+}
+
+function detectCategory(idea, cats) {
+  const t = idea.toLowerCase();
+  return cats.find(c => t.includes(c.split(" ")[0].toLowerCase())) || null;
+}
+
+function calcCreativityScore(lines, prompt) {
+  const valid = lines.filter(l => l.trim().length > 2);
+  const n = valid.length;
+  if (n === 0) return { total:5, fluency:0, flexibility:0, originality:0, elaboration:0 };
+
+  const fluency     = Math.min(100, Math.round((n / 8) * 100));
+  const uniqueCats  = new Set(valid.map(l => detectCategory(l, prompt.cats)).filter(Boolean));
+  const flexibility = Math.min(100, Math.round((uniqueCats.size / 5) * 100));
+  const origScores  = valid.map(l => scoreOriginality(l, prompt.common));
+  const avgOrig     = origScores.reduce((a,b)=>a+b,0) / n;
+  const originality = Math.min(100, Math.round(((avgOrig - 1) / 4) * 100));
+  const wordCounts  = valid.map(l => l.trim().split(/\s+/).length);
+  const avgWords    = wordCounts.reduce((a,b)=>a+b,0) / n;
+  const elaboration = Math.min(100, Math.round((avgWords / 6) * 100));
+  const total = Math.max(5, Math.round(
+    fluency * 0.25 + flexibility * 0.30 + originality * 0.30 + elaboration * 0.15
+  ));
+  return { total, fluency, flexibility, originality, elaboration };
+}
+
 function CreativityGame({ onFinish, lang }) {
-  const [ideas, setIdeas] = useState("");
-  const [timer, setTimer] = useState(30);
-  const [done, setDone]   = useState(false);
-  const ref = useRef();
+  const TOTAL_TIME = 60;
+  const prompts = CREATIVITY_PROMPTS[lang] || CREATIVITY_PROMPTS.en;
+  const [promptIdx] = useState(() => Math.floor(Math.random() * prompts.length));
+  const prompt  = prompts[promptIdx];
+  const [ideas,  setIdeas]  = useState("");
+  const [timer,  setTimer]  = useState(TOTAL_TIME);
+  const [phase,  setPhase]  = useState("intro");
+  const timerRef = useRef(null);
 
-  useEffect(() => {
-    ref.current = setInterval(() => {
-      setTimer((t) => { if (t <= 1) { clearInterval(ref.current); setDone(true); return 0; } return t - 1; });
+  const startGame = () => {
+    setPhase("playing");
+    timerRef.current = setInterval(() => {
+      setTimer(t => {
+        if (t <= 1) { clearInterval(timerRef.current); setPhase("done"); return 0; }
+        return t - 1;
+      });
     }, 1000);
-    return () => clearInterval(ref.current);
-  }, []);
+  };
 
-  if (done) {
-    const count = ideas.split("\n").filter((l) => l.trim()).length;
-    return <GameResult score={Math.min(100, count * 14)} talent="creativity" onFinish={onFinish} lang={lang} />;
+  const finishEarly = () => { clearInterval(timerRef.current); setPhase("done"); };
+  useEffect(() => () => clearInterval(timerRef.current), []);
+
+  const lines = ideas.split("\n");
+
+  // ── INTRO ──
+  if (phase === "intro") {
+    const L = {
+      ru:{ title:"🎨 Тест на творчество", badge:"Метод альтернативных применений (Торренс)",
+        desc:"Придумай как можно больше НЕСТАНДАРТНЫХ применений для предмета за 60 секунд.",
+        howTitle:"Как оценивается:", dims:[
+          "📝 Беглость — сколько идей придумал",
+          "🔀 Гибкость — разные категории применений",
+          "💡 Оригинальность — насколько необычные идеи",
+          "🔍 Детальность — насколько подробно описал",
+        ], tip:"Чем необычнее — тем выше балл!", start:"Начать игру →"},
+      uz:{ title:"🎨 Ijodkorlik testi", badge:"Muqobil foydalanish usuli (Torrens)",
+        desc:"60 soniya ichida buyum uchun imkon qadar ko'proq G'AYRIODDIY foydalanishlarni toping.",
+        howTitle:"Qanday baholanadi:", dims:[
+          "📝 Oqimlilik — qancha g'oya topdingiz",
+          "🔀 Moslashuvchanlik — turli toifalar",
+          "💡 G'ayrioddiyligi — g'oyalar qanchalik noodatiy",
+          "🔍 Batafsilligi — qanchalik batafsil yozdingiz",
+        ], tip:"Qanchalik noodatiy bo'lsa — ball shunchalik yuqori!", start:"O'yinni boshlash →"},
+      en:{ title:"🎨 Creativity Test", badge:"Alternate Uses Method (Torrance / NASA)",
+        desc:"Think of as many UNUSUAL uses for an object as you can in 60 seconds.",
+        howTitle:"How it's scored:", dims:[
+          "📝 Fluency — how many valid ideas",
+          "🔀 Flexibility — how many different categories",
+          "💡 Originality — how unusual vs common",
+          "🔍 Elaboration — how detailed each idea is",
+        ], tip:"The more unusual your idea — the higher the score!", start:"Start →"},
+    }[lang]||{};
+
+    return (
+      <div style={{...G.wrap, gap:14}}>
+        <div style={G.badge}>{L.title}</div>
+        <span style={{ fontSize:"0.72rem", fontWeight:800, color:"#EF9F27", letterSpacing:"0.08em", textTransform:"uppercase", textAlign:"center" }}>{L.badge}</span>
+        <p style={{ fontSize:"0.85rem", color:"#546E7A", lineHeight:1.6, textAlign:"center", maxWidth:340 }}>{L.desc}</p>
+        <div style={{ background: "rgba(15,110,86,0.06)", border:"1px solid rgba(15,110,86,0.15)", borderRadius:14, padding:"12px 16px", width:"100%", maxWidth:340 }}>
+          <p style={{ fontSize:"0.78rem", fontWeight:800, color:"#0F6E56", marginBottom:8 }}>{L.howTitle}</p>
+          {L.dims.map((d,i) => (
+            <p key={i} style={{ fontSize:"0.78rem", color:"#546E7A", fontWeight:600, marginBottom:4 }}>{d}</p>
+          ))}
+        </div>
+        <div style={{ background:"rgba(239,159,39,0.08)", border:"1px solid rgba(239,159,39,0.25)", borderRadius:10, padding:"8px 14px", fontSize:"0.8rem", color:"#EF9F27", fontWeight:800, textAlign:"center" }}>
+          💡 {L.tip}
+        </div>
+        <div style={{ fontSize:"2.5rem", marginTop:4 }}>{prompt.obj.split(" ")[0]}</div>
+        <p style={{ fontWeight:800, color:"#0F6E56", fontSize:"1rem", textAlign:"center" }}>
+          {lang==="ru"?"Объект:":lang==="uz"?"Buyum:":"Object:"} <b>{prompt.obj}</b>
+        </p>
+        <button className="fin-btn" style={{...G.finBtn, marginTop:4}} onClick={startGame}>{L.start}</button>
+      </div>
+    );
   }
 
-  const pct = (timer / 30) * 100;
-  const barC = timer > 15 ? "#66BB6A" : timer > 8 ? "#FFD740" : "#EF9F27";
-  const prompt = lang === "ru" ? "применений для старой газеты" : lang === "uz" ? "eski gazeta uchun foydalanishlar" : "uses for an old newspaper";
+  // ── PLAYING ──
+  if (phase === "playing") {
+    const count = lines.filter(l => l.trim().length > 2).length;
+    const pct   = (timer / TOTAL_TIME) * 100;
+    const barC  = timer > 30 ? "#66BB6A" : timer > 15 ? "#FFD740" : "#EF5350";
+    return (
+      <div style={G.wrap}>
+        <div style={G.badge}>🎨 {lang==="ru"?"Творчество":lang==="uz"?"Ijodkorlik":"Creativity"}</div>
+        <p style={{ fontSize:"0.78rem", fontWeight:800, color:"#EF9F27", textTransform:"uppercase", letterSpacing:"0.06em" }}>
+          {lang==="ru"?"Нестандартные применения для:":lang==="uz"?"G'ayrioddiiy foydalanishlar:":"Unusual uses for:"}
+        </p>
+        <p style={{ fontWeight:900, color:"#0F6E56", fontSize:"1.1rem" }}>{prompt.obj}</p>
+        <div style={{ width:"100%", height:10, background:"#E1F5EE", borderRadius:99, overflow:"hidden" }}>
+          <div style={{ height:"100%", width:`${pct}%`, background:barC, borderRadius:99, transition:"width 1s linear, background 0.5s" }}/>
+        </div>
+        <p style={{ fontWeight:900, color:barC, fontSize:"1.2rem" }}>⏱ {timer}s</p>
+        <textarea
+          style={{...G.textarea, minHeight:150, textAlign:"left"}}
+          placeholder={lang==="ru"?"Каждая идея с новой строки...\n\nПример:\n- использовать как линейку\n- согнуть в форму буквы":lang==="uz"?"Har bir g'oya yangi qatorda...\n\nMisol:\n- chizg'ich sifatida\n- harf shakliga bukish":"One idea per line...\n\nExample:\n- use as a ruler\n- bend into letter shapes"}
+          value={ideas}
+          onChange={e => setIdeas(e.target.value)}
+          autoFocus
+        />
+        <div style={{ display:"flex", gap:12, alignItems:"center", flexWrap:"wrap", justifyContent:"center" }}>
+          <span style={{ fontSize:"0.82rem", fontWeight:800, color:"#0F6E56", background:"rgba(15,110,86,0.08)", borderRadius:99, padding:"5px 14px" }}>
+            📝 {count} {lang==="ru"?"идей":lang==="uz"?"g'oya":"ideas"}
+          </span>
+          <span style={{ fontSize:"0.75rem", color:"#90A4AE", fontWeight:700 }}>
+            {lang==="ru"?"Необычнее = больше баллов":lang==="uz"?"Noodatiy = ko'proq ball":"Unusual = more points"}
+          </span>
+        </div>
+        <button onClick={finishEarly} style={{ background:"none", border:"1.5px solid #E1F5EE", borderRadius:99, padding:"8px 24px", color:"#90A4AE", fontSize:"0.82rem", fontWeight:800, cursor:"pointer", transition:"all 0.2s" }}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor="#0F6E56";e.currentTarget.style.color="#0F6E56";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor="#E1F5EE";e.currentTarget.style.color="#90A4AE";}}>
+          {lang==="ru"?"✓ Готово, показать результат":lang==="uz"?"✓ Tayyor, natijani ko'rsat":"✓ Done, show result"}
+        </button>
+      </div>
+    );
+  }
+
+  // ── DONE ──
+  const result = calcCreativityScore(lines, prompt);
+  const emoji  = result.total >= 80 ? "🏆" : result.total >= 60 ? "⭐" : result.total >= 40 ? "💪" : "🌱";
+  const scoreColor = result.total>=80?"#66BB6A":result.total>=60?"#1D9E75":result.total>=40?"#EF9F27":"#EF5350";
+
+  const DIMS = [
+    { key:"fluency",     label:{ ru:"Беглость",        uz:"Oqimlilik",         en:"Fluency"      }, color:"#5DCAA5", tip:{ ru:"Количество идей",    uz:"G'oyalar soni",       en:"Number of ideas"     } },
+    { key:"flexibility", label:{ ru:"Гибкость",         uz:"Moslashuvchanlik",  en:"Flexibility"  }, color:"#EF9F27", tip:{ ru:"Разнообразие тем",   uz:"Mavzular xilma-xil",  en:"Variety of topics"   } },
+    { key:"originality", label:{ ru:"Оригинальность",   uz:"G'ayrioddiyligi",   en:"Originality"  }, color:"#7E57C2", tip:{ ru:"Насколько необычно", uz:"Qanchalik noodatiy",  en:"How unusual"         } },
+    { key:"elaboration", label:{ ru:"Детальность",      uz:"Batafsilligi",      en:"Elaboration"  }, color:"#0F6E56", tip:{ ru:"Подробность идей",   uz:"Batafsil g'oyalar",   en:"Detail in ideas"     } },
+  ];
 
   return (
-    <div style={G.wrap}>
-      <div style={G.badge}>🎨 {lang === "ru" ? "Творчество" : lang === "uz" ? "Ijodkorlik" : "Creativity"}</div>
-      <p style={G.question}>{lang === "ru" ? "Придумай как можно больше" : lang === "uz" ? "Imkon qadar ko'proq toping:" : "Think of as many"} <b>{prompt}</b>!</p>
-      <div style={{ width:"100%", height:8, background:"#E1F5EE", borderRadius:99, overflow:"hidden" }}>
-        <div style={{ height:"100%", width:`${pct}%`, background:barC, borderRadius:99, transition:"width 1s linear, background 0.5s" }} />
-      </div>
-      <p style={{ fontWeight:800, color:barC }}>{timer}s</p>
-      <textarea style={G.textarea} placeholder={lang === "ru" ? "Каждая идея на новой строке..." : lang === "uz" ? "Har bir g'oya yangi qatorda..." : "One idea per line..."}
-        value={ideas} onChange={(e) => setIdeas(e.target.value)} autoFocus />
-      <p style={{ fontSize:"0.8rem", color:"#90A4AE" }}>
-        {lang === "ru" ? "Идей:" : lang === "uz" ? "G'oyalar:" : "Ideas:"} <b style={{ color:"#0F6E56" }}>{ideas.split("\n").filter((l)=>l.trim()).length}</b>
+    <div style={{...G.wrap, gap:16}}>
+      <div style={G.badge}>🎨 {lang==="ru"?"Результат":lang==="uz"?"Natija":"Result"}</div>
+      <div style={{ fontSize:"3rem" }}>{emoji}</div>
+      <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"3rem", color:scoreColor, lineHeight:1 }}>{result.total}%</div>
+      <p style={{ fontSize:"0.8rem", color:"#90A4AE", fontWeight:700 }}>
+        {lines.filter(l=>l.trim().length>2).length} {lang==="ru"?"идей написано":lang==="uz"?"g'oya yozildi":"ideas written"}
       </p>
+
+      {/* 4 dimension bars */}
+      <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:12, marginTop:4 }}>
+        {DIMS.map(({key, label, color, tip}) => (
+          <div key={key}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:5 }}>
+              <div>
+                <span style={{ fontSize:"0.82rem", fontWeight:800, color:"#2E4057" }}>{label[lang]||label.en}</span>
+                <span style={{ fontSize:"0.7rem", color:"#90A4AE", marginLeft:6, fontWeight:600 }}>— {tip[lang]||tip.en}</span>
+              </div>
+              <span style={{ fontSize:"0.85rem", fontWeight:900, color }}>{result[key]}%</span>
+            </div>
+            <div style={{ height:10, background:"#F0F4F8", borderRadius:99, overflow:"hidden" }}>
+              <div style={{ height:"100%", width:`${result[key]}%`, background:`linear-gradient(90deg,${color},${color}99)`, borderRadius:99, transition:"width 0.9s cubic-bezier(0.34,1.56,0.64,1)" }}/>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Weighted formula explanation */}
+      <div style={{ background:"rgba(15,110,86,0.06)", border:"1px solid rgba(15,110,86,0.12)", borderRadius:12, padding:"10px 14px", width:"100%", textAlign:"center" }}>
+        <p style={{ fontSize:"0.72rem", color:"#546E7A", fontWeight:700, lineHeight:1.6 }}>
+          {lang==="ru"
+            ? "Итог = Беглость×25% + Гибкость×30% + Оригинальность×30% + Детальность×15%"
+            : lang==="uz"
+            ? "Jami = Oqimlilik×25% + Moslashuvchanlik×30% + G'ayrioddiyligi×30% + Batafsilligi×15%"
+            : "Total = Fluency×25% + Flexibility×30% + Originality×30% + Elaboration×15%"}
+        </p>
+      </div>
+
+      <button className="fin-btn" style={{...G.finBtn, marginTop:4}} onClick={() => onFinish("creativity", result.total)}>
+        {lang==="ru"?"Сохранить →":lang==="uz"?"Saqlash →":"Save result →"}
+      </button>
     </div>
   );
 }
