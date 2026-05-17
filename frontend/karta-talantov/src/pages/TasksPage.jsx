@@ -222,40 +222,65 @@ const CREATIVITY_PROMPTS = {
   ],
 };
 
-function scoreOriginality(idea, common) {
-  const t = idea.trim().toLowerCase();
-  if (t.length < 3) return 0;
-  const isCommon = common.some(c => t.includes(c.toLowerCase()));
-  if (isCommon)    return 1;
-  if (t.length < 6) return 2;
-  if (t.length > 35) return 5;
-  if (t.length > 18) return 4;
-  return 3;
-}
+// ── AI-powered creativity scoring ────────────────────────────────────────────
+async function analyzeCreativityWithAI(ideas, prompt, lang) {
+  const lines = ideas.split("\n").filter(l => l.trim().length > 2);
+  if (lines.length === 0) return { total:5, fluency:0, flexibility:0, originality:0, elaboration:0, aiUsed:false };
 
-function detectCategory(idea, cats) {
-  const t = idea.toLowerCase();
-  return cats.find(c => t.includes(c.split(" ")[0].toLowerCase())) || null;
-}
+  const systemPrompt = `You are a psychologist specializing in divergent thinking and creativity assessment using the Torrance Tests of Creative Thinking (TTCT).
 
-function calcCreativityScore(lines, prompt) {
-  const valid = lines.filter(l => l.trim().length > 2);
-  const n = valid.length;
-  if (n === 0) return { total:5, fluency:0, flexibility:0, originality:0, elaboration:0 };
+Evaluate a list of ideas for alternate uses of an object. Score each of these 4 dimensions from 0-100:
 
-  const fluency     = Math.min(100, Math.round((n / 8) * 100));
-  const uniqueCats  = new Set(valid.map(l => detectCategory(l, prompt.cats)).filter(Boolean));
-  const flexibility = Math.min(100, Math.round((uniqueCats.size / 5) * 100));
-  const origScores  = valid.map(l => scoreOriginality(l, prompt.common));
-  const avgOrig     = origScores.reduce((a,b)=>a+b,0) / n;
-  const originality = Math.min(100, Math.round(((avgOrig - 1) / 4) * 100));
-  const wordCounts  = valid.map(l => l.trim().split(/\s+/).length);
-  const avgWords    = wordCounts.reduce((a,b)=>a+b,0) / n;
-  const elaboration = Math.min(100, Math.round((avgWords / 6) * 100));
-  const total = Math.max(5, Math.round(
-    fluency * 0.25 + flexibility * 0.30 + originality * 0.30 + elaboration * 0.15
-  ));
-  return { total, fluency, flexibility, originality, elaboration };
+1. FLUENCY (25% weight): How many valid, meaningful ideas are there? (not just filler words)
+2. FLEXIBILITY (30% weight): How many genuinely DIFFERENT categories/domains of use are represented? (e.g. musical instrument vs. medical tool vs. weapon vs. art — these are different; "hammer" and "doorstop" are similar)  
+3. ORIGINALITY (30% weight): How UNUSUAL and creative are the ideas compared to what most people would think of? Common ideas score low, truly unexpected ideas score high.
+4. ELABORATION (15% weight): How MEANINGFUL and thought-out are the ideas? Does the person explain HOW it would be used, show understanding, show imagination? (NOT about text length — a short but clever idea scores high)
+
+Return ONLY a JSON object with no markdown, no explanation:
+{"fluency":70,"flexibility":60,"originality":45,"elaboration":55,"total":58,"feedback":"One sentence of encouraging feedback in ${lang === 'ru' ? 'Russian' : lang === 'uz' ? 'Uzbek' : 'English'}"}`;
+
+  const userMsg = `Object: ${prompt.obj}
+Common/obvious uses people usually think of: ${prompt.common.join(', ')}
+
+The user's ideas:
+${lines.map((l,i) => `${i+1}. ${l.trim()}`).join('\n')}
+
+Score their creativity on all 4 dimensions.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        messages: [{ role: "user", content: userMsg }],
+        system: systemPrompt,
+      }),
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || "";
+    const clean = text.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    return {
+      total:       Math.max(5, Math.min(100, parsed.total || 30)),
+      fluency:     Math.min(100, parsed.fluency || 0),
+      flexibility: Math.min(100, parsed.flexibility || 0),
+      originality: Math.min(100, parsed.originality || 0),
+      elaboration: Math.min(100, parsed.elaboration || 0),
+      feedback:    parsed.feedback || "",
+      aiUsed:      true,
+    };
+  } catch {
+    // Fallback to simple scoring if API fails
+    const n = lines.length;
+    const fluency     = Math.min(100, Math.round((n / 8) * 100));
+    const originality = Math.min(100, Math.round(
+      (lines.filter(l => !prompt.common.some(c => l.toLowerCase().includes(c.toLowerCase()))).length / Math.max(n,1)) * 100
+    ));
+    const total = Math.max(5, Math.round(fluency*0.4 + originality*0.6));
+    return { total, fluency, flexibility:40, originality, elaboration:40, aiUsed:false };
+  }
 }
 
 function CreativityGame({ onFinish, lang }) {
@@ -376,7 +401,36 @@ function CreativityGame({ onFinish, lang }) {
   }
 
   // ── DONE ──
-  const result = calcCreativityScore(lines, prompt);
+  const [aiResult, setAiResult] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    if (phase === "done" && !aiResult && !aiLoading) {
+      setAiLoading(true);
+      analyzeCreativityWithAI(ideas, prompt, lang).then(r => {
+        setAiResult(r);
+        setAiLoading(false);
+      });
+    }
+  }, [phase]);
+
+  if (phase === "done" && (aiLoading || !aiResult)) {
+    return (
+      <div style={{...G.wrap, gap:20}}>
+        <div style={G.badge}>🤖 {lang==="ru"?"AI анализирует ваши идеи...":lang==="uz"?"AI g'oyalaringizni tahlil qilmoqda...":"AI is analysing your ideas..."}</div>
+        <div style={{ fontSize:"2.5rem", animation:"float 1.5s ease-in-out infinite" }}>🧠</div>
+        <p style={{ color:"#546E7A", fontWeight:600, fontSize:"0.88rem", textAlign:"center", maxWidth:280 }}>
+          {lang==="ru"?"Оцениваем оригинальность, гибкость и смысл каждой идеи...":lang==="uz"?"Har bir g'oyaning g'ayrioddiyligi va ma'nosini baholayapmiz...":"Evaluating the originality, flexibility and meaning of each idea..."}
+        </p>
+        <div style={{ display:"flex", gap:6 }}>
+          {[0,1,2].map(i => <div key={i} style={{ width:10, height:10, borderRadius:"50%", background:"#0F6E56", animation:`pulse 1.2s ease-in-out ${i*0.2}s infinite` }}/>)}
+        </div>
+      </div>
+    );
+  }
+
+  if (phase !== "done") return null;
+  const result = aiResult || { total:5, fluency:0, flexibility:0, originality:0, elaboration:0 };
   const emoji  = result.total >= 80 ? "🏆" : result.total >= 60 ? "⭐" : result.total >= 40 ? "💪" : "🌱";
   const scoreColor = result.total>=80?"#66BB6A":result.total>=60?"#1D9E75":result.total>=40?"#EF9F27":"#EF5350";
 
@@ -414,14 +468,22 @@ function CreativityGame({ onFinish, lang }) {
         ))}
       </div>
 
-      {/* Weighted formula explanation */}
-      <div style={{ background:"rgba(15,110,86,0.06)", border:"1px solid rgba(15,110,86,0.12)", borderRadius:12, padding:"10px 14px", width:"100%", textAlign:"center" }}>
-        <p style={{ fontSize:"0.72rem", color:"#546E7A", fontWeight:700, lineHeight:1.6 }}>
+      {/* AI feedback */}
+      {result.feedback && (
+        <div style={{ background:"linear-gradient(135deg,rgba(15,110,86,0.08),rgba(29,158,117,0.05))", border:"1px solid rgba(15,110,86,0.2)", borderRadius:14, padding:"12px 16px", width:"100%", textAlign:"center" }}>
+          <p style={{ fontSize:"0.8rem", color:"#0F6E56", fontWeight:700, lineHeight:1.5 }}>
+            🤖 {result.feedback}
+          </p>
+        </div>
+      )}
+      {/* Formula */}
+      <div style={{ background:"rgba(15,110,86,0.04)", border:"1px solid rgba(15,110,86,0.10)", borderRadius:12, padding:"8px 14px", width:"100%", textAlign:"center" }}>
+        <p style={{ fontSize:"0.7rem", color:"#90A4AE", fontWeight:700, lineHeight:1.6 }}>
           {lang==="ru"
-            ? "Итог = Беглость×25% + Гибкость×30% + Оригинальность×30% + Детальность×15%"
+            ? "AI оценивает смысл и оригинальность идей, не длину текста"
             : lang==="uz"
-            ? "Jami = Oqimlilik×25% + Moslashuvchanlik×30% + G'ayrioddiyligi×30% + Batafsilligi×15%"
-            : "Total = Fluency×25% + Flexibility×30% + Originality×30% + Elaboration×15%"}
+            ? "AI g'oyalarning ma'nosi va g'ayrioddiyligi bo'yicha baholaydi, matn uzunligi bo'yicha emas"
+            : "AI scores the meaning and originality of ideas — not text length"}
         </p>
       </div>
 
