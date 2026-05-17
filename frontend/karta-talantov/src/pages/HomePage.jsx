@@ -635,7 +635,12 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
       <style>{`
         @keyframes infiniteScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
         @keyframes heroFadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes scrollBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(6px); } }
+        @keyframes scrollBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(8px); } }
+        @keyframes typewriter { from{width:0;opacity:0} to{width:100%;opacity:1} }
+        @keyframes blinkCaret { 0%,100%{border-color:#5DCAA5} 50%{border-color:transparent} }
+        @keyframes socialFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes badgePop { from{opacity:0;transform:scale(0.8) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        @keyframes floatAvatar { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
         @keyframes mascotFloat { 0%,100% { transform:translateY(0px); } 50% { transform:translateY(-14px); } }
@@ -702,87 +707,8 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         }
       `}</style>
 
-      {/* ── GITHUB-STYLE CENTRED HERO — mascot + headline + CTA ── */}
-      <div className="home-hero" style={{
-        minHeight: "100vh",
-        background: "linear-gradient(180deg, #0D1117 0%, #0D1117 70%, #161B22 100%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        padding: "80px 24px 60px",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-
-        {/* Subtle radial glow behind mascot */}
-        <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(92,53,204,0.18) 0%, transparent 70%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(15,110,86,0.10) 0%, transparent 70%)", pointerEvents:"none" }} />
-
-        {/* Mascot — centred */}
-        <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both", marginBottom:8, transform: typeof window!=="undefined" && window.innerWidth<=768 ? "scale(0.9)" : "scale(1.3)" }}>
-          <StarMascot />
-        </div>
-
-        {/* Headline */}
-        <h1 style={{
-          fontFamily:"'Fredoka One', cursive",
-          fontSize: "clamp(2rem, 6vw, 3.6rem)",
-          color: "#E1F5EE",
-          lineHeight: 1.15,
-          maxWidth: 640,
-          margin: "0 auto 16px",
-          animation: "heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s both",
-        }}>
-          {t(lang, "home.title")}
-        </h1>
-
-        {/* Subheading */}
-        <p style={{
-          fontSize: "1.05rem",
-          fontWeight: 600,
-          color: "#8B949E",
-          maxWidth: 480,
-          margin: "0 auto 36px",
-          lineHeight: 1.6,
-          animation: "heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both",
-        }}>
-          {lang==="ru" ? "Пройди тест, узнай свои таланты и найди идеальную карьеру с помощью AI"
-           : lang==="uz" ? "Test o'ting, iste'dodlaringizni biling va AI yordamida ideal karerangizni toping"
-           : "Take the quiz, discover your talents and find your ideal career with AI"}
-        </p>
-
-        {/* CTA buttons */}
-        <div className="home-hero-btns" style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.4s both" }}>
-          <button
-            onClick={() => setPage("quiz")}
-            style={{ padding:"14px 32px", background:"linear-gradient(135deg,#7C4DFF,#5C35CC)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 6px 24px rgba(92,53,204,0.45)", transition:"transform 0.2s, box-shadow 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(92,53,204,0.6)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 6px 24px rgba(92,53,204,0.45)"; }}
-          >
-            {t(lang, "home.cta")} →
-          </button>
-          <button
-            onClick={() => setPage("tasks")}
-            style={{ padding:"14px 32px", background:"transparent", color:"#E1F5EE", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", transition:"all 0.2s", backdropFilter:"blur(8px)" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.5)"; e.currentTarget.style.background="rgba(255,255,255,0.05)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.2)"; e.currentTarget.style.background="transparent"; }}
-          >
-            {lang==="ru"?"Попробовать игры":lang==="uz"?"O'yinlarni sinash":"Try mini-games"}
-          </button>
-        </div>
-
-        {/* Scroll indicator */}
-        <div style={{ position:"absolute", bottom:32, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:6, animation:"heroFadeUp 0.7s ease 0.8s both" }}>
-          <span style={{ fontSize:"0.72rem", fontWeight:700, color:"#484F58", letterSpacing:"0.1em", textTransform:"uppercase" }}>
-            {lang==="ru"?"Листай вниз":lang==="uz"?"Pastga suring":"Scroll down"}
-          </span>
-          <div style={{ width:24, height:38, border:"2px solid rgba(255,255,255,0.15)", borderRadius:99, display:"flex", justifyContent:"center", paddingTop:6 }}>
-            <div style={{ width:4, height:8, background:"rgba(255,255,255,0.4)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }} />
-          </div>
-        </div>
-      </div>
+      {/* ── UPGRADED HERO ── */}
+      <HeroSection lang={lang} dark={dark} setPage={setPage} />
 
       {/* Logo slider */}
       <div style={{ padding:"28px 0 8px", overflow:"hidden", background: dark?"#0F1923":"#F1EFE8" }}>
