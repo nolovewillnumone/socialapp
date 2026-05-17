@@ -722,27 +722,34 @@ function HeroSection({ lang, setPage }) {
   const prefix = PREFIX[lang] || PREFIX.en;
 
   return (
-    <div className="home-hero" style={{ minHeight:"100vh", background:"linear-gradient(180deg,#0D1117 0%,#0D1117 70%,#161B22 100%)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"80px 24px 80px", position:"relative", overflow:"hidden" }}>
+    <div className="home-hero" style={{
+      minHeight:"100vh",
+      background:"linear-gradient(180deg,#0D1117 0%,#0D1117 70%,#161B22 100%)",
+      display:"flex", flexDirection:"column", alignItems:"center",
+      justifyContent:"center", textAlign:"center",
+      padding:"120px 24px 100px",
+      position:"relative", overflow:"hidden",
+    }}>
 
       {/* Glows */}
-      <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,rgba(92,53,204,0.15) 0%,transparent 70%)", pointerEvents:"none" }}/>
-      <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(15,110,86,0.08) 0%,transparent 70%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,rgba(92,53,204,0.15) 0%,transparent 70%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(15,110,86,0.08) 0%,transparent 70%)", pointerEvents:"none" }}/>
 
       {/* Mascot */}
-      <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both", marginBottom:8, transform: typeof window!=="undefined" && window.innerWidth<=768 ? "scale(0.85)" : "scale(1.25)" }}>
+      <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both", marginBottom:20 }}>
         <StarMascot />
       </div>
 
       {/* Typewriter headline */}
-      <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.8rem,6vw,3.4rem)", color:"#E1F5EE", lineHeight:1.15, maxWidth:660, margin:"0 auto 8px", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both" }}>
+      <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(2rem,6vw,3.6rem)", color:"#E1F5EE", lineHeight:1.2, maxWidth:700, margin:"0 auto 0", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both" }}>
         {prefix}{" "}
-        <span style={{ color:"#5DCAA5", borderRight:"3px solid #5DCAA5", paddingRight:3, animation:"blinkCaret 0.8s step-end infinite" }}>
+        <span style={{ color:"#5DCAA5", borderRight:"3px solid #5DCAA5", paddingRight:4, animation:"blinkCaret 0.8s step-end infinite" }}>
           {typed}
         </span>
       </h1>
 
       {/* Subtitle */}
-      <p style={{ fontSize:"1rem", fontWeight:600, color:"#8B949E", maxWidth:460, margin:"16px auto 32px", lineHeight:1.6, animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.25s both" }}>
+      <p style={{ fontSize:"1rem", fontWeight:600, color:"#8B949E", maxWidth:460, margin:"20px auto 32px", lineHeight:1.7, animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.25s both" }}>
         {lang==="ru"?"Пройди тест, узнай 9 талантов и получи рекомендации по 35+ профессиям — бесплатно"
         :lang==="uz"?"Test o'ting, 9 iste'dodingizni biling va 35+ kasb bo'yicha tavsiya oling — bepul"
         :"Take the quiz, discover 9 talents and get recommendations for 35+ careers — free"}
@@ -765,10 +772,10 @@ function HeroSection({ lang, setPage }) {
       </div>
 
       {/* Social proof */}
-      <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:28, animation:"socialFadeIn 0.7s ease 0.6s both" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:24, animation:"socialFadeIn 0.7s ease 0.55s both" }}>
         <div style={{ display:"flex" }}>
           {AVATARS.map((a,i) => (
-            <div key={i} style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", border:"2px solid #0D1117", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.8rem", marginLeft:i>0?-8:0, animation:`floatAvatar ${2+i*0.3}s ease-in-out infinite` }}>
+            <div key={i} style={{ width:30, height:30, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", border:"2px solid #0D1117", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.85rem", marginLeft:i>0?-8:0, animation:`floatAvatar ${2+i*0.3}s ease-in-out infinite` }}>
               {a}
             </div>
           ))}
@@ -779,19 +786,93 @@ function HeroSection({ lang, setPage }) {
         </span>
       </div>
 
-      {/* Stat counters */}
-      <div style={{ display:"flex", gap:typeof window!=="undefined"&&window.innerWidth<=480?"20px":"48px", justifyContent:"center", flexWrap:"wrap", marginTop:48, paddingTop:36, borderTop:"1px solid rgba(255,255,255,0.06)", width:"100%", maxWidth:560, animation:"heroFadeUp 0.7s ease 0.5s both" }}>
-        {stats.map((s,i) => <AnimatedStat key={i} target={s.t} suffix={s.s} label={s.l} color={COLORS[i]} />)}
+
+
+      {/* Scroll indicator — absolute at bottom, clear of content */}
+      <div style={{ position:"absolute", bottom:24, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:4, animation:"heroFadeUp 0.7s ease 0.9s both", pointerEvents:"none" }}>
+        <span style={{ fontSize:"0.62rem", fontWeight:800, color:"rgba(255,255,255,0.2)", letterSpacing:"0.15em", textTransform:"uppercase" }}>
+          {lang==="ru"?"листай":lang==="uz"?"suring":"scroll"}
+        </span>
+        <div style={{ width:20, height:32, border:"1.5px solid rgba(255,255,255,0.1)", borderRadius:99, display:"flex", justifyContent:"center", paddingTop:5 }}>
+          <div style={{ width:3, height:6, background:"rgba(255,255,255,0.25)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// ── Stats Section ─────────────────────────────────────────────────────────────
+function StatsSection({ lang, dark }) {
+  const STATS = {
+    ru: [
+      { t:30, s:"",  l:"Вопросов",   icon:"📋", desc:"За 7 минут" },
+      { t:9,  s:"",  l:"Талантов",   icon:"🧠", desc:"По Гарднеру" },
+      { t:35, s:"+", l:"Профессий",  icon:"🚀", desc:"С процентом совпадения" },
+      { t:3,  s:"",  l:"Языка",      icon:"🌍", desc:"RU · UZ · EN" },
+    ],
+    uz: [
+      { t:30, s:"",  l:"Savol",       icon:"📋", desc:"7 daqiqada" },
+      { t:9,  s:"",  l:"Iste'dod",   icon:"🧠", desc:"Gardner bo'yicha" },
+      { t:35, s:"+", l:"Kasb",        icon:"🚀", desc:"Mos foiz bilan" },
+      { t:3,  s:"",  l:"Til",         icon:"🌍", desc:"RU · UZ · EN" },
+    ],
+    en: [
+      { t:30, s:"",  l:"Questions",  icon:"📋", desc:"In 7 minutes" },
+      { t:9,  s:"",  l:"Talents",    icon:"🧠", desc:"Gardner's theory" },
+      { t:35, s:"+", l:"Careers",    icon:"🚀", desc:"With match %" },
+      { t:3,  s:"",  l:"Languages",  icon:"🌍", desc:"RU · UZ · EN" },
+    ],
+  };
+  const COLORS = ["#5DCAA5","#EF9F27","#7E57C2","#E64A19"];
+  const stats = STATS[lang] || STATS.en;
+
+  const [ref, visible] = useInView(0.15);
+
+  return (
+    <div ref={ref} style={{
+      padding:"80px 24px",
+      background: dark
+        ? "linear-gradient(135deg,#0A1F15,#060E09)"
+        : "linear-gradient(135deg,#E1F5EE,#F1EFE8)",
+    }}>
+      {/* Section label */}
+      <div style={{ textAlign:"center", marginBottom:48 }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background: dark?"rgba(93,202,165,0.1)":"rgba(15,110,86,0.08)", border:"1px solid rgba(15,110,86,0.2)", borderRadius:99, padding:"5px 18px", fontSize:"0.72rem", fontWeight:800, color:"#0F6E56", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14, opacity:visible?1:0, transition:"opacity 0.6s ease" }}>
+          ✦ {lang==="ru"?"Платформа в цифрах":lang==="uz"?"Platforma raqamlarda":"Platform in numbers"}
+        </div>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.6rem,4vw,2.6rem)", color: dark?"#E1F5EE":"#04342C", margin:0, opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:"opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s" }}>
+          {lang==="ru"?"Всё что тебе нужно — в одном тесте"
+          :lang==="uz"?"Sizga kerak bo'lgan hamma narsa — bir testda"
+          :"Everything you need — in one quiz"}
+        </h2>
       </div>
 
-      {/* Scroll indicator */}
-      <div style={{ position:"absolute", bottom:28, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:6, animation:"heroFadeUp 0.7s ease 0.9s both" }}>
-        <span style={{ fontSize:"0.68rem", fontWeight:700, color:"#484F58", letterSpacing:"0.12em", textTransform:"uppercase" }}>
-          {lang==="ru"?"Листай вниз":lang==="uz"?"Pastga suring":"Scroll"}
-        </span>
-        <div style={{ width:22, height:36, border:"1.5px solid rgba(255,255,255,0.12)", borderRadius:99, display:"flex", justifyContent:"center", paddingTop:5 }}>
-          <div style={{ width:3, height:7, background:"rgba(255,255,255,0.35)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }}/>
-        </div>
+      {/* 4 stat cards */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:20, maxWidth:860, margin:"0 auto" }}>
+        {stats.map((s, i) => (
+          <div key={i}
+            style={{
+              background: dark?"rgba(255,255,255,0.03)":"#fff",
+              border:`1.5px solid ${COLORS[i]}22`,
+              borderRadius:24,
+              padding:"32px 24px",
+              textAlign:"center",
+              boxShadow:`0 4px 24px ${COLORS[i]}10`,
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0) scale(1)" : "translateY(32px) scale(0.95)",
+              transition:`opacity 0.6s ease ${0.1+i*0.1}s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1) ${0.1+i*0.1}s`,
+            }}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-6px) scale(1.02)";e.currentTarget.style.boxShadow=`0 16px 40px ${COLORS[i]}22`;}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0) scale(1)";e.currentTarget.style.boxShadow=`0 4px 24px ${COLORS[i]}10`;}}
+          >
+            <div style={{ fontSize:"2rem", marginBottom:12 }}>{s.icon}</div>
+            <AnimatedStat target={s.t} suffix={s.s} label={s.l} color={COLORS[i]} />
+            <p style={{ fontSize:"0.75rem", fontWeight:600, color: dark?"#607D8B":"#90A4AE", marginTop:8, letterSpacing:"0.02em" }}>
+              {s.desc}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
