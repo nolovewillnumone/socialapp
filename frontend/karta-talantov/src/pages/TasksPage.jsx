@@ -288,10 +288,23 @@ function CreativityGame({ onFinish, lang }) {
   const prompts = CREATIVITY_PROMPTS[lang] || CREATIVITY_PROMPTS.en;
   const [promptIdx] = useState(() => Math.floor(Math.random() * prompts.length));
   const prompt  = prompts[promptIdx];
-  const [ideas,  setIdeas]  = useState("");
-  const [timer,  setTimer]  = useState(TOTAL_TIME);
-  const [phase,  setPhase]  = useState("intro");
+  const [ideas,    setIdeas]    = useState("");
+  const [timer,    setTimer]    = useState(TOTAL_TIME);
+  const [phase,    setPhase]    = useState("intro");
+  const [aiResult, setAiResult] = useState(null);
+  const [aiLoading,setAiLoading]= useState(false);
   const timerRef = useRef(null);
+
+  // Trigger AI analysis when phase becomes "done"
+  useEffect(() => {
+    if (phase === "done" && !aiResult && !aiLoading) {
+      setAiLoading(true);
+      analyzeCreativityWithAI(ideas, prompt, lang).then(r => {
+        setAiResult(r);
+        setAiLoading(false);
+      });
+    }
+  }, [phase]); // eslint-disable-line
 
   const startGame = () => {
     setPhase("playing");
@@ -401,18 +414,6 @@ function CreativityGame({ onFinish, lang }) {
   }
 
   // ── DONE ──
-  const [aiResult, setAiResult] = useState(null);
-  const [aiLoading, setAiLoading] = useState(false);
-
-  useEffect(() => {
-    if (phase === "done" && !aiResult && !aiLoading) {
-      setAiLoading(true);
-      analyzeCreativityWithAI(ideas, prompt, lang).then(r => {
-        setAiResult(r);
-        setAiLoading(false);
-      });
-    }
-  }, [phase]);
 
   if (phase === "done" && (aiLoading || !aiResult)) {
     return (
