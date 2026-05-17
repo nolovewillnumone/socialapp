@@ -626,6 +626,177 @@ function StarMascot() {
   );
 }
 
+
+// ── Typewriter hook ───────────────────────────────────────────────────────────
+function useTypewriter(texts, speed=60, pause=2200) {
+  const [displayed, setDisplayed] = useState("");
+  const [textIdx,   setTextIdx]   = useState(0);
+  const [charIdx,   setCharIdx]   = useState(0);
+  const [deleting,  setDeleting]  = useState(false);
+
+  useEffect(() => {
+    const current = texts[textIdx] || "";
+    let delay = deleting ? speed/2 : speed;
+    if (!deleting && charIdx === current.length) delay = pause;
+    if (deleting && charIdx === 0) {
+      setDeleting(false);
+      setTextIdx(i => (i+1) % texts.length);
+      return;
+    }
+    const t = setTimeout(() => {
+      if (!deleting && charIdx < current.length) {
+        setDisplayed(current.slice(0, charIdx+1));
+        setCharIdx(c => c+1);
+      } else if (!deleting && charIdx === current.length) {
+        setDeleting(true);
+      } else if (deleting) {
+        setDisplayed(current.slice(0, charIdx-1));
+        setCharIdx(c => c-1);
+      }
+    }, delay);
+    return () => clearTimeout(t);
+  }, [charIdx, deleting, textIdx, texts, speed, pause]);
+
+  return displayed;
+}
+
+// ── Animated counter stat ─────────────────────────────────────────────────────
+function AnimatedStat({ target, suffix="", label, color="#5DCAA5" }) {
+  const [count,   setCount]   = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started) setStarted(true);
+    }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    let start = null;
+    const duration = 1400;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(step);
+      else setCount(target);
+    };
+    requestAnimationFrame(step);
+  }, [started, target]);
+
+  return (
+    <div ref={ref} style={{ textAlign:"center" }}>
+      <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.8rem,5vw,2.8rem)", color, lineHeight:1 }}>
+        {count}{suffix}
+      </div>
+      <div style={{ fontSize:"0.72rem", fontWeight:800, color:"#484F58", textTransform:"uppercase", letterSpacing:"0.1em", marginTop:4 }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ── Hero Section ──────────────────────────────────────────────────────────────
+function HeroSection({ lang, setPage }) {
+  const TYPEWRITER = {
+    ru: ["программиста 💻","дизайнера 🎨","врача 🩺","музыканта 🎵","учёного 🔬","биолога 🌿","лидера 👑","спортсмена 🏆"],
+    uz: ["dasturchi 💻","dizayner 🎨","shifokor 🩺","musiqachi 🎵","olim 🔬","biolog 🌿","lider 👑","sportchi 🏆"],
+    en: ["Programmer 💻","Designer 🎨","Doctor 🩺","Musician 🎵","Scientist 🔬","Biologist 🌿","Leader 👑","Athlete 🏆"],
+  };
+  const STATS = {
+    ru: [{t:30,s:"",l:"Вопросов"},{t:9,s:"",l:"Талантов"},{t:35,s:"+",l:"Профессий"},{t:3,s:"",l:"Языка"}],
+    uz: [{t:30,s:"",l:"Savol"},{t:9,s:"",l:"Iste'dod"},{t:35,s:"+",l:"Kasb"},{t:3,s:"",l:"Til"}],
+    en: [{t:30,s:"",l:"Questions"},{t:9,s:"",l:"Talents"},{t:35,s:"+",l:"Careers"},{t:3,s:"",l:"Languages"}],
+  };
+  const COLORS = ["#5DCAA5","#EF9F27","#7E57C2","#E64A19"];
+  const PREFIX = { ru:"Найди своего", uz:"O'z ichingdagi", en:"Discover the" };
+  const AVATARS = ["👧","👦","🧒","👩","🧑"];
+
+  const typed  = useTypewriter(TYPEWRITER[lang] || TYPEWRITER.en);
+  const stats  = STATS[lang] || STATS.en;
+  const prefix = PREFIX[lang] || PREFIX.en;
+
+  return (
+    <div className="home-hero" style={{ minHeight:"100vh", background:"linear-gradient(180deg,#0D1117 0%,#0D1117 70%,#161B22 100%)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"80px 24px 80px", position:"relative", overflow:"hidden" }}>
+
+      {/* Glows */}
+      <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,rgba(92,53,204,0.15) 0%,transparent 70%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(15,110,86,0.08) 0%,transparent 70%)", pointerEvents:"none" }}/>
+
+      {/* Mascot */}
+      <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both", marginBottom:8, transform: typeof window!=="undefined" && window.innerWidth<=768 ? "scale(0.85)" : "scale(1.25)" }}>
+        <StarMascot />
+      </div>
+
+      {/* Typewriter headline */}
+      <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.8rem,6vw,3.4rem)", color:"#E1F5EE", lineHeight:1.15, maxWidth:660, margin:"0 auto 8px", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both" }}>
+        {prefix}{" "}
+        <span style={{ color:"#5DCAA5", borderRight:"3px solid #5DCAA5", paddingRight:3, animation:"blinkCaret 0.8s step-end infinite" }}>
+          {typed}
+        </span>
+      </h1>
+
+      {/* Subtitle */}
+      <p style={{ fontSize:"1rem", fontWeight:600, color:"#8B949E", maxWidth:460, margin:"16px auto 32px", lineHeight:1.6, animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.25s both" }}>
+        {lang==="ru"?"Пройди тест, узнай 9 талантов и получи рекомендации по 35+ профессиям — бесплатно"
+        :lang==="uz"?"Test o'ting, 9 iste'dodingizni biling va 35+ kasb bo'yicha tavsiya oling — bepul"
+        :"Take the quiz, discover 9 talents and get recommendations for 35+ careers — free"}
+      </p>
+
+      {/* CTAs */}
+      <div className="home-hero-btns" style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}>
+        <button onClick={() => setPage("quiz")}
+          style={{ padding:"15px 36px", background:"linear-gradient(135deg,#0F6E56,#1D9E75)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 6px 24px rgba(15,110,86,0.5)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px) scale(1.03)";e.currentTarget.style.boxShadow="0 12px 36px rgba(15,110,86,0.65)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="0 6px 24px rgba(15,110,86,0.5)";}}>
+          {lang==="ru"?"Пройти тест бесплатно →":lang==="uz"?"Bepul test topshirish →":"Take the quiz free →"}
+        </button>
+        <button onClick={() => setPage("tasks")}
+          style={{ padding:"15px 32px", background:"transparent", color:"#E1F5EE", border:"1.5px solid rgba(255,255,255,0.18)", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", transition:"all 0.2s", backdropFilter:"blur(8px)" }}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.45)";e.currentTarget.style.background="rgba(255,255,255,0.05)";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.18)";e.currentTarget.style.background="transparent";}}>
+          {lang==="ru"?"Мини-игры 🎮":lang==="uz"?"Mini-o'yinlar 🎮":"Mini-games 🎮"}
+        </button>
+      </div>
+
+      {/* Social proof */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:28, animation:"socialFadeIn 0.7s ease 0.6s both" }}>
+        <div style={{ display:"flex" }}>
+          {AVATARS.map((a,i) => (
+            <div key={i} style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", border:"2px solid #0D1117", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.8rem", marginLeft:i>0?-8:0, animation:`floatAvatar ${2+i*0.3}s ease-in-out infinite` }}>
+              {a}
+            </div>
+          ))}
+        </div>
+        <span style={{ fontSize:"0.82rem", fontWeight:700, color:"#8B949E" }}>
+          <span style={{ color:"#5DCAA5", fontWeight:900 }}>+247</span>{" "}
+          {lang==="ru"?"учеников на этой неделе":lang==="uz"?"o'quvchi shu hafta":"students this week"}
+        </span>
+      </div>
+
+      {/* Stat counters */}
+      <div style={{ display:"flex", gap:typeof window!=="undefined"&&window.innerWidth<=480?"20px":"48px", justifyContent:"center", flexWrap:"wrap", marginTop:48, paddingTop:36, borderTop:"1px solid rgba(255,255,255,0.06)", width:"100%", maxWidth:560, animation:"heroFadeUp 0.7s ease 0.5s both" }}>
+        {stats.map((s,i) => <AnimatedStat key={i} target={s.t} suffix={s.s} label={s.l} color={COLORS[i]} />)}
+      </div>
+
+      {/* Scroll indicator */}
+      <div style={{ position:"absolute", bottom:28, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:6, animation:"heroFadeUp 0.7s ease 0.9s both" }}>
+        <span style={{ fontSize:"0.68rem", fontWeight:700, color:"#484F58", letterSpacing:"0.12em", textTransform:"uppercase" }}>
+          {lang==="ru"?"Листай вниз":lang==="uz"?"Pastga suring":"Scroll"}
+        </span>
+        <div style={{ width:22, height:36, border:"1.5px solid rgba(255,255,255,0.12)", borderRadius:99, display:"flex", justifyContent:"center", paddingTop:5 }}>
+          <div style={{ width:3, height:7, background:"rgba(255,255,255,0.35)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomePage({ setPage, user, onLogout, lang, dark }) {
   return (
