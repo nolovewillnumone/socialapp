@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Nav from "../components/Nav";
+import { animateCounter } from "../animations";
 import { FeedbackSection } from "../components/FeedbackSection";
 import { t } from "../i18n";
 
@@ -625,6 +626,334 @@ function StarMascot() {
   );
 }
 
+
+// ── Typewriter hook ───────────────────────────────────────────────────────────
+function useTypewriter(texts, speed=60, pause=2200) {
+  const [displayed, setDisplayed] = useState("");
+  const [textIdx,   setTextIdx]   = useState(0);
+  const [charIdx,   setCharIdx]   = useState(0);
+  const [deleting,  setDeleting]  = useState(false);
+
+  useEffect(() => {
+    const current = texts[textIdx] || "";
+    let delay = deleting ? speed/2 : speed;
+    if (!deleting && charIdx === current.length) delay = pause;
+    if (deleting && charIdx === 0) {
+      setDeleting(false);
+      setTextIdx(i => (i+1) % texts.length);
+      return;
+    }
+    const t = setTimeout(() => {
+      if (!deleting && charIdx < current.length) {
+        setDisplayed(current.slice(0, charIdx+1));
+        setCharIdx(c => c+1);
+      } else if (!deleting && charIdx === current.length) {
+        setDeleting(true);
+      } else if (deleting) {
+        setDisplayed(current.slice(0, charIdx-1));
+        setCharIdx(c => c-1);
+      }
+    }, delay);
+    return () => clearTimeout(t);
+  }, [charIdx, deleting, textIdx, texts, speed, pause]);
+
+  return displayed;
+}
+
+// ── Animated counter stat ─────────────────────────────────────────────────────
+function AnimatedStat({ target, suffix="", label, color="#5DCAA5" }) {
+  const [count,   setCount]   = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started) setStarted(true);
+    }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    let start = null;
+    const duration = 1400;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(step);
+      else setCount(target);
+    };
+    requestAnimationFrame(step);
+  }, [started, target]);
+
+  return (
+    <div ref={ref} style={{ textAlign:"center" }}>
+      <div style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.8rem,5vw,2.8rem)", color, lineHeight:1 }}>
+        {count}{suffix}
+      </div>
+      <div style={{ fontSize:"0.72rem", fontWeight:800, color:"#484F58", textTransform:"uppercase", letterSpacing:"0.1em", marginTop:4 }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ── Hero Section ──────────────────────────────────────────────────────────────
+function HeroSection({ lang, setPage }) {
+  const TYPEWRITER = {
+    ru: ["программиста 💻","дизайнера 🎨","врача 🩺","музыканта 🎵","учёного 🔬","биолога 🌿","лидера 👑","спортсмена 🏆"],
+    uz: ["dasturchi 💻","dizayner 🎨","shifokor 🩺","musiqachi 🎵","olim 🔬","biolog 🌿","lider 👑","sportchi 🏆"],
+    en: ["Programmer 💻","Designer 🎨","Doctor 🩺","Musician 🎵","Scientist 🔬","Biologist 🌿","Leader 👑","Athlete 🏆"],
+  };
+  const STATS = {
+    ru: [{t:30,s:"",l:"Вопросов"},{t:9,s:"",l:"Талантов"},{t:35,s:"+",l:"Профессий"},{t:3,s:"",l:"Языка"}],
+    uz: [{t:30,s:"",l:"Savol"},{t:9,s:"",l:"Iste'dod"},{t:35,s:"+",l:"Kasb"},{t:3,s:"",l:"Til"}],
+    en: [{t:30,s:"",l:"Questions"},{t:9,s:"",l:"Talents"},{t:35,s:"+",l:"Careers"},{t:3,s:"",l:"Languages"}],
+  };
+  const COLORS = ["#5DCAA5","#EF9F27","#7E57C2","#E64A19"];
+  const PREFIX = { ru:"Найди своего", uz:"O'z ichingdagi", en:"Discover the" };
+  const AVATARS = ["👧","👦","🧒","👩","🧑"];
+
+  const typed  = useTypewriter(TYPEWRITER[lang] || TYPEWRITER.en);
+  const stats  = STATS[lang] || STATS.en;
+  const prefix = PREFIX[lang] || PREFIX.en;
+
+  return (
+    <div className="home-hero" style={{
+      minHeight:"100vh",
+      background:"linear-gradient(180deg,#0D1117 0%,#0D1117 70%,#161B22 100%)",
+      display:"flex", flexDirection:"column", alignItems:"center",
+      justifyContent:"center", textAlign:"center",
+      padding:"120px 24px 100px",
+      position:"relative", overflow:"hidden",
+    }}>
+
+      {/* Glows */}
+      <div style={{ position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,rgba(92,53,204,0.15) 0%,transparent 70%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(15,110,86,0.08) 0%,transparent 70%)", pointerEvents:"none" }}/>
+
+      {/* Mascot */}
+      <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both", marginBottom:28 }}>
+        <StarMascot />
+      </div>
+
+      {/* Badge */}
+      <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(93,202,165,0.1)", border:"1px solid rgba(93,202,165,0.25)", borderRadius:99, padding:"6px 18px", fontSize:"0.78rem", fontWeight:800, color:"#5DCAA5", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:28, animation:"heroFadeUp 0.7s ease 0.1s both" }}>
+        <span style={{ width:7, height:7, borderRadius:"50%", background:"#5DCAA5", animation:"pulse 2s ease infinite", display:"inline-block" }}/>
+        {lang==="ru"?"Бесплатно · Научно · 3 языка":lang==="uz"?"Bepul · Ilmiy · 3 tilda":"Free · Science-backed · 3 languages"}
+      </div>
+
+      {/* CTAs */}
+      <div className="home-hero-btns" style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}>
+        <button onClick={() => setPage("quiz")}
+          style={{ padding:"15px 36px", background:"linear-gradient(135deg,#0F6E56,#1D9E75)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 6px 24px rgba(15,110,86,0.5)", transition:"all 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px) scale(1.03)";e.currentTarget.style.boxShadow="0 12px 36px rgba(15,110,86,0.65)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="0 6px 24px rgba(15,110,86,0.5)";}}>
+          {lang==="ru"?"Пройти тест бесплатно →":lang==="uz"?"Bepul test topshirish →":"Take the quiz free →"}
+        </button>
+        <button onClick={() => setPage("tasks")}
+          style={{ padding:"15px 32px", background:"transparent", color:"#E1F5EE", border:"1.5px solid rgba(255,255,255,0.18)", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.05rem", cursor:"pointer", transition:"all 0.2s", backdropFilter:"blur(8px)" }}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.45)";e.currentTarget.style.background="rgba(255,255,255,0.05)";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.18)";e.currentTarget.style.background="transparent";}}>
+          {lang==="ru"?"Мини-игры 🎮":lang==="uz"?"Mini-o'yinlar 🎮":"Mini-games 🎮"}
+        </button>
+      </div>
+
+      {/* Social proof */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:24, animation:"socialFadeIn 0.7s ease 0.55s both" }}>
+        <div style={{ display:"flex" }}>
+          {AVATARS.map((a,i) => (
+            <div key={i} style={{ width:30, height:30, borderRadius:"50%", background:"linear-gradient(135deg,#0F6E56,#5DCAA5)", border:"2px solid #0D1117", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.85rem", marginLeft:i>0?-8:0, animation:`floatAvatar ${2+i*0.3}s ease-in-out infinite` }}>
+              {a}
+            </div>
+          ))}
+        </div>
+        <span style={{ fontSize:"0.82rem", fontWeight:700, color:"#8B949E" }}>
+          <span style={{ color:"#5DCAA5", fontWeight:900 }}>+247</span>{" "}
+          {lang==="ru"?"учеников на этой неделе":lang==="uz"?"o'quvchi shu hafta":"students this week"}
+        </span>
+      </div>
+
+
+
+      {/* Scroll indicator — absolute at bottom, clear of content */}
+      <div style={{ position:"absolute", bottom:24, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:4, animation:"heroFadeUp 0.7s ease 0.9s both", pointerEvents:"none" }}>
+        <span style={{ fontSize:"0.62rem", fontWeight:800, color:"rgba(255,255,255,0.2)", letterSpacing:"0.15em", textTransform:"uppercase" }}>
+          {lang==="ru"?"листай":lang==="uz"?"suring":"scroll"}
+        </span>
+        <div style={{ width:20, height:32, border:"1.5px solid rgba(255,255,255,0.1)", borderRadius:99, display:"flex", justifyContent:"center", paddingTop:5 }}>
+          <div style={{ width:3, height:6, background:"rgba(255,255,255,0.25)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+// ── Typewriter Banner (shown after chat demo) ─────────────────────────────────
+function TypewriterBanner({ lang, dark }) {
+  const TEXTS = {
+    ru: ["Программиста 💻","Дизайнера 🎨","Врача 🩺","Музыканта 🎵","Учёного 🔬","Биолога 🌿","Лидера 👑","Спортсмена 🏆"],
+    uz: ["Dasturchi 💻","Dizayner 🎨","Shifokor 🩺","Musiqachi 🎵","Olim 🔬","Biolog 🌿","Lider 👑","Sportchi 🏆"],
+    en: ["Programmer 💻","Designer 🎨","Doctor 🩺","Musician 🎵","Scientist 🔬","Biologist 🌿","Leader 👑","Athlete 🏆"],
+  };
+  const PREFIX = { ru:"Открой в себе", uz:"O'z ichingdagi", en:"Discover the" };
+  const SUB = {
+    ru:"Пройди тест, узнай 9 талантов и получи рекомендации по 35+ профессиям — бесплатно",
+    uz:"Test o'ting, 9 iste'dodingizni biling va 35+ kasb bo'yicha tavsiya oling — bepul",
+    en:"Take the quiz, discover 9 talents and get recommendations for 35+ careers — free",
+  };
+
+  const typed  = useTypewriter(TEXTS[lang] || TEXTS.en);
+  const [ref, visible] = useInView(0.2);
+
+  return (
+    <div ref={ref} style={{
+      padding:"80px 24px 72px",
+      background: dark
+        ? "linear-gradient(180deg,#060E09,#0A1F15)"
+        : "linear-gradient(180deg,#F1EFE8,#E1F5EE)",
+      textAlign:"center",
+    }}>
+      {/* Typewriter headline */}
+      <h2 style={{
+        fontFamily:"'Fredoka One',cursive",
+        fontSize:"clamp(2.4rem,7vw,4.5rem)",
+        color: dark?"#E1F5EE":"#04342C",
+        lineHeight:1.15,
+        maxWidth:720,
+        margin:"0 auto 20px",
+        opacity: visible?1:0,
+        transform: visible?"translateY(0)":"translateY(24px)",
+        transition:"opacity 0.7s ease, transform 0.7s ease",
+      }}>
+        {PREFIX[lang]||PREFIX.en}{" "}
+        <span style={{
+          color:"#1D9E75",
+          borderBottom:`3px solid #1D9E75`,
+          paddingBottom:2,
+          display:"inline-block",
+          minWidth:20,
+          position:"relative",
+        }}>
+          {typed}
+          <span style={{
+            position:"absolute", right:-4, top:0, bottom:0,
+            width:3, background:"#1D9E75",
+            animation:"blinkCaret 0.8s step-end infinite",
+          }}/>
+        </span>
+      </h2>
+
+      {/* Subtitle */}
+      <p style={{
+        fontSize:"1.05rem",
+        fontWeight:600,
+        color: dark?"#7DB99A":"#546E7A",
+        maxWidth:500,
+        margin:"0 auto 36px",
+        lineHeight:1.7,
+        opacity: visible?1:0,
+        transition:"opacity 0.7s ease 0.15s",
+      }}>
+        {SUB[lang]||SUB.en}
+      </p>
+
+      {/* Decorative divider */}
+      <div style={{ display:"flex", alignItems:"center", gap:16, justifyContent:"center", marginTop:8 }}>
+        {["🧠","🎨","🎵","👑","🌍","🏃","🌿","🤝","🃏"].map((e,i)=>(
+          <span key={i} style={{
+            fontSize:"1.4rem",
+            opacity: visible ? 1 : 0,
+            transform: visible?"scale(1)":"scale(0.5)",
+            transition:`opacity 0.4s ease ${0.05*i}s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1) ${0.05*i}s`,
+          }}>{e}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Stats Section ─────────────────────────────────────────────────────────────
+function StatsSection({ lang, dark }) {
+  const STATS = {
+    ru: [
+      { t:30, s:"",  l:"Вопросов",   icon:"📋", desc:"За 7 минут" },
+      { t:9,  s:"",  l:"Талантов",   icon:"🧠", desc:"По Гарднеру" },
+      { t:35, s:"+", l:"Профессий",  icon:"🚀", desc:"С процентом совпадения" },
+      { t:3,  s:"",  l:"Языка",      icon:"🌍", desc:"RU · UZ · EN" },
+    ],
+    uz: [
+      { t:30, s:"",  l:"Savol",       icon:"📋", desc:"7 daqiqada" },
+      { t:9,  s:"",  l:"Iste'dod",   icon:"🧠", desc:"Gardner bo'yicha" },
+      { t:35, s:"+", l:"Kasb",        icon:"🚀", desc:"Mos foiz bilan" },
+      { t:3,  s:"",  l:"Til",         icon:"🌍", desc:"RU · UZ · EN" },
+    ],
+    en: [
+      { t:30, s:"",  l:"Questions",  icon:"📋", desc:"In 7 minutes" },
+      { t:9,  s:"",  l:"Talents",    icon:"🧠", desc:"Gardner's theory" },
+      { t:35, s:"+", l:"Careers",    icon:"🚀", desc:"With match %" },
+      { t:3,  s:"",  l:"Languages",  icon:"🌍", desc:"RU · UZ · EN" },
+    ],
+  };
+  const COLORS = ["#5DCAA5","#EF9F27","#7E57C2","#E64A19"];
+  const stats = STATS[lang] || STATS.en;
+
+  const [ref, visible] = useInView(0.15);
+
+  return (
+    <div ref={ref} style={{
+      padding:"80px 24px",
+      background: dark
+        ? "linear-gradient(135deg,#0A1F15,#060E09)"
+        : "linear-gradient(135deg,#E1F5EE,#F1EFE8)",
+    }}>
+      {/* Section label */}
+      <div style={{ textAlign:"center", marginBottom:48 }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background: dark?"rgba(93,202,165,0.1)":"rgba(15,110,86,0.08)", border:"1px solid rgba(15,110,86,0.2)", borderRadius:99, padding:"5px 18px", fontSize:"0.72rem", fontWeight:800, color:"#0F6E56", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14, opacity:visible?1:0, transition:"opacity 0.6s ease" }}>
+          ✦ {lang==="ru"?"Платформа в цифрах":lang==="uz"?"Platforma raqamlarda":"Platform in numbers"}
+        </div>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.6rem,4vw,2.6rem)", color: dark?"#E1F5EE":"#04342C", margin:0, opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)", transition:"opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s" }}>
+          {lang==="ru"?"Всё что тебе нужно — в одном тесте"
+          :lang==="uz"?"Sizga kerak bo'lgan hamma narsa — bir testda"
+          :"Everything you need — in one quiz"}
+        </h2>
+      </div>
+
+      {/* 4 stat cards */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:20, maxWidth:860, margin:"0 auto" }}>
+        {stats.map((s, i) => (
+          <div key={i}
+            style={{
+              background: dark?"rgba(255,255,255,0.03)":"#fff",
+              border:`1.5px solid ${COLORS[i]}22`,
+              borderRadius:24,
+              padding:"32px 24px",
+              textAlign:"center",
+              boxShadow:`0 4px 24px ${COLORS[i]}10`,
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0) scale(1)" : "translateY(32px) scale(0.95)",
+              transition:`opacity 0.6s ease ${0.1+i*0.1}s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1) ${0.1+i*0.1}s`,
+            }}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-6px) scale(1.02)";e.currentTarget.style.boxShadow=`0 16px 40px ${COLORS[i]}22`;}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0) scale(1)";e.currentTarget.style.boxShadow=`0 4px 24px ${COLORS[i]}10`;}}
+          >
+            <div style={{ fontSize:"2rem", marginBottom:12 }}>{s.icon}</div>
+            <AnimatedStat target={s.t} suffix={s.s} label={s.l} color={COLORS[i]} />
+            <p style={{ fontSize:"0.75rem", fontWeight:600, color: dark?"#607D8B":"#90A4AE", marginTop:8, letterSpacing:"0.02em" }}>
+              {s.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomePage({ setPage, user, onLogout, lang, dark }) {
   return (
@@ -634,7 +963,12 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
       <style>{`
         @keyframes infiniteScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
         @keyframes heroFadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes scrollBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(6px); } }
+        @keyframes scrollBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(8px); } }
+        @keyframes typewriter { from{width:0;opacity:0} to{width:100%;opacity:1} }
+        @keyframes blinkCaret { 0%,100%{border-color:#5DCAA5} 50%{border-color:transparent} }
+        @keyframes socialFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes badgePop { from{opacity:0;transform:scale(0.8) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        @keyframes floatAvatar { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
         @keyframes mascotFloat { 0%,100% { transform:translateY(0px); } 50% { transform:translateY(-14px); } }
@@ -701,87 +1035,8 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         }
       `}</style>
 
-      {/* ── GITHUB-STYLE CENTRED HERO — mascot + headline + CTA ── */}
-      <div className="home-hero" style={{
-        minHeight: "100vh",
-        background: "linear-gradient(180deg, #0D1117 0%, #0D1117 70%, #161B22 100%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        padding: "80px 24px 60px",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-
-        {/* Subtle radial glow behind mascot */}
-        <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(92,53,204,0.18) 0%, transparent 70%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", top:"30%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(15,110,86,0.10) 0%, transparent 70%)", pointerEvents:"none" }} />
-
-        {/* Mascot — centred */}
-        <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both", marginBottom:8, transform: typeof window!=="undefined" && window.innerWidth<=768 ? "scale(0.9)" : "scale(1.3)" }}>
-          <StarMascot />
-        </div>
-
-        {/* Headline */}
-        <h1 style={{
-          fontFamily:"'Fredoka One', cursive",
-          fontSize: "clamp(2rem, 6vw, 3.6rem)",
-          color: "#E1F5EE",
-          lineHeight: 1.15,
-          maxWidth: 640,
-          margin: "0 auto 16px",
-          animation: "heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s both",
-        }}>
-          {t(lang, "home.title")}
-        </h1>
-
-        {/* Subheading */}
-        <p style={{
-          fontSize: "1.05rem",
-          fontWeight: 600,
-          color: "#8B949E",
-          maxWidth: 480,
-          margin: "0 auto 36px",
-          lineHeight: 1.6,
-          animation: "heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.3s both",
-        }}>
-          {lang==="ru" ? "Пройди тест, узнай свои таланты и найди идеальную карьеру с помощью AI"
-           : lang==="uz" ? "Test o'ting, iste'dodlaringizni biling va AI yordamida ideal karerangizni toping"
-           : "Take the quiz, discover your talents and find your ideal career with AI"}
-        </p>
-
-        {/* CTA buttons */}
-        <div className="home-hero-btns" style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.4s both" }}>
-          <button
-            onClick={() => setPage("quiz")}
-            style={{ padding:"14px 32px", background:"linear-gradient(135deg,#7C4DFF,#5C35CC)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", boxShadow:"0 6px 24px rgba(92,53,204,0.45)", transition:"transform 0.2s, box-shadow 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(92,53,204,0.6)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 6px 24px rgba(92,53,204,0.45)"; }}
-          >
-            {t(lang, "home.cta")} →
-          </button>
-          <button
-            onClick={() => setPage("tasks")}
-            style={{ padding:"14px 32px", background:"transparent", color:"#E1F5EE", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1.1rem", cursor:"pointer", transition:"all 0.2s", backdropFilter:"blur(8px)" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.5)"; e.currentTarget.style.background="rgba(255,255,255,0.05)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.2)"; e.currentTarget.style.background="transparent"; }}
-          >
-            {lang==="ru"?"Попробовать игры":lang==="uz"?"O'yinlarni sinash":"Try mini-games"}
-          </button>
-        </div>
-
-        {/* Scroll indicator */}
-        <div style={{ position:"absolute", bottom:32, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:6, animation:"heroFadeUp 0.7s ease 0.8s both" }}>
-          <span style={{ fontSize:"0.72rem", fontWeight:700, color:"#484F58", letterSpacing:"0.1em", textTransform:"uppercase" }}>
-            {lang==="ru"?"Листай вниз":lang==="uz"?"Pastga suring":"Scroll down"}
-          </span>
-          <div style={{ width:24, height:38, border:"2px solid rgba(255,255,255,0.15)", borderRadius:99, display:"flex", justifyContent:"center", paddingTop:6 }}>
-            <div style={{ width:4, height:8, background:"rgba(255,255,255,0.4)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }} />
-          </div>
-        </div>
-      </div>
+      {/* ── UPGRADED HERO ── */}
+      <HeroSection lang={lang} dark={dark} setPage={setPage} />
 
       {/* Logo slider */}
       <div style={{ padding:"28px 0 8px", overflow:"hidden", background: dark?"#0F1923":"#F1EFE8" }}>
@@ -804,6 +1059,9 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
 
       {/* AI Demo — GitHub Copilot style */}
       <AIDemoSection lang={lang} dark={dark} />
+
+      {/* Typewriter headline + subtitle — appears after chat demo */}
+      <TypewriterBanner lang={lang} dark={dark} />
 
       {/* Scroll benefit sections */}
       <div>
