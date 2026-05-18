@@ -3,7 +3,7 @@ import Nav from "../components/Nav";
 
 const API = "https://karta-talantov-backend.onrender.com";
 
-const TALENTS = ["logic","creativity","memory","leadership","languages","music","sport","nature","social"];
+const TALENTS = ["logic","creativity","memory","leadership"]; // Only game talents
 const TALENT_META = {
   logic:      { icon:"🧠", color:"#1565C0", ru:"Логика",      uz:"Mantiq",     en:"Logic"      },
   creativity: { icon:"🎨", color:"#E64A19", ru:"Творчество",  uz:"Ijodkorlik", en:"Creativity"  },
@@ -62,7 +62,10 @@ export default function LeaderboardPage({ setPage, results, lang, dark }) {
   useEffect(() => {
     if (tab !== "leaderboard") return;
     setLoading(true);
-    fetch(`${API}/leaderboard?talent=${activeTalent}`)
+    // Map talent names to game names
+    const gameMap = {logic:"logic",creativity:"creativity",memory:"memory",leadership:"leadership"};
+    const game = gameMap[activeTalent] || "total";
+    fetch(`${API}/leaderboard/games?game=${game}&limit=10`)
       .then(r => r.json())
       .then(d => { setBoard(Array.isArray(d) ? d : []); })
       .catch(() => setBoard([]))
@@ -149,7 +152,7 @@ export default function LeaderboardPage({ setPage, results, lang, dark }) {
                 <div style={{ padding:"48px", textAlign:"center" }}>
                   <div style={{ fontSize:"2.5rem", marginBottom:12 }}>🏆</div>
                   <p style={{ color:dark?"#9FE1CB":"#78909C", fontWeight:700 }}>{L.empty}</p>
-                  <button onClick={() => setPage("quiz")} style={{ marginTop:16, padding:"10px 24px", background:`linear-gradient(135deg,#0F6E56,#1D9E75)`, color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer" }}>
+                  <button onClick={() => setPage("tasks")} style={{ marginTop:16, padding:"10px 24px", background:`linear-gradient(135deg,#0F6E56,#1D9E75)`, color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"0.95rem", cursor:"pointer" }}>
                     {L.takeQuiz}
                   </button>
                 </div>
@@ -175,19 +178,12 @@ export default function LeaderboardPage({ setPage, results, lang, dark }) {
             </div>
 
             {/* Your position hint */}
-            {hasResults && scores[activeTalent] && (
-              <div style={{ marginTop:16, padding:"14px 20px", background:`${tm.color}10`, borderRadius:14, border:`1.5px solid ${tm.color}33`, display:"flex", alignItems:"center", gap:12 }}>
-                <span style={{ fontSize:"1.4rem" }}>{tm.icon}</span>
-                <div>
-                  <span style={{ fontWeight:800, color:tm.color }}>{L.yourScore}: {Math.round(scores[activeTalent])}%</span>
-                  {board.length > 0 && (
-                    <span style={{ fontSize:"0.82rem", color:dark?"#B0BEC5":"#78909C", marginLeft:10 }}>
-                      — #{board.findIndex(r => r.score <= (scores[activeTalent]||0)) + 1 || board.length + 1} {lang==="ru"?"в рейтинге":lang==="uz"?"reytingda":"in ranking"}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
+            <div style={{ marginTop:16, padding:"14px 20px", background:`${tm.color}10`, borderRadius:14, border:`1.5px solid ${tm.color}33`, display:"flex", alignItems:"center", gap:12 }}>
+              <span style={{ fontSize:"1.4rem" }}>🎮</span>
+              <span style={{ fontWeight:700, color:dark?"#B0BEC5":"#546E7A", fontSize:"0.85rem" }}>
+                {lang==="ru"?"Сыграй в мини-игры на странице Задания чтобы попасть в топ!":lang==="uz"?"Reytingga kirish uchun Vazifalar sahifasida mini-o'yinlarni o'ynang!":"Play mini-games on the Tasks page to join the leaderboard!"}
+              </span>
+            </div>
           </div>
         )}
 
@@ -196,9 +192,9 @@ export default function LeaderboardPage({ setPage, results, lang, dark }) {
           <div style={{ animation:"fadeSlide 0.3s ease both" }}>
             {!hasResults ? (
               <div style={{ textAlign:"center", padding:"48px 24px", background:dark?"#1A2A3A":"#fff", borderRadius:20, border:`1.5px solid ${dark?"#2A4070":"#E1F5EE"}` }}>
-                <div style={{ fontSize:"3rem", marginBottom:16 }}>📊</div>
+                <div style={{ fontSize:"3rem", marginBottom:16 }}>🎮</div>
                 <p style={{ fontWeight:700, color:dark?"#9FE1CB":"#546E7A", marginBottom:20, fontSize:"1.05rem" }}>{L.noResults}</p>
-                <button onClick={() => setPage("quiz")} style={{ padding:"12px 28px", background:"linear-gradient(135deg,#0F6E56,#1D9E75)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer" }}>{L.takeQuiz}</button>
+                <button onClick={() => setPage("tasks")} style={{ padding:"12px 28px", background:"linear-gradient(135deg,#0F6E56,#1D9E75)", color:"#fff", border:"none", borderRadius:50, fontFamily:"'Fredoka One',cursive", fontSize:"1rem", cursor:"pointer" }}>{L.takeQuiz}</button>
               </div>
             ) : (
               <div>

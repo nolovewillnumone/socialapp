@@ -542,6 +542,142 @@ const styles = `
   /* ══════════════════════════════════════════════════════
      TABLET — max 768px
   ══════════════════════════════════════════════════════ */
+
+  /* ── 1. Navbar frosted glass + scroll shadow ─────────────────────────── */
+  .nav-bar {
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    transition: box-shadow 0.3s ease, background 0.3s ease !important;
+  }
+  .nav-bar.scrolled {
+    box-shadow: 0 4px 24px rgba(15,110,86,0.12) !important;
+  }
+  .nav-link-active {
+    position: relative;
+  }
+  .nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,#0F6E56,#5DCAA5);
+    border-radius: 99px;
+    animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes slideIn { from{width:0;opacity:0} to{width:100%;opacity:1} }
+
+  /* ── 2. Counter animation ────────────────────────────────────────────── */
+  @keyframes countUp {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .count-num { animation: countUp 0.6s ease both; }
+
+  /* ── 3. Animated score bars ─────────────────────────────────────────── */
+  .score-bar-fill {
+    width: 0% !important;
+    transition: width 1s cubic-bezier(0.34,1.56,0.64,1) !important;
+  }
+  .score-bar-fill.animated {
+    width: var(--target-width) !important;
+  }
+
+  /* ── 4. Quiz slide transition ───────────────────────────────────────── */
+  @keyframes slideRight {
+    from { opacity:0; transform:translateX(32px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  @keyframes slideLeft {
+    from { opacity:0; transform:translateX(-32px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  .quiz-slide-in  { animation: slideRight 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .quiz-slide-out { animation: slideLeft  0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  /* ── 5. Button ripple ───────────────────────────────────────────────── */
+  .ripple-btn { position:relative; overflow:hidden; }
+  .ripple-btn::after {
+    content:'';
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.35);
+    transform:scale(0);
+    animation:ripple 0.5s linear;
+    pointer-events:none;
+  }
+  @keyframes rippleAnim { to { transform:scale(4); opacity:0; } }
+  @keyframes ripple {
+    to { transform:scale(4); opacity:0; }
+  }
+
+  /* ── 6. Page transition ─────────────────────────────────────────────── */
+  @keyframes pageFadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .page-wrap { animation: pageFadeUp 0.4s ease both; }
+
+  /* ── 6b. Skeleton shimmer ───────────────────────────────────────────── */
+  @keyframes shimmerLoad {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, #E1F5EE 25%, #C8F0E0 50%, #E1F5EE 75%);
+    background-size: 400px 100%;
+    animation: shimmerLoad 1.4s ease-in-out infinite;
+    border-radius: 8px;
+  }
+
+  /* ── Mobile bottom nav ──────────────────────────────────────────────── */
+  .mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(15,110,86,0.1);
+    z-index: 200;
+    padding: 8px 0 12px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+  }
+  .mobile-bottom-nav.dark-nav {
+    background: rgba(15,25,35,0.95);
+    border-top-color: rgba(93,202,165,0.15);
+  }
+  .mobile-nav-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    border: none;
+    background: none;
+    font-family: 'Nunito', sans-serif;
+  }
+  .mobile-nav-item:active { transform: scale(0.9); }
+  .mobile-nav-icon { font-size: 1.4rem; line-height: 1; }
+  .mobile-nav-label { font-size: 0.62rem; font-weight: 800; letter-spacing:0.04em; }
+
+  /* ── Confetti canvas ────────────────────────────────────────────────── */
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9997;
+  }
+
   @media (max-width: 768px) {
 
     /* Nav — hide desktop links, show hamburger */

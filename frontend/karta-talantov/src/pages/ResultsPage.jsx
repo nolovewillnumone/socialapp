@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Nav from "../components/Nav";
 import RadarChart from "../components/RadarChart";
 import Loader from "../components/Loader";
 import { quizAPI } from "../api/client";
 import { t } from "../i18n";
+import { fireConfetti } from "../animations";
 import { FeedbackForm } from "../components/FeedbackSection";
 
 const DEMO_SCORES = { logic:85, creativity:60, memory:90, leadership:45, languages:70, music:50, sport:30, nature:40, social:55 };
@@ -23,6 +24,17 @@ const COLORS = ["#5DCAA5","#26C6DA","#66BB6A","#7E57C2","#EF9F27","#FFD740"];
 export default function ResultsPage({ setPage, results, lang, dark }) {
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(null);
+  const confettiFired = useRef(false);
+  useEffect(() => {
+    if (!confettiFired.current && (results || fetched)) {
+      confettiFired.current = true;
+      const alreadySeen = localStorage.getItem("kt_results_seen");
+      if (!alreadySeen) {
+        setTimeout(() => fireConfetti(), 600);
+        localStorage.setItem("kt_results_seen", "1");
+      }
+    }
+  }, [results, fetched]);
 
   useEffect(() => {
     if (!results && localStorage.getItem("token")) {

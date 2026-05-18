@@ -736,6 +736,7 @@ function HeroSection({ lang, setPage }) {
       <div style={{ position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(15,110,86,0.08) 0%,transparent 70%)", pointerEvents:"none" }}/>
 
       {/* Mascot */}
+<<<<<<< HEAD
       <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both", marginBottom:28 }}>
         <StarMascot />
       </div>
@@ -745,6 +746,26 @@ function HeroSection({ lang, setPage }) {
         <span style={{ width:7, height:7, borderRadius:"50%", background:"#5DCAA5", animation:"pulse 2s ease infinite", display:"inline-block" }}/>
         {lang==="ru"?"Бесплатно · Научно · 3 языка":lang==="uz"?"Bepul · Ilmiy · 3 tilda":"Free · Science-backed · 3 languages"}
       </div>
+=======
+      <div style={{ animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both", marginBottom:20 }}>
+        <StarMascot />
+      </div>
+
+      {/* Typewriter headline */}
+      <h1 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(2rem,6vw,3.6rem)", color:"#E1F5EE", lineHeight:1.2, maxWidth:700, margin:"0 auto 0", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both" }}>
+        {prefix}{" "}
+        <span style={{ color:"#5DCAA5", borderRight:"3px solid #5DCAA5", paddingRight:4, animation:"blinkCaret 0.8s step-end infinite" }}>
+          {typed}
+        </span>
+      </h1>
+
+      {/* Subtitle */}
+      <p style={{ fontSize:"1rem", fontWeight:600, color:"#8B949E", maxWidth:460, margin:"20px auto 32px", lineHeight:1.7, animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.25s both" }}>
+        {lang==="ru"?"Пройди тест, узнай 9 талантов и получи рекомендации по 35+ профессиям — бесплатно"
+        :lang==="uz"?"Test o'ting, 9 iste'dodingizni biling va 35+ kasb bo'yicha tavsiya oling — bepul"
+        :"Take the quiz, discover 9 talents and get recommendations for 35+ careers — free"}
+      </p>
+>>>>>>> ba89ccb2ee6e9d2ba19e60a153bbe67ad70cbbba
 
       {/* CTAs */}
       <div className="home-hero-btns" style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", animation:"heroFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}>
@@ -793,6 +814,7 @@ function HeroSection({ lang, setPage }) {
 }
 
 
+<<<<<<< HEAD
 
 // ── Typewriter Banner (shown after chat demo) ─────────────────────────────────
 function TypewriterBanner({ lang, dark }) {
@@ -878,6 +900,8 @@ function TypewriterBanner({ lang, dark }) {
   );
 }
 
+=======
+>>>>>>> ba89ccb2ee6e9d2ba19e60a153bbe67ad70cbbba
 // ── Stats Section ─────────────────────────────────────────────────────────────
 function StatsSection({ lang, dark }) {
   const STATS = {

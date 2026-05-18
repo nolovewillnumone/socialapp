@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ITEMS = [
   { key: "home",    ru: "Главная",  uz: "Asosiy",   en: "Home"    },
@@ -11,6 +11,12 @@ const ITEMS = [
 
 export default function Nav({ page, setPage, lang = "ru", dark = false, user, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const [logoClicks, setLogoClicks] = useState(0);
 
   const go = (key) => { setPage(key); setOpen(false); };

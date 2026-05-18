@@ -99,4 +99,7 @@ class ResultOut(BaseModel):
 
 
 class TaskResultCreate(BaseModel):
-    task_scores: dict
+    task_scores:  dict
+    player_name:  Optional[str] = "Anonymous"
+    session_id:   Optional[str] = ""
+    lang:         Optional[str] = "ru"
