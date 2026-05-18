@@ -809,12 +809,11 @@ function HeroSection({ lang, setPage }) {
           <div style={{ width:3, height:6, background:"rgba(255,255,255,0.25)", borderRadius:99, animation:"scrollBounce 1.6s ease-in-out infinite" }}/>
         </div>
       </div>
-    </div>
-  );
+    
 }
 
 
-<<<<<<< HEAD
+
 
 // ── Typewriter Banner (shown after chat demo) ─────────────────────────────────
 function TypewriterBanner({ lang, dark }) {
@@ -900,9 +899,8 @@ function TypewriterBanner({ lang, dark }) {
   );
 }
 
-=======
->>>>>>> ba89ccb2ee6e9d2ba19e60a153bbe67ad70cbbba
-// ── Stats Section ─────────────────────────────────────────────────────────────
+
+
 function StatsSection({ lang, dark }) {
   const STATS = {
     ru: [
