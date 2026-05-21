@@ -1005,19 +1005,3 @@ async def chat(request: Request, db: Session = Depends(get_db)):
         }
         lang = body.get("lang","en") if "body" in dir() else "en"
         return {"reply": fallbacks.get(lang, fallbacks["en"])}
-
-
-@app.post("/chat")
-def chat(body: ChatRequest):
-    """Rule-based AI talent advisor chatbot."""
-    try:
-        message = body.message.strip()
-        if not message:
-            greet_data = RESPONSES["greet"]
-            return {"reply": random.choice(greet_data.get(body.lang, greet_data["en"]))}
-
-        reply = find_response(message, body.lang, body.scores or {})
-        return {"reply": reply}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
