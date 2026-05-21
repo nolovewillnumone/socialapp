@@ -106,25 +106,21 @@ The Karta Talantov Team""",
 
 
 # ── Telegram Notifications ────────────────────────────────────────────────────
-async def send_telegram(message: str):
+def send_telegram_sync(message: str):
     """Send a notification to the admin Telegram chat."""
-    import httpx, os
+    import requests as req_lib, os
     token   = os.environ.get("TELEGRAM_BOT_TOKEN", "")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID", "1253383417")
     if not token:
-        return  # Skip if no token configured
+        return
     try:
-        async with httpx.AsyncClient(timeout=5) as client:
-            await client.post(
-                f"https://api.telegram.org/bot{token}/sendMessage",
-                json={
-                    "chat_id": chat_id,
-                    "text": message,
-                    "parse_mode": "HTML",
-                },
-            )
+        req_lib.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": message},
+            timeout=4,
+        )
     except Exception:
-        pass  # Never crash the main request
+        pass
 
 from .database import engine, get_db, Base
 from . import models, schemas, auth
@@ -232,17 +228,26 @@ def register(request: Request, body: schemas.UserCreate, db: Session = Depends(g
         except Exception:
             pass
 
-        # Telegram notification to admin
-        import asyncio
+        # Telegram notification to admin (sync, fire and forget)
         try:
-            asyncio.create_task(send_telegram(
-                f"🌟 <b>New user registered!</b>\n"
-                f"👤 Name: {user.name}\n"
-                f"📧 Email: {user.email}\n"
-                f"🎂 Age: {user.age or '—'}\n"
-                f"🌍 Lang: {user.lang.upper()}\n"
-                f"📊 Total users: check admin panel"
-            ))
+            import requests as req_lib, os
+            tg_token   = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+            tg_chat_id = os.environ.get("TELEGRAM_CHAT_ID", "1253383417")
+            if tg_token:
+                req_lib.post(
+                    f"https://api.telegram.org/bot{tg_token}/sendMessage",
+                    json={
+                        "chat_id": tg_chat_id,
+                        "text": (
+                            f"🌟 New user registered!\n"
+                            f"👤 {user.name}\n"
+                            f"📧 {user.email}\n"
+                            f"🎂 Age: {user.age or '—'}\n"
+                            f"🌍 {user.lang.upper()}"
+                        ),
+                    },
+                    timeout=4,
+                )
         except Exception:
             pass
 
