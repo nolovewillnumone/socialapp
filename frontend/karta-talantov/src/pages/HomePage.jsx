@@ -1026,7 +1026,7 @@ function VideoSection({ lang, dark }) {
         {playing ? (
           <iframe
             width="100%" height="100%"
-            src={`https://www.youtube.com/embed/${https://www.youtube.com/watch?v=tXxHxX7PKf8}?autoplay=1&rel=0`}
+            src={`https://www.youtube.com/embed/${"https://www.youtube.com/watch?v=tXxHxX7PKf8}?autoplay=1&rel=0`"}
             title="Career video"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
