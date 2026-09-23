@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import Nav from "../components/Nav";
-import { animateCounter } from "../animations";
 import { FeedbackSection } from "../components/FeedbackSection";
 import { t } from "../i18n";
 
@@ -954,6 +953,112 @@ function StatsSection({ lang, dark }) {
   );
 }
 
+
+// ── Scroll-triggered Video Section ────────────────────────────────────────────
+function VideoSection({ lang, dark }) {
+  const [inView, setInView]     = useState(false);
+  const [playing, setPlaying]   = useState(false);
+  const ref = useRef(null);
+
+  // YouTube video IDs about career choice for kids (educational)
+  const VIDEOS = {
+    ru: "kZOIVLGkljc",   // Why career choice matters
+    uz: "kZOIVLGkljc",
+    en: "kZOIVLGkljc",
+  };
+  const videoId = VIDEOS[lang] || VIDEOS.en;
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {
+      setInView(e.isIntersecting);
+      // Auto-pause when scrolled away
+      if (!e.isIntersecting) setPlaying(false);
+    }, { threshold: 0.4 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const L = {
+    ru:{ badge:"Почему это важно", title:"Почему выбор профессии важен для каждого", sub:"Каждый ребёнок — мальчик или девочка — заслуживает найти своё призвание", play:"Смотреть видео" },
+    uz:{ badge:"Bu nega muhim", title:"Nega kasb tanlash har bir kishi uchun muhim", sub:"Har bir bola — o'g'il yoki qiz — o'z yo'lini topishga loyiq", play:"Videoni ko'rish" },
+    en:{ badge:"Why it matters", title:"Why choosing a career matters for everyone", sub:"Every child — boy or girl — deserves to find their calling", play:"Watch video" },
+  }[lang]||{};
+
+  return (
+    <div ref={ref} style={{
+      padding:"80px 24px",
+      background: dark
+        ? "linear-gradient(135deg,#060E09,#0A1F15)"
+        : "linear-gradient(135deg,#04342C,#0F6E56)",
+      position:"relative",
+      overflow:"hidden",
+    }}>
+      {/* Decorative glow */}
+      <div style={{ position:"absolute", top:"20%", left:"10%", width:300, height:300, borderRadius:"50%", background:"radial-gradient(circle,rgba(93,202,165,0.15) 0%,transparent 70%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", bottom:"10%", right:"10%", width:250, height:250, borderRadius:"50%", background:"radial-gradient(circle,rgba(239,159,39,0.12) 0%,transparent 70%)", pointerEvents:"none" }}/>
+
+      {/* Header */}
+      <div style={{ textAlign:"center", marginBottom:36, opacity:inView?1:0, transform:inView?"translateY(0)":"translateY(24px)", transition:"opacity 0.7s ease, transform 0.7s ease", position:"relative", zIndex:1 }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(239,159,39,0.15)", border:"1px solid rgba(239,159,39,0.3)", borderRadius:99, padding:"5px 18px", fontSize:"0.72rem", fontWeight:800, color:"#FAC775", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:16 }}>
+          🎬 {L.badge}
+        </div>
+        <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"clamp(1.6rem,4vw,2.6rem)", color:"#fff", marginBottom:12, maxWidth:640, margin:"0 auto 12px", lineHeight:1.25 }}>
+          {L.title}
+        </h2>
+        <p style={{ color:"rgba(255,255,255,0.7)", fontWeight:600, fontSize:"0.95rem", maxWidth:460, margin:"0 auto" }}>
+          {L.sub}
+        </p>
+      </div>
+
+      {/* Video frame */}
+      <div style={{
+        maxWidth:800, margin:"0 auto",
+        borderRadius:24, overflow:"hidden",
+        boxShadow:"0 24px 80px rgba(0,0,0,0.4)",
+        border:"3px solid rgba(93,202,165,0.3)",
+        opacity: inView?1:0,
+        transform: inView?"scale(1)":"scale(0.94)",
+        transition:"opacity 0.8s ease 0.2s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s",
+        position:"relative", zIndex:1,
+        aspectRatio:"16/9",
+        background:"#000",
+      }}>
+        {playing ? (
+          <iframe
+            width="100%" height="100%"
+            src={`https://www.youtube.com/embed/${https://www.youtube.com/watch?v=tXxHxX7PKf8}?autoplay=1&rel=0`}
+            title="Career video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ display:"block", border:"none" }}
+          />
+        ) : (
+          // Thumbnail with play button
+          <div
+            onClick={() => setPlaying(true)}
+            style={{ width:"100%", height:"100%", cursor:"pointer", position:"relative", background:`url(https://img.youtube.com/vi/${videoId}/maxresdefault.jpg) center/cover` }}
+          >
+            {/* Dark overlay */}
+            <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.35)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              {/* Play button */}
+              <div style={{ width:80, height:80, borderRadius:"50%", background:"rgba(239,159,39,0.95)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 32px rgba(239,159,39,0.5)", transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1)", animation:"pulse 2s ease-in-out infinite" }}
+                onMouseEnter={e=>{e.currentTarget.style.transform="scale(1.15)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";}}>
+                <div style={{ width:0, height:0, borderTop:"16px solid transparent", borderBottom:"16px solid transparent", borderLeft:"26px solid #fff", marginLeft:6 }}/>
+              </div>
+            </div>
+            {/* Play label */}
+            <div style={{ position:"absolute", bottom:20, left:"50%", transform:"translateX(-50%)", background:"rgba(0,0,0,0.6)", backdropFilter:"blur(8px)", borderRadius:99, padding:"8px 20px", color:"#fff", fontFamily:"'Fredoka One',cursive", fontSize:"0.9rem", display:"flex", alignItems:"center", gap:8 }}>
+              ▶ {L.play}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomePage({ setPage, user, onLogout, lang, dark }) {
   return (
@@ -1078,6 +1183,9 @@ export default function HomePage({ setPage, user, onLogout, lang, dark }) {
         <div className="step-arrow">›</div>
         <div className="step"><div className="step-icon">🚀</div><div className="step-title">{t(lang,"home.step3")}</div><div className="step-desc">{t(lang,"home.step3desc")}</div></div>
       </div>
+
+      {/* Scroll-triggered video */}
+      <VideoSection lang={lang} dark={dark} />
 
       {/* Final CTA */}
       <div className="final-cta" style={{ textAlign:"center", padding:"60px 24px 80px", background: dark?"linear-gradient(135deg,#1A2A3A,#0F1923)":"linear-gradient(135deg,#E1F5EE,#FAEEDA)" }}>
