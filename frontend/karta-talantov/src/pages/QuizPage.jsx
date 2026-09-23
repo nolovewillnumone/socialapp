@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Nav from "../components/Nav";
 import Loader from "../components/Loader";
@@ -475,13 +474,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#9FE1CB" }}>{qInChapter+1}/{chapterQ.length}</span>
       </div>
 
-      <AnimatePresence mode="wait">
-      <motion.div key={currentQ} className="quiz-section" style={{ textAlign:"center" }}
-        initial={{ opacity:0, x:60, scale:0.97 }}
-        animate={{ opacity:1, x:0, scale:1 }}
-        exit={{ opacity:0, x:-60, scale:0.97 }}
-        transition={{ duration:0.35, ease:[0.22,1,0.36,1] }}
-      >
+      <div key={currentQ} className="quiz-section quiz-slide-in" style={{ textAlign:"center" }}>
         {error && <div style={{ background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"10px 14px", color:"#C62828", fontWeight:700, marginBottom:14 }}>❌ {error}</div>}
 
         <p className="quiz-q" style={{ fontSize:"1.2rem", lineHeight:1.5, color:dark?"#E3F2FD":"#04342C" }}>{currentQ?.q}</p>
@@ -514,8 +507,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <p style={{ textAlign:"center", fontSize:"0.75rem", color:"#9FE1CB", fontWeight:700, marginTop:12 }}>
           {lang==="ru"?`Вопрос ${totalDone+1} из ${totalQ}`:lang==="uz"?`Savol ${totalDone+1} / ${totalQ}`:`Question ${totalDone+1} of ${totalQ}`}
         </p>
-      </motion.div>
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
