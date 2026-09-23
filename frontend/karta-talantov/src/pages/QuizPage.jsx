@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Nav from "../components/Nav";
 import Loader from "../components/Loader";
@@ -22,7 +23,7 @@ const STORY = {
           { id:"q3", mission:"В группе", q:"Когда ты в группе одноклассников, ты обычно...", opts:["Предлагаю идеи и организую всех 👑","Придумываю что-то творческое и интересное 🎭","Слушаю и помогаю всем найти общий язык 💙","Наблюдаю за природой или погодой вокруг 🌱"] },
           { id:"q16", mission:"На природе", q:"Как ты относишься к природе и животным?", opts:["Обожаю спорт и активный отдых на свежем воздухе 🏃","Люблю наблюдать за животными, растениями, природой 🦋","Люблю рисовать природу и пейзажи 🎨","Предпочитаю быть дома за компьютером 💻"] },
           { id:"q17", mission:"С людьми", q:"Как тебе общение с разными людьми?", opts:["Легко нахожу общий язык, обожаю знакомиться 🗣️","Предпочитаю руководить и организовывать 👑","Люблю творческое общение — через искусство или музыку 🎨","Общаюсь только с близкими, остальных немного стесняюсь 🤔"] },
-          { id:"q18", mission:"Мир вокруг", q:"Что тебя больше всего восхищает в окружающем мире?", opts:["Как работает природа — животные, экосистемы, биология 🌿","Как работают машины, технологии и системы ⚙️","Красота искусства, архитектуры и дизайна 🏛️","Истории и культуры разных народов 🌍"] },
+          { id:"q18", mission:"Что бы ты сделал?", q:"Представь: твой друг заболел. Что бы ты сделал в первую очередь?", opts:["Поискал бы в интернете, что за болезнь и как помочь 🔍","Придумал бы, как развеселить и поднять настроение 🎨","Просто был бы рядом и выслушал 💙","Позвал бы взрослых и организовал помощь 👑"] },
         ],
         complete:"Отлично! Мы узнали о твоих любимых занятиях! 🎉",
       },
@@ -36,7 +37,7 @@ const STORY = {
           { id:"q6", mission:"Чтение и языки", q:"Как ты относишься к чтению и иностранным языкам?", opts:["Обожаю читать книги на разные темы 📚","Учу иностранные языки — это мне легко даётся 🌍","Читаю только по необходимости 📖","Смотрю видео и слушаю подкасты вместо чтения 🎧"] },
           { id:"q19", mission:"Спорт", q:"Какое место спорт занимает в твоей жизни?", opts:["Спорт — это моё всё! Тренируюсь постоянно 🏆","Играю в командные игры — футбол, баскетбол, волейбол 🏀","Занимаюсь для здоровья, но не на профессиональном уровне 🏃","Предпочитаю интеллектуальные игры, а не физические 🧩"] },
           { id:"q20", mission:"Идеальный проект", q:"Если бы у тебя был любой школьный проект, ты выбрал бы:", opts:["Написать программу или создать сайт 💻","Снять фильм или создать арт-инсталляцию 🎬","Провести социальный проект — помочь людям 🤲","Исследовать экосистему или поставить научный эксперимент 🔬"] },
-          { id:"q21", mission:"Тип мышления", q:"Когда ты решаешь сложную задачу, ты чаще всего:", opts:["Ищешь нестандартные, необычные решения 🌈","Слушаешь музыку — она помогает думать 🎵","Анализируешь шаг за шагом, ищешь логику ⚙️","Обсуждаю с другими, ищу мнения команды 🤝"] },
+          { id:"q21", mission:"Умный помощник", q:"Если бы у тебя был умный AI-помощник, для чего бы ты его использовал?", opts:["Чтобы он помогал решать задачи и учиться 🧠","Чтобы вместе придумывать истории и рисунки 🎨","Чтобы он помогал людям вокруг меня 💙","Чтобы управлять командой или проектом 👑"] },
         ],
         complete:"Замечательно! Твои увлечения рассказали нам о тебе очень много! ✨",
       },
@@ -45,7 +46,7 @@ const STORY = {
         color:"#EF9F27", bg:"linear-gradient(135deg,#FAEEDA,#E1F5EE)",
         intro:"Расскажи, как ты взаимодействуешь с людьми и обществом вокруг тебя!",
         questions:[
-          { id:"q7", mission:"Интересы", q:"Что тебя больше всего fascинирует и увлекает?", opts:["Как работают технологии, алгоритмы и системы ⚙️","Почему люди так себя ведут — психология и эмоции 🧠","Как создаётся красота — дизайн, живопись, музыка 🎨","Как устроены экосистемы и живые организмы 🌿"] },
+          { id:"q7", mission:"Интересы", q:"Что тебе интереснее всего?", opts:["Как работают технологии и роботы ⚙️","Почему люди ведут себя по-разному 🧠","Как создаётся красивое — рисунки, музыка 🎨","Животные, растения и природа 🌿"] },
           { id:"q8", mission:"Лидерство", q:"Если нужно организовать мероприятие в классе, ты:", opts:["С удовольствием возьмёшь на себя роль организатора 🌟","Предложишь несколько творческих идей 💡","Создашь красивое оформление и декорации 🎨","Позаботишься о том, чтобы все чувствовали себя хорошо 😊"] },
           { id:"q22", mission:"Помощь другим", q:"В каких ситуациях ты чувствуешь себя наиболее полезным?", opts:["Когда помогаю разобраться в сложной теме или задаче 💡","Когда выслушиваю и поддерживаю тех, кто расстроен 💙","Когда создаю что-то, что радует людей 🎨","Когда организую команду для достижения цели 🏆"] },
           { id:"q23", mission:"Природа и экология", q:"Как ты относишься к охране природы?", opts:["Это очень важно! Хотел бы работать в этой сфере 🌿","Занимаюсь спортом на природе — это мотивирует заботиться о ней 🏃","Интересно изучать природные явления и живых существ 🦋","Поддерживаю экологию, но это не моё главное призвание 🌍"] },
@@ -64,7 +65,7 @@ const STORY = {
           { id:"q26", mission:"Музыкальные мечты", q:"Если говорить о музыке и выступлениях:", opts:["Мечтаю выступать на сцене — петь или играть 🎤","Хочу создавать музыку — писать песни или сочинять 🎼","Люблю музыку, но мечтаю о другом 🎵","Мне нравится за кулисами — звук, свет, режиссура 🎬"] },
           { id:"q27", mission:"Спортивные мечты", q:"Если говорить о спорте и физической активности:", opts:["Хочу стать профессиональным спортсменом или тренером 🏆","Спорт — часть жизни, но не карьера 🏃","Интересует спортивная медицина или психология 🩺","Предпочитаю интеллектуальные соревнования ♟️"] },
           { id:"q28", mission:"Языки и путешествия", q:"Как ты относишься к разным языкам и культурам?", opts:["Хочу знать 5+ языков и работать на международном уровне 🌍","Путешествия и новые культуры меня вдохновляют ✈️","Один-два языка — вполне достаточно 📖","Мне интереснее погружаться в одну культуру глубоко 🏛️"] },
-          { id:"q29", mission:"Природа и наука", q:"Что из научных направлений тебя привлекает больше?", opts:["Биология, экология, зоология — живые организмы 🌿","Физика, астрономия, космос — законы вселенной 🌌","Химия, медицина — состав и реакции веществ 🧪","Психология, социология — поведение людей 🧠"] },
+          { id:"q29", mission:"Если бы ты изобретал", q:"Если бы ты мог изобрести что-то новое с помощью AI, это было бы...", opts:["Робот, который помогает врачам лечить людей 🩺","Программа, которая создаёт музыку и картины 🎨","Приложение, которое помогает учиться легко 📚","Система, которая защищает природу и животных 🌿"] },
         ],
         complete:"Твои мечты помогают нам понять твоё предназначение! 🌟",
       },
@@ -101,7 +102,7 @@ const STORY = {
           { id:"q3", mission:"Guruhda", q:"Sinfdoshlar guruhida qanday bo'lasiz?", opts:["G'oyalar taklif qilaman va hammasini tashkil qilaman 👑","Ijodiy va qiziqarli narsalar o'ylaymanlar 🎭","Tinglaymanlar va hammasiga yordam beraman 💙","Atrofdagi tabiatni kuzataman 🌱"] },
           { id:"q16", mission:"Tabiatda", q:"Tabiat va hayvonlarga qanday munosabatdasiz?", opts:["Sport va faol dam olishni yaxshi ko'raman 🏃","Hayvonlar, o'simliklar va tabiatni kuzatishni yaxshi ko'raman 🦋","Tabiat manzaralarini chizishni yaxshi ko'raman 🎨","Uyda kompyuter oldida bo'lishni afzal ko'raman 💻"] },
           { id:"q17", mission:"Odamlar bilan", q:"Turli odamlar bilan muloqot qanday?", opts:["Tez til topaman, tanishishni yaxshi ko'raman 🗣️","Boshqarish va tashkil qilishni afzal ko'raman 👑","Ijodiy muloqot — san'at yoki musiqa orqali 🎨","Faqat yaqinlar bilan muloqot qilaman 🤔"] },
-          { id:"q18", mission:"Atrofdagi dunyo", q:"Atrofdagi dunyoda sizni eng ko'p nima hayratlantiradi?", opts:["Tabiat qanday ishlashi — hayvonlar, ekotizimlar 🌿","Texnologiyalar va mashinalar qanday ishlashi ⚙️","San'at, arxitektura va dizayn go'zalligi 🏛️","Turli xalqlar tarixi va madaniyati 🌍"] },
+          { id:"q18", mission:"Nima qilardingiz?", q:"Tasavvur qiling: do'stingiz kasal bo'lib qoldi. Birinchi navbatda nima qilardingiz?", opts:["Internetdan kasallik va yordam haqida qidirardim 🔍","Uni qanday xursand qilishni o'ylardim 🎨","Shunchaki yonida bo'lib, tinglardim 💙","Kattalarni chaqirib, yordam tashkil qilardim 👑"] },
         ], complete:"Ajoyib! Sevimli mashg'ulotlaringiz haqida bildik! 🎉" },
       { id:"ch2", zone:"Qiziqishlar", emoji:"🎯", color:"#1D9E75", bg:"linear-gradient(135deg,#E1F5EE,#FAEEDA)", intro:"Hobbi va qiziqishlaringiz haqida gapirishng!",
         questions:[
@@ -110,11 +111,11 @@ const STORY = {
           { id:"q6", mission:"O'qish va tillar", q:"O'qish va xorijiy tillarga qanday munosabatdasiz?", opts:["Turli mavzularda kitob o'qishni yaxshi ko'raman 📚","Xorijiy tillarni o'rganaman — menga oson beriladi 🌍","Faqat kerak bo'lganda o'qiyman 📖","Video va podkastlarni o'qishdan afzal ko'raman 🎧"] },
           { id:"q19", mission:"Sport", q:"Sport hayotingizda qanday o'rin egallaydi?", opts:["Sport — bu mening hammasim! Doim mashg'ul bo'laman 🏆","Jamoa o'yinlarini — futbol, basketbol o'ynayman 🏀","Sog'liq uchun shug'ullanaman, professional emas 🏃","Jismoniy emas, intellektual o'yinlarni afzal ko'raman 🧩"] },
           { id:"q20", mission:"Ideal loyiha", q:"Istalgan maktab loyihasini tanlasangiz:", opts:["Dastur yoki veb-sayt yarataman 💻","Film suratga olaman yoki art-installyatsiya yarataman 🎬","Odamlarga yordam beruvchi ijtimoiy loyiha 🤲","Ekotizimni tadqiq qilaman yoki ilmiy tajriba o'tkazaman 🔬"] },
-          { id:"q21", mission:"Tafakkur turi", q:"Murakkab masalani yechishda ko'pincha:", opts:["Noodatiy, g'ayrioddiy yechimlar qidiraman 🌈","Musiqa yoqaman — u fikrlashga yordam beradi 🎵","Qadam-baqadam tahlil qilaman, mantiqni qidiraman ⚙️","Jamoa bilan muhokama qilaman 🤝"] },
+          { id:"q21", mission:"Aqlli yordamchi", q:"Agar sizda aqlli AI-yordamchi bo'lsa, uni nima uchun ishlatardingiz?", opts:["Masalalar yechish va o'qishga yordam berish uchun 🧠","Birga hikoya va rasmlar o'ylab topish uchun 🎨","Atrofimdagi odamlarga yordam berish uchun 💙","Jamoa yoki loyihani boshqarish uchun 👑"] },
         ], complete:"Ajoyib! Qiziqishlaringiz siz haqingizda ko'p narsani aytdi! ✨" },
       { id:"ch3", zone:"Siz va odamlar", emoji:"🤝", color:"#EF9F27", bg:"linear-gradient(135deg,#FAEEDA,#E1F5EE)", intro:"Odamlar va jamiyat bilan munosabatingiz haqida gapirishng!",
         questions:[
-          { id:"q7", mission:"Qiziqishlar", q:"Sizni eng ko'p nima qiziqtiradi?", opts:["Texnologiyalar, algoritmlar va tizimlar qanday ishlashi ⚙️","Odamlar nima uchun shunday harakat qiladi — psixologiya 🧠","Go'zallik qanday yaratiladi — dizayn, rasm, musiqa 🎨","Ekotizimlar va tirik organizmlar qanday tuzilgan 🌿"] },
+          { id:"q7", mission:"Qiziqishlar", q:"Sizga nima qiziqroq?", opts:["Texnologiya va robotlar qanday ishlashi ⚙️","Odamlar nega turlicha harakat qilishi 🧠","Chiroyli narsa yaratish — rasm, musiqa 🎨","Hayvonlar, o'simliklar va tabiat 🌿"] },
           { id:"q8", mission:"Liderlik", q:"Sinfda tadbir tashkil qilish kerak bo'lsa:", opts:["Mamnuniyat bilan tashkilotchi rolini o'z zimmangizga olasiz 🌟","Bir nechta ijodiy g'oyalar taklif qilasiz 💡","Chiroyli bezatish va dekoratsiya qilasiz 🎨","Hammaga qulay va yaxshi his qilishiga g'amxo'rlik qilasiz 😊"] },
           { id:"q22", mission:"Boshqalarga yordam", q:"Qaysi vaziyatlarda o'zingizni eng foydali his qilasiz?", opts:["Murakkab mavzu yoki masalani tushuntirganda 💡","Xafa bo'lgan kishini eshitib, qo'llab-quvvatlaganda 💙","Odamlarni xursand qiladigan narsa yaratganda 🎨","Maqsadga erishish uchun jamoani tashkil qilganda 🏆"] },
           { id:"q23", mission:"Tabiat va ekologiya", q:"Tabiatni muhofaza qilishga qanday munosabatdasiz?", opts:["Bu juda muhim! Shu sohadagi kasbda ishlashni xohlayman 🌿","Tabiatda sport bilan shug'ullanaman — bu uni muhofaza qilishga undaydi 🏃","Tabiiy hodisalar va tirik mavjudotlarni o'rganish qiziq 🦋","Ekologiyani qo'llab-quvvatlayman, lekin bu mening asosiy maqsadim emas 🌍"] },
@@ -128,7 +129,7 @@ const STORY = {
           { id:"q26", mission:"Musiqa orzulari", q:"Musiqa va sahnada chiqish haqida:", opts:["Sahnada chiqishni orzu qilaman — qo'shiq yoki cholg'u 🎤","Musiqa yaratishni xohlayman — qo'shiq yoki besto yozish 🎼","Musiqani yaxshi ko'raman, lekin boshqa orzularim bor 🎵","Sahna ortida — ovoz, yorug'lik, rejissura qiziqroq 🎬"] },
           { id:"q27", mission:"Sport orzulari", q:"Sport va jismoniy faollik haqida:", opts:["Professional sportchi yoki murabbiy bo'lmoqchiman 🏆","Sport — hayot qismim, lekin kasb emas 🏃","Sport tibbiyoti yoki psixologiyasi qiziqtiradi 🩺","Intellektual musobaqalarni afzal ko'raman ♟️"] },
           { id:"q28", mission:"Tillar va sayohat", q:"Turli tillar va madaniyatlarga qanday munosabatdasiz?", opts:["5+ til bilmoqchiman va xalqaro darajada ishlashni xohlayman 🌍","Sayohat va yangi madaniyatlar meni ilhomlantiradi ✈️","Bir-ikki til yetarli 📖","Bitta madaniyatni chuqur o'rganishni afzal ko'raman 🏛️"] },
-          { id:"q29", mission:"Tabiat va fan", q:"Qaysi ilmiy yo'nalish sizni ko'proq jalb qiladi?", opts:["Biologiya, ekologiya, zoologiya — tirik organizmlar 🌿","Fizika, astronomiya, kosmos — koinot qonunlari 🌌","Kimyo, tibbiyot — moddalar tarkibi va reaksiyalari 🧪","Psixologiya, sotsiologiya — odamlar xulq-atvori 🧠"] },
+          { id:"q29", mission:"Agar ixtiro qilsangiz", q:"Agar AI yordamida yangi narsa ixtiro qila olsangiz, bu...", opts:["Shifokorlarga davolashda yordam beruvchi robot 🩺","Musiqa va rasm yaratuvchi dastur 🎨","Oson o'qishga yordam beruvchi ilova 📚","Tabiat va hayvonlarni himoya qiluvchi tizim 🌿"] },
         ], complete:"Orzularingiz maqsadingizni tushunishga yordam beradi! 🌟" },
       { id:"ch5", zone:"Siz harakatda", emoji:"⚡", color:"#5DCAA5", bg:"linear-gradient(135deg,#E1F5EE,#F1EFE8)", intro:"Oxirgi savollar! Haqiqiy vaziyatlarda qanday harakat qilishingiz haqida!",
         questions:[
@@ -158,7 +159,7 @@ const STORY = {
           { id:"q3", mission:"In a Group", q:"When you're in a group of classmates, you usually...", opts:["Suggest ideas and organise everyone 👑","Think of something creative and interesting 🎭","Listen and help everyone get along 💙","Observe the nature or weather around you 🌱"] },
           { id:"q16", mission:"Nature", q:"How do you feel about nature and animals?", opts:["I love sports and active outdoor activities 🏃","I love observing animals, plants and nature 🦋","I love drawing landscapes and nature scenes 🎨","I prefer being at home on the computer 💻"] },
           { id:"q17", mission:"With People", q:"How do you feel about meeting different people?", opts:["I easily connect with people and love meeting them 🗣️","I prefer to lead and organise 👑","I like creative connection — through art or music 🎨","I mainly talk with close friends, feel shy with others 🤔"] },
-          { id:"q18", mission:"The World Around You", q:"What amazes you most about the world?", opts:["How nature works — animals, ecosystems, biology 🌿","How machines, technology and systems work ⚙️","The beauty of art, architecture and design 🏛️","The stories and cultures of different peoples 🌍"] },
+          { id:"q18", mission:"What Would You Do?", q:"Imagine: your friend got sick. What would you do first?", opts:["Search online what the illness is and how to help 🔍","Think of ways to cheer them up 🎨","Just be there and listen 💙","Call adults and organise help 👑"] },
         ], complete:"Great! We've learned about your favourite activities! 🎉" },
       { id:"ch2", zone:"Your Hobbies", emoji:"🎯", color:"#1D9E75", bg:"linear-gradient(135deg,#E1F5EE,#FAEEDA)", intro:"Now let's talk about your hobbies and what truly captivates you!",
         questions:[
@@ -167,11 +168,11 @@ const STORY = {
           { id:"q6", mission:"Reading & Languages", q:"How do you feel about reading and foreign languages?", opts:["I love reading books on all kinds of topics 📚","I learn foreign languages — it comes easily to me 🌍","I only read when necessary 📖","I prefer videos and podcasts over reading 🎧"] },
           { id:"q19", mission:"Sport", q:"What place does sport have in your life?", opts:["Sport is everything to me! I train constantly 🏆","I play team sports — football, basketball, volleyball 🏀","I exercise for health, not at a professional level 🏃","I prefer intellectual games over physical ones 🧩"] },
           { id:"q20", mission:"Dream Project", q:"If you could do any school project, you'd choose:", opts:["Write a program or create a website 💻","Shoot a film or create an art installation 🎬","Run a social project — helping people 🤲","Research an ecosystem or conduct a science experiment 🔬"] },
-          { id:"q21", mission:"Type of Thinking", q:"When you're solving a hard problem, you usually:", opts:["Look for unusual, non-standard solutions 🌈","Put on music — it helps you think 🎵","Analyse step by step, looking for the logic ⚙️","Discuss it with others and gather opinions 🤝"] },
+          { id:"q21", mission:"Smart Helper", q:"If you had a smart AI helper, what would you use it for?", opts:["To help solve problems and study 🧠","To create stories and drawings together 🎨","To help the people around me 💙","To manage a team or project 👑"] },
         ], complete:"Wonderful! Your hobbies told us a great deal about you! ✨" },
       { id:"ch3", zone:"You & People", emoji:"🤝", color:"#EF9F27", bg:"linear-gradient(135deg,#FAEEDA,#E1F5EE)", intro:"Tell us how you interact with people and society around you!",
         questions:[
-          { id:"q7", mission:"Interests", q:"What fascinates and captivates you most?", opts:["How technology, algorithms and systems work ⚙️","Why people behave the way they do — psychology 🧠","How beauty is created — design, painting, music 🎨","How ecosystems and living organisms are structured 🌿"] },
+          { id:"q7", mission:"Interests", q:"What interests you the most?", opts:["How technology and robots work ⚙️","Why people behave differently 🧠","Creating beautiful things — art, music 🎨","Animals, plants and nature 🌿"] },
           { id:"q8", mission:"Leadership", q:"If your class needs to organise an event, you:", opts:["Happily take on the organiser role 🌟","Suggest several creative ideas 💡","Create beautiful decorations 🎨","Make sure everyone feels comfortable 😊"] },
           { id:"q22", mission:"Helping Others", q:"In which situations do you feel most useful?", opts:["When I help someone understand a complex topic 💡","When I listen to and support someone who is upset 💙","When I create something that brings people joy 🎨","When I organise a team to achieve a goal 🏆"] },
           { id:"q23", mission:"Nature & Ecology", q:"How do you feel about protecting nature?", opts:["It's very important! I'd love to work in this field 🌿","I do sport in nature — it motivates me to protect it 🏃","I find it interesting to study natural phenomena 🦋","I support ecology but it's not my main calling 🌍"] },
@@ -185,7 +186,7 @@ const STORY = {
           { id:"q26", mission:"Music Dreams", q:"When it comes to music and performing:", opts:["I dream of performing on stage — singing or playing 🎤","I want to create music — write songs or compose 🎼","I love music but dream of something else 🎵","I'm more interested in backstage — sound, lighting, directing 🎬"] },
           { id:"q27", mission:"Sport Dreams", q:"When it comes to sport and physical activity:", opts:["I want to become a professional athlete or coach 🏆","Sport is part of life but not a career 🏃","Sports medicine or psychology interests me 🩺","I prefer intellectual competitions ♟️"] },
           { id:"q28", mission:"Languages & Travel", q:"How do you feel about different languages and cultures?", opts:["I want to know 5+ languages and work internationally 🌍","Travel and new cultures inspire me ✈️","One or two languages is quite enough 📖","I prefer diving deep into one culture 🏛️"] },
-          { id:"q29", mission:"Nature & Science", q:"Which scientific field attracts you more?", opts:["Biology, ecology, zoology — living organisms 🌿","Physics, astronomy, space — laws of the universe 🌌","Chemistry, medicine — substances and reactions 🧪","Psychology, sociology — human behaviour 🧠"] },
+          { id:"q29", mission:"If You Could Invent", q:"If you could invent something new with AI, it would be...", opts:["A robot that helps doctors treat people 🩺","A program that creates music and art 🎨","An app that makes learning easy 📚","A system that protects nature and animals 🌿"] },
         ], complete:"Your dreams help us understand your purpose! 🌟" },
       { id:"ch5", zone:"You In Action", emoji:"⚡", color:"#5DCAA5", bg:"linear-gradient(135deg,#E1F5EE,#F1EFE8)", intro:"Last questions! Tell us how you act in real situations.",
         questions:[
@@ -209,7 +210,7 @@ const INTEREST_MAP = {
   "q4":[{"music":1.0},{"music":0.8},{"music":0.4},{"logic":0.3}],
   "q5":[{"creativity":1.0},{"languages":1.0},{"logic":1.0},{"music":0.9}],
   "q6":[{"languages":1.0},{"languages":1.0},{"memory":0.5},{"music":0.4}],
-  "q7":[{"logic":1.0},{"social":0.9},{"creativity":1.0},{"nature":0.9}],
+  "q7":[{"logic":1.0},{"social":1.0},{"creativity":1.0},{"nature":1.0}],
   "q8":[{"leadership":1.0},{"creativity":0.8},{"creativity":1.0},{"social":0.9}],
   "q9":[{"logic":1.0},{"creativity":1.0},{"languages":1.0},{"leadership":1.0}],
   "q10":[{"logic":1.0},{"creativity":1.0},{"social":1.0},{"leadership":0.9}],
@@ -220,10 +221,10 @@ const INTEREST_MAP = {
   "q15":[{"logic":1.0},{"creativity":1.0},{"languages":1.0},{"leadership":1.0}],
   "q16":[{"sport":1.0},{"nature":1.0},{"creativity":0.8},{"logic":0.7}],
   "q17":[{"social":1.0},{"leadership":0.9},{"creativity":0.8},{"memory":0.6}],
-  "q18":[{"nature":1.0},{"logic":0.9},{"creativity":0.8},{"languages":0.7}],
+  "q18":[{"logic":1.0},{"creativity":1.0},{"social":1.0},{"leadership":1.0}],
   "q19":[{"sport":1.0},{"sport":0.9},{"social":0.7},{"logic":0.6}],
   "q20":[{"logic":1.0},{"creativity":1.0},{"social":1.0},{"nature":0.9}],
-  "q21":[{"creativity":1.0},{"music":0.9},{"logic":0.8},{"social":0.7}],
+  "q21":[{"logic":1.0},{"creativity":1.0},{"social":1.0},{"leadership":1.0}],
   "q22":[{"social":1.0},{"social":0.9},{"creativity":0.8},{"leadership":0.9}],
   "q23":[{"nature":1.0},{"sport":0.8},{"nature":0.9},{"social":0.6}],
   "q24":[{"leadership":1.0},{"logic":0.9},{"creativity":0.9},{"sport":0.9}],
@@ -231,7 +232,7 @@ const INTEREST_MAP = {
   "q26":[{"music":1.0},{"music":0.9},{"music":0.5},{"creativity":0.8}],
   "q27":[{"sport":1.0},{"sport":0.7},{"social":0.8},{"logic":0.7}],
   "q28":[{"languages":1.0},{"languages":0.9},{"languages":0.5},{"memory":0.6}],
-  "q29":[{"nature":1.0},{"logic":0.9},{"nature":0.8},{"social":0.8}],
+  "q29":[{"logic":1.0},{"creativity":1.0},{"logic":0.9},{"nature":1.0}],
   "q30":[{"logic":0.8},{"creativity":1.0},{"music":1.0},{"leadership":1.0}],
 };
 
@@ -300,30 +301,68 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
 
   const submit = async (finalAnswers) => {
     setPhase("submitting");
+
+    // Always compute scores locally first — this is the safety net.
     const localScores = calculateScores(finalAnswers);
+    const fallbackData = {
+      scores: localScores,
+      careers: [],
+      strengths: [],
+      top_talents: Object.entries(localScores).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k),
+    };
+
+    // Build the best result we can, but NEVER fail — always show results.
+    let data = fallbackData;
+
     try {
       const token = localStorage.getItem("token");
-      let data;
+
       if (token) {
-        const res = await quizAPI.submitAnswers(finalAnswers, lang);
-        data = res.data;
-        if (!data.scores) data.scores = localScores;
+        // Logged-in: try backend, but fall back gracefully on any error
+        try {
+          const res = await quizAPI.submitAnswers(finalAnswers, lang);
+          if (res?.data?.scores) {
+            data = res.data;
+          } else if (res?.data) {
+            data = { ...fallbackData, ...res.data, scores: res.data.scores || localScores };
+          }
+        } catch {
+          // Backend failed (asleep / DB error) — use local fallback
+          data = fallbackData;
+        }
       } else {
+        // Guest: try ML service, fall back gracefully
         try {
           const res = await fetch("https://karta-talantov-ml.onrender.com/analyze", {
             method:"POST", headers:{"Content-Type":"application/json"},
             body:JSON.stringify({ answers:finalAnswers, scores:localScores, lang }),
           });
-          data = await res.json();
-          if (!data.scores) data.scores = localScores;
+          const mlData = await res.json();
+          if (mlData?.scores) {
+            data = mlData;
+          } else if (mlData) {
+            data = { ...fallbackData, ...mlData, scores: mlData.scores || localScores };
+          }
         } catch {
-          data = { scores:localScores, careers:[], strengths:[], top_talents:Object.entries(localScores).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k) };
+          data = fallbackData;
         }
       }
-      setResults(data);
-      setPage("results");
+    } catch {
+      // Absolute last resort — still show results with local scores
+      data = fallbackData;
+    }
 
-      // Save anonymous analytics — fire and forget, never blocks UX
+    // Ensure scores always exist no matter what
+    if (!data.scores || Object.keys(data.scores).length === 0) {
+      data.scores = localScores;
+    }
+
+    // ALWAYS navigate to results — this can never fail now
+    setResults(data);
+    setPage("results");
+
+    // Save analytics in the background — fire and forget, never blocks or errors
+    try {
       const sid = localStorage.getItem("session_id") || Math.random().toString(36).slice(2);
       localStorage.setItem("session_id", sid);
       fetch("https://karta-talantov-backend.onrender.com/results/anonymous", {
@@ -336,11 +375,7 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
           top_career: data.careers?.[0]?.name || "",
         }),
       }).catch(() => {});
-
-    } catch {
-      setError(lang==="ru"?"Ошибка. Попробуй ещё раз.":lang==="uz"?"Xato. Qaytadan urinib ko'ring.":"Error. Please try again.");
-      setPhase("question");
-    }
+    } catch {}
   };
 
   // ── INTRO ──────────────────────────────────────────────────────────────────
@@ -379,7 +414,9 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         </div>
         <h2 style={{ fontFamily:"'Fredoka One',cursive", fontSize:"2rem", color:dark?"#E3F2FD":chapter.color, marginBottom:16 }}>{chapter.zone}</h2>
         <p style={{ fontSize:"1rem", fontWeight:600, color:dark?"#B0BEC5":"#546E7A", maxWidth:440, lineHeight:1.7, marginBottom:32 }}>{chapter.intro}</p>
-        <button className="quiz-next ripple-btn" onMouseDown={e=>{const r=document.createElement("span");const rect=e.currentTarget.getBoundingClientRect();r.style.cssText=`position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);width:80px;height:80px;left:${e.clientX-rect.left-40}px;top:${e.clientY-rect.top-40}px;transform:scale(0);animation:rippleAnim 0.5s linear;pointer-events:none`;e.currentTarget.appendChild(r);setTimeout(()=>r.remove(),600);}} style={{ background:chapter.color, maxWidth:280 }} onClick={() => setPhase("question")}>
+        <button className="quiz-next"
+          onClick={() => setPhase("question")}
+          style={{ background:`linear-gradient(135deg,${chapter.color},${chapter.color}cc)`, boxShadow:`0 6px 20px ${chapter.color}55`, maxWidth:320 }}>
           {lang==="ru"?"Поехали! →":lang==="uz"?"Ketdik! →":"Let's go! →"}
         </button>
       </div>
@@ -438,7 +475,13 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <span style={{ fontSize:"0.8rem", fontWeight:800, color:"#9FE1CB" }}>{qInChapter+1}/{chapterQ.length}</span>
       </div>
 
-      <div className="quiz-section quiz-slide-in" style={{ textAlign:"center" }}>
+      <AnimatePresence mode="wait">
+      <motion.div key={currentQ} className="quiz-section" style={{ textAlign:"center" }}
+        initial={{ opacity:0, x:60, scale:0.97 }}
+        animate={{ opacity:1, x:0, scale:1 }}
+        exit={{ opacity:0, x:-60, scale:0.97 }}
+        transition={{ duration:0.35, ease:[0.22,1,0.36,1] }}
+      >
         {error && <div style={{ background:"#FFEBEE", border:"1.5px solid #EF5350", borderRadius:10, padding:"10px 14px", color:"#C62828", fontWeight:700, marginBottom:14 }}>❌ {error}</div>}
 
         <p className="quiz-q" style={{ fontSize:"1.2rem", lineHeight:1.5, color:dark?"#E3F2FD":"#04342C" }}>{currentQ?.q}</p>
@@ -471,7 +514,8 @@ export default function QuizPage({ setPage, setResults, lang, dark }) {
         <p style={{ textAlign:"center", fontSize:"0.75rem", color:"#9FE1CB", fontWeight:700, marginTop:12 }}>
           {lang==="ru"?`Вопрос ${totalDone+1} из ${totalQ}`:lang==="uz"?`Savol ${totalDone+1} / ${totalQ}`:`Question ${totalDone+1} of ${totalQ}`}
         </p>
-      </div>
+      </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
