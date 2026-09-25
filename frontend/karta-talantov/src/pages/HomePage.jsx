@@ -960,11 +960,11 @@ function VideoSection({ lang, dark }) {
   const [playing, setPlaying]   = useState(false);
   const ref = useRef(null);
 
-  // YouTube video IDs about career choice for kids (educational)
+  // YouTube video IDs about career choice for kids (educational, embeddable)
   const VIDEOS = {
-    ru: "kZOIVLGkljc",   // Why career choice matters
-    uz: "kZOIVLGkljc",
-    en: "kZOIVLGkljc",
+    ru: "tXxHxX7PKf8",
+    uz: "tXxHxX7PKf8",
+    en: "tXxHxX7PKf8",
   };
   const videoId = VIDEOS[lang] || VIDEOS.en;
 
@@ -1026,7 +1026,7 @@ function VideoSection({ lang, dark }) {
         {playing ? (
           <iframe
             width="100%" height="100%"
-            src={"https://www.youtube.com/watch?v=tXxHxX7PKf8"+videoId+"?autoplay=1&rel=0"}
+            src={"https://www.youtube.com/embed/"+videoId+"?autoplay=1&rel=0"}
             title="Career video"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1037,8 +1037,15 @@ function VideoSection({ lang, dark }) {
           // Thumbnail with play button
           <div
             onClick={() => setPlaying(true)}
-            style={{ width:"100%", height:"100%", cursor:"pointer", position:"relative", backgroundImage:"url(https://img.youtube.com/vi/"+videoId+"/maxresdefault.jpg)", backgroundSize:"cover", backgroundPosition:"center" }}
+            style={{ width:"100%", height:"100%", cursor:"pointer", position:"relative", background:"linear-gradient(135deg,#0F6E56,#1D9E75,#04342C)" }}
           >
+            {/* YouTube thumbnail (hidden if fails) */}
+            <img
+              src={"https://img.youtube.com/vi/"+videoId+"/hqdefault.jpg"}
+              alt=""
+              onError={(e)=>{ e.currentTarget.style.display="none"; }}
+              style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover" }}
+            />
             {/* Dark overlay */}
             <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.35)", display:"flex", alignItems:"center", justifyContent:"center" }}>
               {/* Play button */}
