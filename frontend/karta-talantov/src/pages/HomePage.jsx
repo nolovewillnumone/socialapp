@@ -1037,14 +1037,16 @@ function VideoSection({ lang, dark }) {
           // Thumbnail with play button
           <div
             onClick={() => setPlaying(true)}
-            style={{ width:"100%", height:"100%", cursor:"pointer", position:"relative", background:"linear-gradient(135deg,#0F6E56,#1D9E75,#04342C)" }}
+            style={{ width:"100%", height:"100%", cursor:"pointer", position:"relative", background:"linear-gradient(135deg,#0F6E56,#1D9E75,#04342C)", overflow:"hidden" }}
           >
-            {/* YouTube thumbnail (hidden if fails) */}
+            {/* YouTube thumbnail (only shows once fully loaded) */}
             <img
               src={"https://img.youtube.com/vi/"+videoId+"/hqdefault.jpg"}
               alt=""
-              onError={(e)=>{ e.currentTarget.style.display="none"; }}
-              style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover" }}
+              loading="lazy"
+              onLoad={(e)=>{ if(e.currentTarget.naturalWidth > 120) e.currentTarget.style.opacity="1"; }}
+              onError={(e)=>{ e.currentTarget.remove(); }}
+              style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", opacity:0, transition:"opacity 0.4s ease" }}
             />
             {/* Dark overlay */}
             <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.35)", display:"flex", alignItems:"center", justifyContent:"center" }}>
